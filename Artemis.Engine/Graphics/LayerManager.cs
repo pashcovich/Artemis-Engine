@@ -22,6 +22,11 @@ namespace Artemis.Engine.Graphics
         public List<string> RenderOrder { get; private set; }
 
         /// <summary>
+        /// Whether or not a RenderOrder has been supplied.
+        /// </summary>
+        public bool RenderOrderSet { get { return RenderOrder != null; } }
+
+        /// <summary>
         /// The list of remaining layers not included in the RenderOrder.
         /// </summary>
         private List<RenderLayer> RemainingLayers = new List<RenderLayer>();
@@ -42,7 +47,6 @@ namespace Artemis.Engine.Graphics
         public LayerManager() 
         {
             ManagedLayers = new Dictionary<string, RenderLayer>();
-            RenderOrder = new List<string>();
         }
 
         /// <summary>
@@ -147,14 +151,17 @@ namespace Artemis.Engine.Graphics
 
             foreach (var name in RenderOrder)
             {
-                if (visited.Contains(name))
+                var layer = GetLayer(name);
+                if (visited.Contains(name) && layer.TimesRendered <= 2)
                 {
-                    var layer = ManagedLayers[name];
+                    // If the TimesRendered is > 2, then the layer has already
+                    // passed through this rigmarole.
                     var multiRenderAction = layer.MultiRenderAction;
 
                     switch (multiRenderAction)
                     {
                         case MultiRenderAction.Ignore:
+                            layer.TimesQueuedForRendering++;
                             continue;
                         case MultiRenderAction.Fail:
                             throw new MultiRenderException(
@@ -163,7 +170,6 @@ namespace Artemis.Engine.Graphics
                                     )
                                 );
                         case MultiRenderAction.RenderAgain:
-                            // layer.Render();
                             break;
                         case MultiRenderAction.LogWarn:
                         case MultiRenderAction.LogCritical:
@@ -171,7 +177,11 @@ namespace Artemis.Engine.Graphics
                             break;
                     }
                 }
-                FinalLayerOrder.Add(GetLayer(name));
+
+                layer.TimesRendered++;
+                layer.TimesQueuedForRendering++;
+
+                FinalLayerOrder.Add(layer);
                 visited.Add(name);
             }
         }
@@ -208,12 +218,12 @@ namespace Artemis.Engine.Graphics
         {
             foreach (var layer in FinalLayerOrder)
             {
-                // layer.Render();
+                layer.Render();
             }
 
             foreach (var layer in RemainingLayers)
             {
-                // layer.Render();
+                layer.Render();
             }
         }
     }
