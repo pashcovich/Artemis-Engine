@@ -261,7 +261,7 @@ namespace Artemis.Engine
             }
             else
             {
-                return LoadedAssetGroups[parts[0]].GetSubgroup(parts.Skip(1).ToArray());
+                return LoadedAssetGroups[parts[0]].GetSubgroup(parts.Skip(1).ToArray(), false);
             }
         }
 

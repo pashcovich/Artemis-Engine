@@ -24,7 +24,7 @@ namespace Artemis.ApprovalTests
 
         static void Initialize()
         {
-            var image = AssetLoader.Load<Texture2D>("text-image1");
+            var image = AssetLoader.Load<Texture2D>("test-image1");
 
             AssetLoader.RegisterAssetImporter<string>(new TestAssetImporter(), ".test");
 

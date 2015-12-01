@@ -58,6 +58,16 @@
     <Compile Include="EngineSetupException.cs" />
     <Compile Include="GameProperties.cs" />
     <Compile Include="GameSetupReader.cs" />
+    <Compile Include="Graphics\Interfaces\IBasicRenderable.cs" />
+    <Compile Include="Graphics\Interfaces\INullRenderable.cs" />
+    <Compile Include="Graphics\Interfaces\IRenderable.cs" />
+    <Compile Include="Graphics\LayerManager.cs" />
+    <Compile Include="Graphics\LayerManagerException.cs" />
+    <Compile Include="Graphics\MultiRenderAction.cs" />
+    <Compile Include="Graphics\MultiRenderException.cs" />
+    <Compile Include="Graphics\RemainingLayersAction.cs" />
+    <Compile Include="Graphics\RenderComponent.cs" />
+    <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
@@ -77,6 +87,9 @@
     <Compile Include="SpriteFontAssetImporter.cs" />
     <Compile Include="Texture2DAssetImporter.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
+    <Compile Include="Utilities\Groups\UriGroup.cs" />
+    <Compile Include="Utilities\Groups\UriGroupException.cs" />
+    <Compile Include="Utilities\Groups\UriUtilities.cs" />
     <Compile Include="Utilities\Reflection.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +101,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
