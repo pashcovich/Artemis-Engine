@@ -16,19 +16,10 @@ namespace Artemis.Engine
         /// </summary>
         private Action renderer;
 
-        public Multiform()
+        public Multiform() : base()
         {
             var thisType = this.GetType();
-            var nameAttributes = Reflection.GetAttributes<NamedMultiform>(thisType);
-            if (nameAttributes.Count != 1)
-            {
-                throw new MultiformException(
-                    String.Format(
-                        "Anonymous Multiforms may only have one NamedMultiformAttribute. " + 
-                        "Multiform with type {0} has {1}.", thisType, nameAttributes.Count)
-                        );
-            }
-            Name = nameAttributes[0].Name;
+            Name = Reflection.GetFirstAttribute<NamedMultiformAttribute>(thisType).Name;
         }
 
         public Multiform(string name)

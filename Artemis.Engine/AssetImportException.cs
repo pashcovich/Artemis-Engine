@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Artemis.Engine
 {
     /// <summary>
-    /// An exception thrown when something goes wrong in the engine setup.
+    /// An exception thrown when something goes wrong when importing an asset.
     /// </summary>
     public class AssetImportException : Exception
     {

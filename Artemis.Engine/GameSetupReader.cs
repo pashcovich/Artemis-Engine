@@ -16,25 +16,26 @@ namespace Artemis.Engine
         #region Xml Constants
 
         // Xml Tags
-        private const string BASE_RESOLUTION_ELEMENT            = "BaseResolution";
-        private const string FULLSCREEN_ELEMENT                 = "Fullscreen";
-        private const string FULLSCREEN_TOGGLABLE_ELEMENT       = "FullscreenTogglable";
-        private const string MOUSE_VISIBLE_ELEMENT              = "MouseVisible";
-        private const string MOUSE_VISIBILITY_TOGGLABLE_ELEMENT = "MouseVisibilityTogglable";
-        private const string BORDERLESS_ELEMENT                 = "Borderless";
-        private const string BORDER_TOGGLABLE_ELEMENT           = "BorderTogglable";
-        private const string WINDOW_TITLE_ELEMENT               = "WindowTitle";
-        private const string VSYNC_ELEMENT                      = "VSync";
-        private const string BG_COLOUR_ELEMENT                  = "BackgroundColour";
-        private const string CONTENT_FOLDER_ELEMENT             = "ContentFolder";
+        public const string BASE_RESOLUTION_ELEMENT            = "BaseResolution";
+        public const string WINDOW_RESIZABLE_ELEMENT           = "WindowResizable";
+        public const string FULLSCREEN_ELEMENT                 = "Fullscreen";
+        public const string FULLSCREEN_TOGGLABLE_ELEMENT       = "FullscreenTogglable";
+        public const string MOUSE_VISIBLE_ELEMENT              = "MouseVisible";
+        public const string MOUSE_VISIBILITY_TOGGLABLE_ELEMENT = "MouseVisibilityTogglable";
+        public const string BORDERLESS_ELEMENT                 = "Borderless";
+        public const string BORDER_TOGGLABLE_ELEMENT           = "BorderTogglable";
+        public const string WINDOW_TITLE_ELEMENT               = "WindowTitle";
+        public const string VSYNC_ELEMENT                      = "VSync";
+        public const string BG_COLOUR_ELEMENT                  = "BackgroundColour";
+        public const string CONTENT_FOLDER_ELEMENT             = "ContentFolder";
 
         // Xml Inner Text Regexs
-        private const string RESOLUTION_REGEX = @"[0-9]+x[0-9]+$";
-        private const string COLOUR_REGEX     = @"0(x|X)[0-9a-fA-F]{6}$";
+        public const string RESOLUTION_REGEX = @"[0-9]+x[0-9]+$";
+        public const string COLOUR_REGEX     = @"0(x|X)[0-9a-fA-F]{6}$";
 
         // Xml Inner Text Identifiers (magic strings that denote special values when used
         // as the inner text in an Xml tag).
-        private const string NATIVE_RESOLUTION = "Native";
+        public const string NATIVE_RESOLUTION_ID = "Native";
 
         #endregion
 
@@ -97,6 +98,10 @@ namespace Artemis.Engine
                 case BASE_RESOLUTION_ELEMENT:
                     properties.BaseResolution = ReadResolution(
                         element, GameProperties.DEFAULT_RESOLUTION);
+                    break;
+                case WINDOW_RESIZABLE_ELEMENT:
+                    properties.WindowResizable = ReadBool(
+                        element, GameProperties.DEFAULT_WINDOW_RESIZABLE);
                     break;
                 case FULLSCREEN_ELEMENT:
                     properties.Fullscreen = ReadBool(
@@ -167,7 +172,7 @@ namespace Artemis.Engine
         {
             var text = element.InnerText;
 
-            if (text == NATIVE_RESOLUTION)
+            if (text == NATIVE_RESOLUTION_ID)
             {
                 return Resolution.Native;
             }
