@@ -46,5 +46,15 @@ namespace Artemis.Engine.Utilities.Groups
             return new String(name.TakeWhile(c => c != URI_SEPARATOR).ToArray());
         }
 
+        /// <summary>
+        /// Return everything in a URI except for the first part of the name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string AllButFirstPart(string name)
+        {
+            return new String(name.SkipWhile(c => c != URI_SEPARATOR).Skip(1).ToArray());
+        }
+
     }
 }

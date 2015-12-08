@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Artemis.Engine
 {
-    public class AssetGroup : UriGroup<AssetGroup, object>, IDisposable
+    public class AssetGroup : UriTreeGroup<AssetGroup, object>, IDisposable
     {
         internal AssetGroup( string pathName
                            , SearchOption option
@@ -121,10 +121,6 @@ namespace Artemis.Engine
                         }
                     }
                 }
-
-                // Dispose native resources.
-                Subgroups = null;
-                Items = null;
 
                 disposed = true;
             }

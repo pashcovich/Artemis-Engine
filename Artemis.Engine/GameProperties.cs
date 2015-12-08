@@ -13,6 +13,7 @@ namespace Artemis.Engine
 
         // Default bools.
 
+        internal const bool DEFAULT_WINDOW_RESIZABLE           = false;
         internal const bool DEFAULT_FULLSCREEN                 = false;
         internal const bool DEFAULT_FULLSCREEN_TOGGLABLE       = false;
         internal const bool DEFAULT_MOUSE_VISIBLE              = true;
@@ -36,6 +37,11 @@ namespace Artemis.Engine
         /// from which every renderable item gets scaled relative to when the resolution changes.
         /// </summary>
         public Resolution BaseResolution { get; internal set; }
+
+        /// <summary>
+        /// Whether or not the game's window can be resized.
+        /// </summary>
+        public bool WindowResizable { get; internal set; }
 
         /// <summary>
         /// Whether or not the game is fullscreen on startup.

@@ -11,8 +11,7 @@ namespace Artemis.Engine.Utilities.Groups
     /// URI_SEPARATOR character).
     /// </summary>
     /// <typeparam name="T">This must be the class itself, otherwise recursion won't work.</typeparam>
-    /// <typeparam name="U">The type of object stored in each group.</typeparam>
-    public class UriGroup<T, U> where T : UriGroup<T, U>
+    public class UriTreeNode<T> where T : UriTreeNode<T>
     {
 
         /// <summary>
@@ -49,31 +48,15 @@ namespace Artemis.Engine.Utilities.Groups
         }
 
         /// <summary>
-        /// Check if this group is empty (i.e. it has no items and it has no
-        /// subgroups).
-        /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return (Items.Count == 0 && IsLeaf);
-            }
-        }
-
-        /// <summary>
         /// The dictionary of subgroups of this group, mapping from unqualified 
         /// names to associated subgroups.
         /// </summary>
-        protected Dictionary<string, T> Subgroups = new Dictionary<string, T>();
+        public Dictionary<string, T> Subgroups { get; protected set; }
 
-        /// <summary>
-        /// The dictionary of all items in this group.
-        /// </summary>
-        protected Dictionary<string, U> Items = new Dictionary<string, U>();
-
-        protected UriGroup(string name)
+        protected UriTreeNode(string name)
         {
             Name = name;
+            Subgroups = new Dictionary<string, T>();
         }
 
         protected void SetParent(T parent)
@@ -108,7 +91,7 @@ namespace Artemis.Engine.Utilities.Groups
                         "Could not retrieve subgroup with unqualified name '{0}' " +
                         "from group  with full name '{1}'.", subgroupNameParts[0], FullName
                         )
-                    ); 
+                    );
             }
             if (subgroupNameParts.Length == 1)
             {
@@ -116,57 +99,6 @@ namespace Artemis.Engine.Utilities.Groups
             }
             var newParts = subgroupNameParts.Skip(1).ToArray();
             return Subgroups[subgroupNameParts[0]].GetSubgroup(newParts, failQuiet);
-        }
-
-        /// <summary>
-        /// Return the item with the given full name.
-        /// </summary>
-        /// <param name="fullName"></param>
-        /// <returns></returns>
-        public U GetItem(string fullName, bool useDefault = false)
-        {
-            return GetItem(UriUtilities.GetParts(fullName), useDefault);
-        }
-
-        internal U GetItem(string[] nameParts, bool useDefault)
-        {
-            if (nameParts.Length > 1 && !Subgroups.ContainsKey(nameParts[0]))
-            {
-                if (useDefault)
-                {
-                    return default(U);
-                }
-                throw CouldNotRetrieveItem(nameParts[0]);
-            }
-            else if (nameParts.Length == 1)
-            {
-                if (!Items.ContainsKey(nameParts[0]))
-                {
-                    if (useDefault)
-                    {
-                        return default(U);
-                    }
-                    throw CouldNotRetrieveItem(nameParts[0]);
-                }
-                return Items[nameParts[0]];
-            }
-            var newParts = nameParts.Skip(1).ToArray();
-            return Subgroups[nameParts[0]].GetItem(newParts, useDefault);
-        }
-
-        /// <summary>
-        /// Common exception thrown when an item could not be retrieved.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private UriGroupException CouldNotRetrieveItem(string name)
-        {
-            return new UriGroupException(
-                    String.Format(
-                        "Could not retrieve item with name '{0}' " +
-                        "from group with full name '{1}'", name, FullName
-                        )
-                    );
         }
 
         /// <summary>
@@ -206,6 +138,8 @@ namespace Artemis.Engine.Utilities.Groups
                 }
 
                 Subgroups.Remove(name);
+
+                return;
             }
             var newParts = nameParts.Skip(1).ToArray();
             Subgroups[nameParts[0]].RemoveSubgroup(newParts, failQuiet);
@@ -226,7 +160,7 @@ namespace Artemis.Engine.Utilities.Groups
         {
             if (nameParts.Length == 1)
             {
-                if (Subgroups.ContainsKey(nameParts[0]))
+                if (Subgroups.ContainsKey(nameParts[0]) && disallowDuplicates)
                 {
                     throw new UriGroupException(
                         String.Format(
@@ -237,9 +171,114 @@ namespace Artemis.Engine.Utilities.Groups
                 }
                 Subgroups.Add(nameParts[0], subgroup);
                 subgroup.SetParent((T)this);
+
+                return;
             }
             var newParts = nameParts.Skip(1).ToArray();
             Subgroups[nameParts[0]].AddSubgroup(newParts, subgroup, disallowDuplicates);
+        }
+
+        /// <summary>
+        /// Create and insert a subgroup with the given full name into this group.
+        /// 
+        /// Inserting a subgroup is different from simply adding a subgroup in that
+        /// if there are any "missing" subgroups between the lowest existent subgroup
+        /// and the given subgroup, they will be added as instances of the given NodeType
+        /// generic parameter.
+        /// 
+        /// For example, if we are attempting to add "a.b.c.d.e.f" to a group who's deepest
+        /// subgroup is "a.b.c", then groups "a.b.c.d", and "a.b.c.d.e" will be created as
+        /// well as "a.b.c.d.e.f".
+        /// </summary>
+        /// <typeparam name="NodeType"></typeparam>
+        /// <param name="fullName"></param>
+        /// <param name="disallowDuplicates"></param>
+        public void AddInsertSubgroup<NodeType>(string fullName, bool disallowDuplicates = true)
+            where NodeType : UriTreeNode<T>
+        {
+            AddInsertSubgroup<NodeType>(UriUtilities.GetParts(fullName), disallowDuplicates);
+        }
+
+        internal void AddInsertSubgroup<NodeType>(string[] nameParts, bool disallowDuplicates)
+            where NodeType : UriTreeNode<T>
+        {
+            var firstPart = nameParts[0];
+
+            if (Subgroups.ContainsKey(firstPart) && nameParts.Length == 1 && disallowDuplicates)
+            {
+                throw new UriGroupException(
+                        String.Format(
+                        "Could not insert subgroup, a group with full name '{0}' " +
+                        "already exists.", Subgroups[firstPart].FullName
+                        )
+                    );
+            }
+            else if (!Subgroups.ContainsKey(firstPart))
+            {
+                Subgroups.Add(firstPart,
+                    (T)Activator.CreateInstance(
+                        typeof(NodeType),
+                        firstPart
+                        )
+                    );
+
+                if (nameParts.Length > 1)
+                {
+                    var newParts = nameParts.Skip(1).ToArray();
+                    Subgroups[firstPart].AddInsertSubgroup<NodeType>(newParts, disallowDuplicates);
+                }
+            }            
+        }
+
+        /// <summary>
+        /// Insert a subgroup into the existing tree structure, creating empty subgroups
+        /// wherever they don't exist in the tree (similar to what AddInsertSubgroup does).
+        /// </summary>
+        /// <typeparam name="NodeType"></typeparam>
+        /// <param name="fullName"></param>
+        /// <param name="subgroup"></param>
+        /// <param name="disallowDuplicates"></param>
+        public void InsertSubgroup<NodeType>(string fullName, T subgroup, bool disallowDuplicates = true)
+            where NodeType : UriTreeNode<T>
+        {
+            InsertSubgroup<NodeType>(UriUtilities.GetParts(fullName), subgroup, disallowDuplicates);
+        }
+
+        internal void InsertSubgroup<NodeType>(string[] nameParts, T subgroup, bool disallowDuplicates)
+            where NodeType : UriTreeNode<T>
+        {
+            var firstPart = nameParts[0];
+
+            if (nameParts.Length == 1)
+            {
+                if (Subgroups.ContainsKey(firstPart) && disallowDuplicates)
+                {
+                    throw new UriGroupException(
+                            String.Format(
+                            "Could not insert subgroup, a group with full name '{0}' " +
+                            "already exists.", Subgroups[firstPart].FullName
+                           )
+                        );
+                }
+
+                Subgroups[firstPart] = subgroup;
+                subgroup.SetParent((T)this);
+
+                return;
+            }
+
+            if (!Subgroups.ContainsKey(firstPart))
+            {
+                Subgroups.Add(firstPart,
+                    (T)Activator.CreateInstance(
+                        typeof(NodeType),
+                        firstPart
+                        )
+                    );
+            }
+
+            var newParts = nameParts.Skip(1).ToArray();
+            Subgroups[firstPart].InsertSubgroup<NodeType>(newParts, subgroup, disallowDuplicates);
         }
     }
 }

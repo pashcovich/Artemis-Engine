@@ -12,6 +12,7 @@ namespace Artemis.Engine
         internal RenderPipeline   _RenderPipeline   { get; private set; }
         internal MultiformManager _MultiformManager { get; private set; }
         internal GameProperties   _GameProperties   { get; private set; }
+        internal DisplayManager   _DisplayManager   { get; private set; }
         internal GlobalTimer      _GameTimer        { get; private set; }
         internal GlobalUpdater    _GameUpdater      { get; private set; }
         internal MouseInput       _Mouse            { get; private set; }
@@ -42,6 +43,7 @@ namespace Artemis.Engine
         internal void InitializeRenderPipeline(SpriteBatch sb, GraphicsDevice gd, GraphicsDeviceManager gdm)
         {
             _RenderPipeline = new RenderPipeline(sb, gd, gdm);
+            _DisplayManager = new DisplayManager(gameKernel, _GameProperties, _RenderPipeline);
         }
 
         internal void Initialize()
@@ -84,10 +86,16 @@ namespace Artemis.Engine
         /// <param name="gameTime"></param>
         internal void Render()
         {
+            // Reinitialize the display first...
+            _DisplayManager.ReinitDisplayProperties();
+
+            // Then begin the render cycle...
             _RenderPipeline.BeginRenderCycle();
 
+            // Then render everything...
             _MultiformManager.Render();
 
+            // Then end the render cycle.
             _RenderPipeline.EndRenderCycle();
         }
 

@@ -1,13 +1,14 @@
 ﻿#region Using Statements
+
 using Artemis.Engine;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+
 #endregion
 
 namespace Artemis.ApprovalTests
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -46,8 +47,12 @@ namespace Artemis.ApprovalTests
         }
     }
 
+    [HasDynamicProperties("Foo")]
     public class MainMultiform1 : Multiform
     {
+        [DynamicProperty]
+        public int Foo { get; set; }
+
         public MainMultiform1() : base() { }
         public MainMultiform1(string name) : base(name) { }
 
@@ -83,5 +88,4 @@ namespace Artemis.ApprovalTests
         }
     }
 
-#endif
 }

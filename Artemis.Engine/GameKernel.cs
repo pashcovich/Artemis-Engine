@@ -27,6 +27,7 @@ namespace Artemis.Engine
             : base()
         {
             this.engine = engine;
+            this.Window.Title = engine._GameProperties.WindowTitle;
 
             graphics = new GraphicsDeviceManager(this);
 
