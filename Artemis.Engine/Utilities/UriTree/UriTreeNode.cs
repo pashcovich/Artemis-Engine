@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Artemis.Engine.Utilities.Groups
+#endregion
+
+namespace Artemis.Engine.Utilities.UriTree
 {
 
     /// <summary>
@@ -86,7 +90,7 @@ namespace Artemis.Engine.Utilities.Groups
                 {
                     return null;
                 }
-                throw new UriGroupException(
+                throw new UriTreeException(
                     String.Format(
                         "Could not retrieve subgroup with unqualified name '{0}' " +
                         "from group  with full name '{1}'.", subgroupNameParts[0], FullName
@@ -119,7 +123,7 @@ namespace Artemis.Engine.Utilities.Groups
                 {
                     return;
                 }
-                throw new UriGroupException(
+                throw new UriTreeException(
                     String.Format(
                         "Could not remove group with unqualified name '{0}' " +
                         "from group with full name '{1}'.", nameParts.Last(), FullName
@@ -162,7 +166,7 @@ namespace Artemis.Engine.Utilities.Groups
             {
                 if (Subgroups.ContainsKey(nameParts[0]) && disallowDuplicates)
                 {
-                    throw new UriGroupException(
+                    throw new UriTreeException(
                         String.Format(
                             "Could not add subgroup, a group with unqualified name '{0}' " +
                             "already exists in group with full name '{1}'.", nameParts[0], FullName
@@ -206,7 +210,7 @@ namespace Artemis.Engine.Utilities.Groups
 
             if (Subgroups.ContainsKey(firstPart) && nameParts.Length == 1 && disallowDuplicates)
             {
-                throw new UriGroupException(
+                throw new UriTreeException(
                         String.Format(
                         "Could not insert subgroup, a group with full name '{0}' " +
                         "already exists.", Subgroups[firstPart].FullName
@@ -253,7 +257,7 @@ namespace Artemis.Engine.Utilities.Groups
             {
                 if (Subgroups.ContainsKey(firstPart) && disallowDuplicates)
                 {
-                    throw new UriGroupException(
+                    throw new UriTreeException(
                             String.Format(
                             "Could not insert subgroup, a group with full name '{0}' " +
                             "already exists.", Subgroups[firstPart].FullName

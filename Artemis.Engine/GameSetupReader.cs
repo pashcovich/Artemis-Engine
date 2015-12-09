@@ -1,8 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
+
 using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
+
+#endregion
 
 namespace Artemis.Engine
 {

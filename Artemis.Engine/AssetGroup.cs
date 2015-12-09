@@ -1,8 +1,13 @@
-﻿using Artemis.Engine.Utilities;
-using Artemis.Engine.Utilities.Groups;
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities;
+using Artemis.Engine.Utilities.UriTree;
+
 using System;
 using System.IO;
 using System.Linq;
+
+#endregion
 
 namespace Artemis.Engine
 {

@@ -1,7 +1,12 @@
-﻿using System;
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities;
+
+using System;
 using System.Linq;
 using System.Reflection;
-using Artemis.Engine.Utilities;
+
+#endregion
 
 namespace Artemis.Engine
 {

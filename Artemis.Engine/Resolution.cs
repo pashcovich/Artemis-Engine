@@ -1,5 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
+
 using System.Windows.Forms;
+
+#endregion
 
 namespace Artemis.Engine
 {

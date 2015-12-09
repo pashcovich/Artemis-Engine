@@ -1,6 +1,12 @@
-﻿using Artemis.Engine.Input;
+﻿#region Using Statements
+
+using Artemis.Engine.Input;
+
 using Microsoft.Xna.Framework;
+
 using System;
+
+#endregion
 
 namespace Artemis.Engine
 {

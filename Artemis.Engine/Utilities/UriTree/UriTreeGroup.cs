@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Artemis.Engine.Utilities.Groups
+#endregion
+
+namespace Artemis.Engine.Utilities.UriTree
 {
     /// <summary>
     /// A recursive container structure where items and subgroups are
@@ -77,9 +81,9 @@ namespace Artemis.Engine.Utilities.Groups
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private UriGroupException CouldNotRetrieveItem(string name)
+        private UriTreeException CouldNotRetrieveItem(string name)
         {
-            return new UriGroupException(
+            return new UriTreeException(
                     String.Format(
                         "Could not retrieve item with name '{0}' " +
                         "from group with full name '{1}'", name, FullName
