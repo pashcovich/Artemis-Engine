@@ -1,7 +1,13 @@
-﻿using Artemis.Engine.Input;
+﻿#region Using Statements
+
+using Artemis.Engine.Input;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using System;
+
+#endregion
 
 namespace Artemis.Engine
 {
@@ -18,10 +24,22 @@ namespace Artemis.Engine
         internal MouseInput       _Mouse            { get; private set; }
         internal KeyboardInput    _Keyboard         { get; private set; }
 
+        /// <summary>
+        /// The instance of the actual Monogame Game object.
+        /// </summary>
         private GameKernel gameKernel;
 
+        /// <summary>
+        /// The action that is performed when the game first starts up. Due to the
+        /// way Monogame works, everything related to initializing the game has to
+        /// be done on the first frame of updating the game, so it's easier if the
+        /// initialization routine is supplied as an Action to be performed.
+        /// </summary>
         private Action initializer;
 
+        /// <summary>
+        /// Whether or not the initializer has been called.
+        /// </summary>
         internal bool Initialized { get; private set; }
 
         private ArtemisEngine(GameProperties properties, Action initializer) : base()
@@ -35,17 +53,26 @@ namespace Artemis.Engine
             _MultiformManager = new MultiformManager();
             _GameTimer        = new GlobalTimer();
             _GameUpdater      = new GlobalUpdater();
-
             _Mouse            = new MouseInput();
             _Keyboard         = new KeyboardInput();
         }
 
+        /// <summary>
+        /// Initialize the game's render pipeline. This has to be called in gameKernel.Initialize
+        /// because that's where the spriteBatch has to be created.
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="gd"></param>
+        /// <param name="gdm"></param>
         internal void InitializeRenderPipeline(SpriteBatch sb, GraphicsDevice gd, GraphicsDeviceManager gdm)
         {
             _RenderPipeline = new RenderPipeline(sb, gd, gdm);
             _DisplayManager = new DisplayManager(gameKernel, _GameProperties, _RenderPipeline);
         }
 
+        /// <summary>
+        /// Actually call the initializer.
+        /// </summary>
         internal void Initialize()
         {
             initializer();

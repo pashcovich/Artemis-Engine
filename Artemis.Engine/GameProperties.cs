@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace Artemis.Engine
 {
@@ -11,7 +15,7 @@ namespace Artemis.Engine
 
         #region Default Values
 
-        // Default bools.
+        // Defaults
 
         internal const bool DEFAULT_WINDOW_RESIZABLE           = false;
         internal const bool DEFAULT_FULLSCREEN                 = false;
@@ -22,12 +26,8 @@ namespace Artemis.Engine
         internal const bool DEFAULT_BORDER_TOGGLABLE           = false;
         internal const bool DEFAULT_VSYNC                      = false;
 
-        // Other defaults.
-
-        internal const string DEFAULT_CONTENT_FOLDER = "Content";
-
-        internal static readonly Color DEFAULT_BG_COLOUR = Color.Black;
-
+        internal const string DEFAULT_CONTENT_FOLDER           = "Content";
+        internal static readonly Color DEFAULT_BG_COLOUR       = Color.Black;
         internal static readonly Resolution DEFAULT_RESOLUTION = new Resolution(800, 600);
 
         #endregion

@@ -1,13 +1,23 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
+#endregion
 
 namespace Artemis.Engine.Utilities
 {
     public static class DirectoryUtils
     {
-
+        /// <summary>
+        /// Return the difference between a root directory and a child directory.
+        /// For example, MakeRelativePath("a\b\", "a\b\c\d\e") will return "c\d\e".
+        /// </summary>
+        /// <param name="rootDirectory"></param>
+        /// <param name="childDirectory"></param>
+        /// <returns></returns>
         public static String MakeRelativePath(string rootDirectory, string childDirectory)
         {
             if (String.IsNullOrEmpty(rootDirectory))

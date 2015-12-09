@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
+#endregion
 
 namespace Artemis.Engine.Utilities
 {
@@ -41,137 +45,325 @@ namespace Artemis.Engine.Utilities
             return attrs;
         }
 
+        #region GetAttributes Overloads
+
+        /// <summary>
+        /// Get the attributes of the given type from the given Assembly object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static List<Attribute> GetAttributes(Assembly obj, Type attributeType)
         {
             return _GetAttributes(Attribute.GetCustomAttributes(obj), attributeType);
         }
 
+        /// <summary>
+        /// Get the attributes of the given type from the given MemberInfo object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static List<Attribute> GetAttributes(MemberInfo obj, Type attributeType)
         {
             return _GetAttributes(Attribute.GetCustomAttributes(obj), attributeType);
         }
 
+        /// <summary>
+        /// Get the attributes of the given type from the given Module object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static List<Attribute> GetAttributes(Module obj, Type attributeType)
         {
             return _GetAttributes(Attribute.GetCustomAttributes(obj), attributeType);
         }
 
+        /// <summary>
+        /// Get the attributes of the given type from the given ParameterInfo object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static List<Attribute> GetAttributes(ParameterInfo obj, Type attributeType)
         {
             return _GetAttributes(Attribute.GetCustomAttributes(obj), attributeType);
         }
 
+        /// <summary>
+        /// Get the attributes of the same type as the given generic parameter from
+        /// the given Assembly object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static List<T> GetAttributes<T>(Assembly obj)
             where T : Attribute
         {
             return _GetAttributes<T>(Attribute.GetCustomAttributes(obj));
         }
 
+        /// <summary>
+        /// Get the attributes of the same type as the given generic parameter from
+        /// the given MemberInfo object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static List<T> GetAttributes<T>(MemberInfo obj)
             where T : Attribute
         {
             return _GetAttributes<T>(Attribute.GetCustomAttributes(obj));
         }
 
+        /// <summary>
+        /// Get the attributes of the same type as the given generic parameter from
+        /// the given Module object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static List<T> GetAttributes<T>(Module obj)
             where T : Attribute
         {
             return _GetAttributes<T>(Attribute.GetCustomAttributes(obj));
         }
 
+        /// <summary>
+        /// Get the attributes of the same type as the given generic parameter from
+        /// the given ParameterInfo object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static List<T> GetAttributes<T>(ParameterInfo obj)
             where T : Attribute
         {
             return _GetAttributes<T>(Attribute.GetCustomAttributes(obj));
         }
 
+        #endregion
+
+        #region GetFirstAttribute Overloads
+
+        /// <summary>
+        /// Get the first attribute of the given type from the given Assembly object.
+        /// This is different from Attribute.GetCustomAttribute because that will throw
+        /// an exception if multiple instances of the given attribute are applied to the
+        /// object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static Attribute GetFirstAttribute(Assembly obj, Type attributeType)
         {
             return GetAttributes(obj, attributeType).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute of the given type from the given MemberInfo object.
+        /// This is different from Attribute.GetCustomAttribute because that will throw
+        /// an exception if multiple instances of the given attribute are applied to the
+        /// object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static Attribute GetFirstAttribute(MemberInfo obj, Type attributeType)
         {
             return GetAttributes(obj, attributeType).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute of the given type from the given Module object.
+        /// This is different from Attribute.GetCustomAttribute because that will throw
+        /// an exception if multiple instances of the given attribute are applied to the
+        /// object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static Attribute GetFirstAttribute(Module obj, Type attributeType)
         {
             return GetAttributes(obj, attributeType).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute of the given type from the given ParameterInfo object.
+        /// This is different from Attribute.GetCustomAttribute because that will throw
+        /// an exception if multiple instances of the given attribute are applied to the
+        /// object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static Attribute GetFirstAttribute(ParameterInfo obj, Type attributeType)
         {
             return GetAttributes(obj, attributeType).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute with the same type as the given generic parameter
+        /// from the given Assembly object. This is different from Attribute.GetCustomAttribute 
+        /// because that will throw an exception if multiple instances of the given attribute are 
+        /// applied to the object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T GetFirstAttribute<T>(Assembly obj)
             where T : Attribute
         {
             return GetAttributes<T>(obj).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute with the same type as the given generic parameter
+        /// from the given MemberInfo object. This is different from Attribute.GetCustomAttribute 
+        /// because that will throw an exception if multiple instances of the given attribute are 
+        /// applied to the object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T GetFirstAttribute<T>(MemberInfo obj)
             where T : Attribute
         {
             return GetAttributes<T>(obj).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute with the same type as the given generic parameter
+        /// from the given Module object. This is different from Attribute.GetCustomAttribute 
+        /// because that will throw an exception if multiple instances of the given attribute are 
+        /// applied to the object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T GetFirstAttribute<T>(Module obj)
             where T : Attribute
         {
             return GetAttributes<T>(obj).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get the first attribute with the same type as the given generic parameter
+        /// from the given ParameterInfo object. This is different from Attribute.GetCustomAttribute 
+        /// because that will throw an exception if multiple instances of the given attribute are 
+        /// applied to the object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static T GetFirstAttribute<T>(ParameterInfo obj)
             where T : Attribute
         {
             return GetAttributes<T>(obj).FirstOrDefault();
         }
 
+        #endregion
+
+        #region HasAttribute Overloads
+
+        /// <summary>
+        /// Check if the given Assembly object has an attribute of the given type.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static bool HasAttribute(Assembly obj, Type attributeType)
         {
             return obj.IsDefined(attributeType, false);
         }
 
+        /// <summary>
+        /// Check if the given MemberInfo object has an attribute of the given type.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static bool HasAttribute(MemberInfo obj, Type attributeType)
         {
             return obj.IsDefined(attributeType, false);
         }
 
+        /// <summary>
+        /// Check if the given Module object has an attribute of the given type.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static bool HasAttribute(Module obj, Type attributeType)
         {
             return obj.IsDefined(attributeType, false);
         }
 
+        /// <summary>
+        /// Check if the given ParameterInfo object has an attribute of the given type.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
         public static bool HasAttribute(ParameterInfo obj, Type attributeType)
         {
             return obj.IsDefined(attributeType, false);
         }
 
+        /// <summary>
+        /// Check if the given Assembly object has an attribute of the same type as
+        /// the given generic parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static bool HasAttribute<T>(Assembly obj)
             where T : Attribute
         {
             return obj.IsDefined(typeof(T), false);
         }
 
+        /// <summary>
+        /// Check if the given MemberInfo object has an attribute of the same type as
+        /// the given generic parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static bool HasAttribute<T>(MemberInfo obj)
             where T : Attribute
         {
             return obj.IsDefined(typeof(T), false);
         }
 
+        /// <summary>
+        /// Check if the given Module object has an attribute of the same type as
+        /// the given generic parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static bool HasAttribute<T>(Module obj)
             where T : Attribute
         {
             return obj.IsDefined(typeof(T), false);
         }
 
+        /// <summary>
+        /// Check if the given ParameterInfo object has an attribute of the same type as
+        /// the given generic parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static bool HasAttribute<T>(ParameterInfo obj)
             where T : Attribute
         {
             return obj.IsDefined(typeof(T), false);
         }
+
+        #endregion
 
         /// <summary>
         /// Invoke a generic method using reflection. This is useful when you need

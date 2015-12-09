@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace Artemis.Engine
 {

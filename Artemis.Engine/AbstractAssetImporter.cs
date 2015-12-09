@@ -1,11 +1,13 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
+
+#endregion
 
 namespace Artemis.Engine
 {
     public abstract class AbstractAssetImporter
     {
-
-        internal Type AssetType { get; set; }
 
         /// <summary>
         /// Import an asset from the given full file path with extension.

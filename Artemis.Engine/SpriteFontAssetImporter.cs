@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework.Graphics;
+
+#endregion
 
 namespace Artemis.Engine
 {

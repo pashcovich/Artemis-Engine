@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+
+#endregion
 
 namespace Artemis.Engine
 {
@@ -91,7 +94,6 @@ namespace Artemis.Engine
                           , SpriteEffects effects      = SpriteEffects.None
                           , float layerDepth           = 0)
         {
-            //consider catching exceptions instead
             if (BegunRenderCycle)
             {
                 var _colour = colour.HasValue ? colour.Value : Color.White;
@@ -111,7 +113,7 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// How the user defines how they want things to be rendered
+        /// Set the current render properties to be applied to everything rendered.
         /// </summary>
         /// <param name="ssm"></param>
         /// <param name="bs"></param>
@@ -137,7 +139,8 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// How the user ends how they've been drawing things so far
+        /// Reset the current render properties to their default values. For the default
+        /// values, see the default values of SetRenderProperties' parameters.
         /// </summary>
         public void ClearRenderProperties()
         {

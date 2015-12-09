@@ -1,10 +1,15 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+#endregion
 
 namespace Artemis.Engine
 {
     /// <summary>
-    /// Because monogame's friggin stupid.
+    /// A subclass of Monogame's Game object from which the Updating and Rendering
+    /// actually stems. We need to explicitly create an instance of this in ArtemisEngine.
     /// </summary>
     internal class GameKernel : Game
     {
@@ -54,6 +59,8 @@ namespace Artemis.Engine
         sealed protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+
+            #region Angry Rant About Monogame
 
             // Alright, story time. Monogame's Game class is structured so that Initialize
             // has to get called before LoadContent, and LoadContent has to be called before Update.
@@ -108,6 +115,8 @@ namespace Artemis.Engine
             // Fuck you monogame.
             //
             // Fuck you.
+
+            #endregion
 
             if (!engine.Initialized)
             {

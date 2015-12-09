@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿#region Using Statements
 
-namespace Artemis.Engine.Utilities.Groups
+using System;
+using System.Linq;
+
+#endregion
+
+namespace Artemis.Engine.Utilities.UriTree
 {
     public static class UriUtilities
     {
 
+        /// <summary>
+        /// The character that is used to separate individual parts in a Uri.
+        /// </summary>
         public const char URI_SEPARATOR = '.';
 
         /// <summary>
-        /// Get the separate parts of a URI name.
+        /// Get the separate parts of a Uri name.
         /// 
         /// Example: GetParts("a.b.c") returns {"a", "b", "c"}
         /// </summary>
@@ -23,7 +28,7 @@ namespace Artemis.Engine.Utilities.Groups
         }
 
         /// <summary>
-        /// Get the last part of a URI name.
+        /// Get the last part of a Uri name.
         /// 
         /// Example: GetLastPart("a.b.c") returns "c"
         /// </summary>
@@ -35,7 +40,7 @@ namespace Artemis.Engine.Utilities.Groups
         }
 
         /// <summary>
-        /// Get the first part of a URI name.
+        /// Get the first part of a Uri name.
         /// 
         /// Example: GetFirstPart("a.b.c") returns "a"
         /// </summary>
@@ -47,7 +52,7 @@ namespace Artemis.Engine.Utilities.Groups
         }
 
         /// <summary>
-        /// Return everything in a URI except for the first part of the name.
+        /// Return everything in a Uri except for the first part of the name.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>

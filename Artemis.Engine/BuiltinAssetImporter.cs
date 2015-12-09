@@ -1,5 +1,10 @@
-﻿using Artemis.Engine.Utilities;
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities;
+
 using System.IO;
+
+#endregion
 
 namespace Artemis.Engine
 {

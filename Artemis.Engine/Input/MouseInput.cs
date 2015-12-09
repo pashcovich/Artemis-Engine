@@ -1,7 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+#region Using Statements
+
 using System.Linq;
+
+#endregion
 
 namespace Artemis.Engine.Input
 {

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#region Using Statements
+
+using System.Collections.Generic;
+
+#endregion
 
 namespace Artemis.Engine
 {

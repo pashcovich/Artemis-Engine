@@ -1,6 +1,11 @@
-﻿using Artemis.Engine.Utilities;
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities;
+
 using System;
 using System.Collections.Generic;
+
+#endregion
 
 namespace Artemis.Engine
 {
@@ -11,6 +16,9 @@ namespace Artemis.Engine
     public sealed class MultiformManager
     {
 
+        /// <summary>
+        /// An event that indicates to construct the multiform with the given name.
+        /// </summary>
         private class ConstructEvent : MultiformPostUpdateEvent
         {
             string name;
@@ -39,6 +47,9 @@ namespace Artemis.Engine
             }
         }
 
+        /// <summary>
+        /// An event that indicates to close the multiform with the given name.
+        /// </summary>
         private class CloseEvent : MultiformPostUpdateEvent
         {
             string name;
