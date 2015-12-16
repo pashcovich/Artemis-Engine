@@ -54,6 +54,15 @@
     <Compile Include="DynamicFieldContainer.cs" />
     <Compile Include="DynamicFieldException.cs" />
     <Compile Include="DynamicPropertyException.cs" />
+    <Compile Include="EffectableArtemisObject.cs" />
+    <Compile Include="Effectors\Effector.cs" />
+    <Compile Include="Effectors\EffectorException.cs" />
+    <Compile Include="Effectors\EffectorOperator.cs" />
+    <Compile Include="Effectors\EffectorOperatorException.cs" />
+    <Compile Include="Effectors\EffectorOperatorType.cs" />
+    <Compile Include="Effectors\EffectorValueType.cs" />
+    <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="ForceUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
     <Compile Include="GlobalUpdater.cs" />
@@ -82,11 +91,13 @@
     <Compile Include="AssetGroup.cs" />
     <Compile Include="SpriteFontAssetImporter.cs" />
     <Compile Include="Texture2DAssetImporter.cs" />
+    <Compile Include="TimeableObject.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
-    <Compile Include="Utilities\Groups\UriTreeGroup.cs" />
-    <Compile Include="Utilities\Groups\UriTreeGroupException.cs" />
-    <Compile Include="Utilities\Groups\UriTreeNode.cs" />
-    <Compile Include="Utilities\Groups\UriUtilities.cs" />
+    <Compile Include="Utilities\GenericOperators.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeException.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeNode.cs" />
+    <Compile Include="Utilities\UriTree\UriUtilities.cs" />
     <Compile Include="Utilities\Reflection.cs" />
   </ItemGroup>
   <ItemGroup>

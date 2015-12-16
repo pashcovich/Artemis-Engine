@@ -63,7 +63,7 @@ namespace Artemis.Engine
             if (pruneEmptySubgroups)
             {
                 Subgroups = Subgroups.Where(kvp => !kvp.Value.IsEmpty)
-                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
         /// <summary>
