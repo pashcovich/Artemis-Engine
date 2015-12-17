@@ -124,9 +124,9 @@ namespace Artemis.Engine
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <param name="getter"></param>
-        public void Set<T>(string name, Func<T> getter)
+        public void SetGetter<T>(string name, Func<T> getter)
         {
-            Set<T>(name, getter, null);
+            SetGetterAndSetter<T>(name, getter, null);
         }
 
         /// <summary>
@@ -135,9 +135,9 @@ namespace Artemis.Engine
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <param name="setter"></param>
-        public void Set<T>(string name, Action<T> setter)
+        public void SetSetter<T>(string name, Action<T> setter)
         {
-            Set<T>(name, null, setter);
+            SetGetterAndSetter<T>(name, null, setter);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Artemis.Engine
         /// <param name="name"></param>
         /// <param name="getter"></param>
         /// <param name="setter"></param>
-        public void Set<T>(string name, Func<T> getter, Action<T> setter)
+        public void SetGetterAndSetter<T>(string name, Func<T> getter, Action<T> setter)
         {
             if (DynamicFields.ContainsKey(name))
             {

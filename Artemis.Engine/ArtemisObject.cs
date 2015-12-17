@@ -78,6 +78,7 @@ namespace Artemis.Engine
         public bool NeedsUpdate { get; internal set; }
 
         private Action updater;
+        private bool managedByGlobalUpdater;
 
         protected ArtemisObject()
             : base()
@@ -95,7 +96,11 @@ namespace Artemis.Engine
 
             CheckForAttributeAndPerformAction(
                 thisType, typeof(ForceUpdateAttribute),
-                () => ArtemisEngine.GameUpdater.Add(this));
+                () =>
+                {
+                    ArtemisEngine.GameUpdater.Add(this);
+                    managedByGlobalUpdater = true;
+                });
         }
 
         /// <summary>
@@ -164,7 +169,7 @@ namespace Artemis.Engine
             Func<T> getter = () => (T)propGetter.Invoke(this, null);
             Action<T> setter = (obj) => propSetter.Invoke(this, new object[] { obj });
 
-            Fields.Set<T>(name, getter, setter);
+            Fields.SetGetterAndSetter<T>(name, getter, setter);
         }
 
         /// <summary>
@@ -194,6 +199,14 @@ namespace Artemis.Engine
             }
 
             NeedsUpdate = false;
+        }
+
+        protected override void Kill()
+        {
+            if (managedByGlobalUpdater)
+            {
+                ArtemisEngine.GameUpdater.Remove(this);
+            }
         }
     }
 }

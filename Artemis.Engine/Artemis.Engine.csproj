@@ -55,6 +55,7 @@
     <Compile Include="DynamicFieldException.cs" />
     <Compile Include="DynamicPropertyException.cs" />
     <Compile Include="EffectableArtemisObject.cs" />
+    <Compile Include="Effectors\BigenericEffector.cs" />
     <Compile Include="Effectors\Effector.cs" />
     <Compile Include="Effectors\EffectorException.cs" />
     <Compile Include="Effectors\EffectorOperator.cs" />
@@ -62,6 +63,11 @@
     <Compile Include="Effectors\EffectorOperatorType.cs" />
     <Compile Include="Effectors\EffectorValueType.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Effectors\Special\DoubleEffector.cs" />
+    <Compile Include="Effectors\Special\IntEffector.cs" />
+    <Compile Include="Effectors\Special\VectorEffector.cs" />
+    <Compile Include="Effectors\Special\XCoordEffector.cs" />
+    <Compile Include="Effectors\Special\YCoordEffector.cs" />
     <Compile Include="ForceUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />

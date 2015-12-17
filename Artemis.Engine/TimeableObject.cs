@@ -17,11 +17,6 @@ namespace Artemis.Engine
     {
 
         /// <summary>
-        /// Decides whether or not to update object
-        /// </summary>
-        public bool NeedsUpdate { get; internal set; }
-
-        /// <summary>
         /// The previous elapsed time in milliseconds.
         /// </summary>
         public double PrevElapsedTime { get; private set; }
@@ -41,15 +36,15 @@ namespace Artemis.Engine
             ElapsedFrames   = 0;
             ElapsedTime     = 0;
             PrevElapsedTime = 0;
+
+            ArtemisEngine.GameTimer.AddTimeableObject(this);
         }
 
-        protected void UpdateTime()
+        internal void UpdateTime()
         {
             PrevElapsedTime = ElapsedTime;
             ElapsedTime += ArtemisEngine.GameTimer.DeltaTime;
             ElapsedFrames++;
-
-            NeedsUpdate = false;
         }
 
         /// <summary>
@@ -269,8 +264,8 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// Returns true if the elapsed frame count is between the given start and
-        /// end frames, and is congruent to zero mod the given interval (with an error
+        /// Returns true if the elapsed time is between the given start and
+        /// end times, and is congruent to zero mod the given interval (with an error
         /// equal to <code>ArtemisEngine.GameTimer.DeltaTime</code>).
         /// 
         /// If ET is the elapsed time, then this function is equivalent to saying
@@ -285,14 +280,35 @@ namespace Artemis.Engine
             return DuringOrAt(start, end) && (ElapsedTime - start) % interval < ArtemisEngine.GameTimer.DeltaTime;
         }
 
+        /// <summary>
+        /// Periodically alternates between being true for the given interval of time,
+        /// and then false for the next interval of time, continuing indefinitely.
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public bool DuringIntervals(int interval, int start = 0, int end = Int32.MaxValue)
         {
             return DuringOrAt(start, end) && (ElapsedFrames - start) % (2 * interval) < interval;
         }
 
+        /// <summary>
+        /// Periodically alternates between being true for the given interval of time,
+        /// and then false for the next interval of time, continuing indefinitely.
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public bool DuringIntervals(double interval, double start = 0, double end = Double.PositiveInfinity)
         {
             return DuringOrAt(start, end) && (ElapsedTime - start) % (2 * interval) < interval;
+        }
+
+        public virtual void Kill()
+        {
+            ArtemisEngine.GameTimer.RemoveTimeableObject(this);
         }
     }
 }

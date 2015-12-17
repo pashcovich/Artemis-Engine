@@ -28,25 +28,20 @@ namespace Artemis.Engine
         public EffectableArtemisObject() : base() { }
 
         /// <summary>
-        /// Add an anonymous effector to this object.
+        /// Add an effector to this object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="effector"></param>
         public void AddEffector<T>(Effector<T> effector)
         {
-            AnonymousEffectors.Add(effector);
-            effector.InternalInitialize(this);
-        }
-
-        /// <summary>
-        /// Add a named effector to this object.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
-        /// <param name="effector"></param>
-        public void AddEffector<T>(string name, Effector<T> effector)
-        {
-            NamedEffectors.Add(name, effector);
+            if (effector.Anonymous)
+            {
+                AnonymousEffectors.Add(effector);
+            }
+            else
+            {
+                NamedEffectors.Add(effector.EffectorName, effector);
+            }
             effector.InternalInitialize(this);
         }
 

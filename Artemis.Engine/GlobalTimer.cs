@@ -2,6 +2,8 @@
 
 using Microsoft.Xna.Framework;
 
+using System.Collections.Generic;
+
 #endregion
 
 namespace Artemis.Engine
@@ -28,7 +30,21 @@ namespace Artemis.Engine
         /// </summary>
         public double DeltaTime { get; private set; }
 
+        // HashSet because it has fast insertion, fast removal, and fast iteration, which is
+        // all we need.
+        private HashSet<TimeableObject> TimeableObjects { get; private set; }
+
         internal GlobalTimer() { }
+
+        internal void AddTimeableObject(TimeableObject obj)
+        {
+            TimeableObjects.Add(obj);
+        }
+
+        internal void RemoveTimeableObject(TimeableObject obj)
+        {
+            TimeableObjects.Remove(obj);
+        }
 
         /// <summary>
         /// Updates total game time with new time
@@ -39,6 +55,11 @@ namespace Artemis.Engine
             GlobalGameTime = gameTime;
             ElapsedTime += DeltaTime;
             ElapsedFrames++;
+
+            foreach (var obj in TimeableObjects)
+            {
+                obj.UpdateTime();
+            }
         }
     }
 }
