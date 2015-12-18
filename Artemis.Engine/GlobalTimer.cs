@@ -32,7 +32,7 @@ namespace Artemis.Engine
 
         // HashSet because it has fast insertion, fast removal, and fast iteration, which is
         // all we need.
-        private HashSet<TimeableObject> TimeableObjects { get; private set; }
+        private HashSet<TimeableObject> TimeableObjects = new HashSet<TimeableObject>();
 
         internal GlobalTimer() { }
 

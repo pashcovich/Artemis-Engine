@@ -63,6 +63,7 @@
     <Compile Include="Effectors\EffectorOperatorType.cs" />
     <Compile Include="Effectors\EffectorValueType.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Effectors\PresetFunctions.cs" />
     <Compile Include="Effectors\Special\DoubleEffector.cs" />
     <Compile Include="Effectors\Special\IntEffector.cs" />
     <Compile Include="Effectors\Special\VectorEffector.cs" />
@@ -78,6 +79,10 @@
     <Compile Include="EngineSetupException.cs" />
     <Compile Include="GameProperties.cs" />
     <Compile Include="GameSetupReader.cs" />
+    <Compile Include="Graphics\IRenderable.cs" />
+    <Compile Include="Graphics\LayerManager.cs" />
+    <Compile Include="Graphics\RenderComponent.cs" />
+    <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\MouseButton.cs" />

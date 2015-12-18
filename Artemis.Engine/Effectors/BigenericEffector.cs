@@ -276,7 +276,7 @@ namespace Artemis.Engine.Effectors
             return next;
         }
 
-        internal virtual void UpdateEffector(EffectableArtemisObject obj)
+        public void UpdateEffector(EffectableArtemisObject obj)
         {
             UpdateTime();
 

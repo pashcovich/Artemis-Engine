@@ -52,7 +52,7 @@ namespace Artemis.Engine.Utilities.UriTree
 
         internal U GetItem(string[] nameParts, bool useDefault)
         {
-            if (nameParts.Length > 1 && !Subgroups.ContainsKey(nameParts[0]))
+            if (nameParts.Length > 1 && !Subnodes.ContainsKey(nameParts[0]))
             {
                 if (useDefault)
                 {
@@ -73,7 +73,7 @@ namespace Artemis.Engine.Utilities.UriTree
                 return Items[nameParts[0]];
             }
             var newParts = nameParts.Skip(1).ToArray();
-            return Subgroups[nameParts[0]].GetItem(newParts, useDefault);
+            return Subnodes[nameParts[0]].GetItem(newParts, useDefault);
         }
 
         /// <summary>

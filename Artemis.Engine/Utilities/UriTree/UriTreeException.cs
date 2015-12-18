@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Utilities.UriTree
 {
     /// <summary>
     /// An exception thrown when something goes wrong in a UriTreeGroup.

@@ -201,7 +201,7 @@ namespace Artemis.Engine
             NeedsUpdate = false;
         }
 
-        protected override void Kill()
+        public override void Kill()
         {
             if (managedByGlobalUpdater)
             {

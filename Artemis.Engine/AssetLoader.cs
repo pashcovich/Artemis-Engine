@@ -266,7 +266,7 @@ namespace Artemis.Engine
             }
             else
             {
-                return LoadedAssetGroups[parts[0]].GetSubgroup(parts.Skip(1).ToArray(), false);
+                return LoadedAssetGroups[parts[0]].GetSubnode(parts.Skip(1).ToArray(), false);
             }
         }
 
@@ -280,7 +280,7 @@ namespace Artemis.Engine
             {
                 var index = name.IndexOf(ASSET_URI_SEPARATOR);
                 LoadedAssetGroups[name.Substring(0, index)]
-                    .RemoveSubgroup(name.Substring(index + 1));                
+                    .RemoveSubnode(name.Substring(index + 1));                
             }
             else
             {
