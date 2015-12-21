@@ -81,10 +81,19 @@
     <Compile Include="GameSetupReader.cs" />
     <Compile Include="Graphics\IRenderable.cs" />
     <Compile Include="Graphics\LayerManager.cs" />
+    <Compile Include="Graphics\RenderOrderException.cs" />
+    <Compile Include="Graphics\RenderablesGroup.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\AbstractRenderOrderAction.cs" />
+    <Compile Include="Graphics\RenderLayerAction.cs" />
+    <Compile Include="Graphics\RenderOrderAction.cs" />
+    <Compile Include="Graphics\RenderPropertiesPacket.cs" />
+    <Compile Include="Graphics\RenderTopLayerAction.cs" />
+    <Compile Include="Graphics\SetRenderPropertiesAction.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
+    <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
     <Compile Include="LazyAsset.cs" />
@@ -105,9 +114,14 @@
     <Compile Include="TimeableObject.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
     <Compile Include="Utilities\GenericOperators.cs" />
+    <Compile Include="Utilities\TreeTraversalOrder.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeNode.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserver.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserverMixin.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserverNode.cs" />
     <Compile Include="Utilities\UriTree\UriUtilities.cs" />
     <Compile Include="Utilities\Reflection.cs" />
   </ItemGroup>
@@ -120,7 +134,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Graphics\Animation\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

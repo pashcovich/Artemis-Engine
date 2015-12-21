@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Graphics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -113,7 +115,9 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// Set the current render properties to be applied to everything rendered.
+        /// Set the current render properties, which are applied to everything rendered up
+        /// until ClearRenderProperties is called or SetRenderProperties is called with
+        /// different arguments.
         /// </summary>
         /// <param name="ssm"></param>
         /// <param name="bs"></param>
@@ -136,6 +140,22 @@ namespace Artemis.Engine
             }
             SpriteBatch.Begin(ssm, bs, ss, dss, rs, e, m);
             spriteBatchBegun = true;
+        }
+
+        /// <summary>
+        /// Set the current render properties to those specified in the given packet.
+        /// </summary>
+        /// <param name="packet"></param>
+        public void SetRenderProperties(RenderPropertiesPacket packet)
+        {
+            SetRenderProperties(
+                packet.SpriteSortMode,
+                packet.BlendState,
+                packet.SamplerState,
+                packet.DepthStencilState,
+                packet.RasterizerState,
+                packet.Effect,
+                packet.Matrix);
         }
 
         /// <summary>
