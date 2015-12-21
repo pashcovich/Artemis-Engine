@@ -45,7 +45,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         protected void InsertObservedNode(string name, T node, bool disallowDuplicates = true)
         {
-            observerMixin.InserObservedtNode(ObservedNodes, name, node, disallowDuplicates);
+            observerMixin.InsertObservedNode(ObservedNodes, name, node, disallowDuplicates);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        protected T GetObservedNode(string name)
+        public T GetObservedNode(string name)
         {
             return observerMixin.GetObservedNode(ObservedNodes, name);
         }

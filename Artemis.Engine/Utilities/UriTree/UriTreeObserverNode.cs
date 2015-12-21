@@ -52,7 +52,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         protected void InsertObservedNode(string name, U node, bool disallowDuplicates = true)
         {
-            observerMixin.InserObservedtNode(ObservedNodes, name, node, disallowDuplicates);
+            observerMixin.InsertObservedNode(ObservedNodes, name, node, disallowDuplicates);
         }
 
         /// <summary>

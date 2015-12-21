@@ -1,7 +1,10 @@
-﻿using System;
+﻿#region Using Statements
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
+#endregion
 
 namespace Artemis.Engine.Utilities.UriTree
 {
@@ -22,6 +25,16 @@ namespace Artemis.Engine.Utilities.UriTree
                 var firstPart = UriUtilities.GetFirstPart(name);
                 var allButFirst = UriUtilities.AllButFirstPart(name);
 
+                if (!observedNodes.ContainsKey(firstPart))
+                {
+                    throw new UriTreeException(
+                        String.Format(
+                            "Could not add node with unqualified name '{0}' to UriTreeObserver. " +
+                            "Missing intermediate node with name '{1}'. Consider using InsertObservedNode instead.",
+                            name, firstPart
+                            )
+                        );
+                }
                 observedNodes[firstPart].AddSubnode(allButFirst, node, disallowDuplicates);
             }
             else
@@ -46,8 +59,15 @@ namespace Artemis.Engine.Utilities.UriTree
             }
         }
 
-        public void InserObservedtNode(
+        public void InsertObservedNode(
             Dictionary<string, U> observedNodes, string name, U node, bool disallowDuplicates = true)
+        {
+            InsertObservedNode<U>(observedNodes, name, node, disallowDuplicates);
+        }
+
+        public void InsertObservedNode<NodeType>(
+            Dictionary<string, U> observedNodes, string name, U node, bool disallowDuplicates = true)
+            where NodeType : U
         {
             if (name.Contains(UriUtilities.URI_SEPARATOR))
             {
@@ -56,9 +76,9 @@ namespace Artemis.Engine.Utilities.UriTree
 
                 if (!observedNodes.ContainsKey(firstPart))
                 {
-                    observedNodes.Add(firstPart, (U)Activator.CreateInstance(typeof(U), firstPart));
+                    observedNodes.Add(firstPart, (U)Activator.CreateInstance(typeof(NodeType), firstPart));
                 }
-                observedNodes[firstPart].InsertSubnode<U>(allButFirst, node, disallowDuplicates);
+                observedNodes[firstPart].InsertSubnode<NodeType>(allButFirst, node, disallowDuplicates);
             }
             else
             {

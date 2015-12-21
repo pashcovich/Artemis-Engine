@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 #endregion
 
@@ -34,10 +35,27 @@ namespace Artemis.Engine.Utilities.UriTree
         /// </summary>
         public Dictionary<string, U> Items { get; protected set; }
 
+        /// <summary>
+        /// The list of all unnamed items in this group.
+        /// </summary>
+        public List<U> AnonymousItems { get; protected set; }
+
         protected UriTreeGroup(string name)
             : base(name)
         {
             Items = new Dictionary<string, U>();
+        }
+
+        /// <summary>
+        /// Return the item with the given full name. If not found, return the given
+        /// default value.
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <param name="defaultVal"></param>
+        /// <returns></returns>
+        public U GetItem(string fullName, U defaultVal, bool useDefault = true)
+        {
+            return GetItem(UriUtilities.GetParts(fullName), useDefault, defaultVal);
         }
 
         /// <summary>
@@ -47,16 +65,16 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <returns></returns>
         public U GetItem(string fullName, bool useDefault = false)
         {
-            return GetItem(UriUtilities.GetParts(fullName), useDefault);
+            return GetItem(UriUtilities.GetParts(fullName), useDefault, default(U));
         }
 
-        internal U GetItem(string[] nameParts, bool useDefault)
+        internal U GetItem(string[] nameParts, bool useDefault, U defaultVal)
         {
             if (nameParts.Length > 1 && !Subnodes.ContainsKey(nameParts[0]))
             {
                 if (useDefault)
                 {
-                    return default(U);
+                    return defaultVal;
                 }
                 throw CouldNotRetrieveItem(nameParts[0]);
             }
@@ -66,14 +84,14 @@ namespace Artemis.Engine.Utilities.UriTree
                 {
                     if (useDefault)
                     {
-                        return default(U);
+                        return defaultVal;
                     }
                     throw CouldNotRetrieveItem(nameParts[0]);
                 }
                 return Items[nameParts[0]];
             }
             var newParts = nameParts.Skip(1).ToArray();
-            return Subnodes[nameParts[0]].GetItem(newParts, useDefault);
+            return Subnodes[nameParts[0]].GetItem(newParts, useDefault, defaultVal);
         }
 
         /// <summary>
@@ -89,6 +107,80 @@ namespace Artemis.Engine.Utilities.UriTree
                         "from group with full name '{1}'", name, FullName
                         )
                     );
+        }
+
+        /// <summary>
+        /// Iterate through all the items in this group.
+        /// 
+        /// Note: This will not iterate through all items in subgroups as well.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<U> IterateItems()
+        {
+            foreach (var kvp in Items)
+            {
+                yield return kvp.Value;
+            }
+
+            foreach (var item in AnonymousItems)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate through all the named items in this group.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<U> IterateNamedItems()
+        {
+            foreach (var kvp in Items)
+            {
+                yield return kvp.Value;
+            }
+        }
+
+        /// <summary>
+        /// Iterate through all the anonymous items in this group.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<U> IterateAnonymousItems()
+        {
+            foreach (var item in AnonymousItems)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate through all the items in this group whose name matches a
+        /// given regex.
+        /// 
+        /// Note: This will not iterate through all items in subgroups as well.
+        /// </summary>
+        /// <param name="regex"></param>
+        /// <returns></returns>
+        public IEnumerator<U> IterateItems(string regex)
+        {
+            foreach (var kvp in Items)
+            {
+                if (Regex.IsMatch(kvp.Key, regex))
+                {
+                    yield return kvp.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate through the names of items.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<string> IterateItemNames()
+        {
+            foreach (var kvp in Items)
+            {
+                yield return kvp.Key;
+            }
         }
     }
 }
