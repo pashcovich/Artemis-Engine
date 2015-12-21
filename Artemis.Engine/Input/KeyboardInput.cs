@@ -5,6 +5,7 @@ using Artemis.Engine.Utilities;
 using Microsoft.Xna.Framework.Input;
 
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -94,6 +95,17 @@ namespace Artemis.Engine.Input
         }
 
         /// <summary>
+        /// Check if a combination of keys have been clicked (i.e. has been 
+        /// pressed for exactly 1 frame).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool IsClicked(KeyCombination keys)
+        {
+            return keys.Keys.All(IsClicked);
+        }
+
+        /// <summary>
         /// Check if a key has been pressed for any number of keys.
         /// </summary>
         /// <param name="key"></param>
@@ -101,6 +113,16 @@ namespace Artemis.Engine.Input
         public bool IsHeld(Keys key)
         {
             return FramesSinceKeyPressed[key] > 0;
+        }
+
+        /// <summary>
+        /// Check if a combination of keys have been pressed for any number of keys.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool IsHeld(KeyCombination keys)
+        {
+            return keys.Keys.All(IsHeld);
         }
 
         /// <summary>
@@ -115,6 +137,17 @@ namespace Artemis.Engine.Input
         }
 
         /// <summary>
+        /// Check if a combination of keys have been pressed for exactly the given number of frames.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="frames"></param>
+        /// <returns></returns>
+        public bool IsHeldFor(KeyCombination keys, int frames)
+        {
+            return keys.Keys.All(k => IsHeldFor(k, frames));
+        }
+
+        /// <summary>
         /// Check if a key has been pressed for at least the given number of frames.
         /// </summary>
         /// <param name="key"></param>
@@ -123,6 +156,17 @@ namespace Artemis.Engine.Input
         public bool IsHeldForAtleast(Keys key, int frames)
         {
             return FramesSinceKeyPressed[key] >= frames;
+        }
+
+        /// <summary>
+        /// Check if a combination of keys have been pressed for at least the given number of frames.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="frames"></param>
+        /// <returns></returns>
+        public bool IsHeldForAtleast(KeyCombination keys, int frames)
+        {
+            return keys.Keys.All(k => IsHeldForAtleast(k, frames));
         }
 
         /// <summary>
@@ -136,6 +180,16 @@ namespace Artemis.Engine.Input
         }
 
         /// <summary>
+        /// Check if a combination of keys have been released (i.e. has been unpressed for exactly 1 frame).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool IsReleased(KeyCombination keys)
+        {
+            return keys.Keys.All(IsReleased);
+        }
+
+        /// <summary>
         /// Check if a key has been unpressed for any number of frames.
         /// </summary>
         /// <param name="key"></param>
@@ -143,6 +197,16 @@ namespace Artemis.Engine.Input
         public bool IsUnheld(Keys key)
         {
             return FramesSinceKeyReleased[key] > 0;
+        }
+
+        /// <summary>
+        /// Check if a combination of keys have been unpressed for any number of frames.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool IsUnheld(KeyCombination keys)
+        {
+            return keys.Keys.All(IsUnheld);
         }
 
         /// <summary>
@@ -157,6 +221,17 @@ namespace Artemis.Engine.Input
         }
 
         /// <summary>
+        /// Check if a combination of keys have been unpressed for exactly the given number of frames.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="frames"></param>
+        /// <returns></returns>
+        public bool IsUnheldFor(KeyCombination keys, int frames)
+        {
+            return keys.Keys.All(k => IsUnheldFor(k, frames));
+        }
+
+        /// <summary>
         /// Check if a key has been unpressed for at least the given number of frames.
         /// </summary>
         /// <param name="key"></param>
@@ -165,6 +240,17 @@ namespace Artemis.Engine.Input
         public bool IsUnheldForAtleast(Keys key, int frames)
         {
             return FramesSinceKeyReleased[key] >= frames;
+        }
+
+        /// <summary>
+        /// Check if a combination of keys have been unpressed for at least the given number of frames.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="frames"></param>
+        /// <returns></returns>
+        public bool IsUnheldForAtleast(KeyCombination keys, int frames)
+        {
+            return keys.Keys.All(k => IsUnheldForAtleast(k, frames));
         }
 
         /// <summary>
