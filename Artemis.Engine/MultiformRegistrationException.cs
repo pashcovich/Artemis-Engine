@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception that occurs when something goes wrong whilst registering a multiform.
     /// </summary>
+    [Serializable]
     public class MultiformRegistrationException : Exception
     {
     	public MultiformRegistrationException() : base() { }

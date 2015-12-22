@@ -6,7 +6,7 @@ using System;
 
 namespace Artemis.Engine
 {
-    public abstract class AbstractAssetImporter
+    public interface IAssetImporter
     {
 
         /// <summary>
@@ -14,6 +14,6 @@ namespace Artemis.Engine
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public abstract object ImportFrom(string filePath);
+        object ImportFrom(string filePath);
     }
 }

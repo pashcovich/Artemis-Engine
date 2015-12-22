@@ -65,14 +65,14 @@ namespace Artemis.Engine
         /// <summary>
         /// The dictionary of asset importers associated with certain types.
         /// </summary>
-        private static Dictionary<Type, AbstractAssetImporter> RegisteredAssetImportersByType
-            = new Dictionary<Type, AbstractAssetImporter>();
+        private static Dictionary<Type, IAssetImporter> RegisteredAssetImportersByType
+            = new Dictionary<Type, IAssetImporter>();
 
         /// <summary>
         /// The dictionary of asset importers associated with certain extensions.
         /// </summary>
-        private static Dictionary<string, AbstractAssetImporter> RegisteredAssetImportersByExtension
-            = new Dictionary<string, AbstractAssetImporter>();
+        private static Dictionary<string, IAssetImporter> RegisteredAssetImportersByExtension
+            = new Dictionary<string, IAssetImporter>();
 
         /// <summary>
         /// Initialize the AssetLoader by supplying the ContentManager.
@@ -120,7 +120,7 @@ namespace Artemis.Engine
         /// <param name="assetImporter"></param>
         /// <param name="assetFileExtensions"></param>
         public static void RegisterAssetImporter<T>(
-            AbstractAssetImporter assetImporter, params string[] assetFileExtensions)
+            IAssetImporter assetImporter, params string[] assetFileExtensions)
         {
             var assetType = typeof(T);
             if (RegisteredAssetImportersByType.ContainsKey(assetType))
@@ -160,7 +160,7 @@ namespace Artemis.Engine
         /// <param name="assetImporter"></param>
         /// <param name="assetFileExtensions"></param>
         public static void RegisterAssetImporter(
-            AbstractAssetImporter assetImporter, params string[] assetFileExtensions)
+            IAssetImporter assetImporter, params string[] assetFileExtensions)
         {
             foreach (var ext in assetFileExtensions)
             {

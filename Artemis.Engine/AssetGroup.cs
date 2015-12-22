@@ -85,7 +85,7 @@ namespace Artemis.Engine
 
         ~AssetGroup()
         {
-            Dispose();
+            Dispose(false);
         }
 
         /// <summary>

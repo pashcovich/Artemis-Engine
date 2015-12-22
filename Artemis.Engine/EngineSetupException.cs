@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong in the engine setup.
     /// </summary>
+    [Serializable]
     public class EngineSetupException : Exception
     {
         public EngineSetupException() : base() { }

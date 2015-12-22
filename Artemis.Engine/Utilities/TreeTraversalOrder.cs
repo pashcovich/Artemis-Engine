@@ -27,6 +27,7 @@ namespace Artemis.Engine.Utilities
     /// <summary>
     /// An exception thrown when an algorithm is supplied an invalid TreeTraversalOrder exception.
     /// </summary>
+    [Serializable]
     public sealed class TreeTraversalOrderException : Exception
     {
         public TreeTraversalOrderException(TreeTraversalOrder order) : base(

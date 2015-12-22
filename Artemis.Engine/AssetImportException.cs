@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong when importing an asset.
     /// </summary>
+    [Serializable]
     public class AssetImportException : Exception
     {
         public AssetImportException() : base() { }

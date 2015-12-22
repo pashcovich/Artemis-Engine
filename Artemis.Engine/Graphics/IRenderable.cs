@@ -2,7 +2,7 @@
 
 namespace Artemis.Engine.Graphics
 {
-    interface IRenderable
+    public interface IRenderable
     {
         Vector2 Position { get; set; }
         RenderComponent RenderComponent { get; set; }

@@ -10,6 +10,7 @@ namespace Artemis.Engine.Utilities.UriTree
     /// <summary>
     /// An exception thrown when something goes wrong in a UriTreeGroup.
     /// </summary>
+    [Serializable]
     public class UriTreeException : Exception
     {
         public UriTreeException() : base() { }

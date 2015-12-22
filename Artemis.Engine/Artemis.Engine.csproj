@@ -47,7 +47,7 @@
     <Compile Include="AssetImportException.cs" />
     <Compile Include="AssetLoadException.cs" />
     <Compile Include="BuiltinAssetImporter.cs" />
-    <Compile Include="AbstractAssetImporter.cs" />
+    <Compile Include="IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="DynamicPropertyAttribute.cs" />

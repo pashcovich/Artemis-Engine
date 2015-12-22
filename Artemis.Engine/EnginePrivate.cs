@@ -11,7 +11,7 @@ using System;
 
 namespace Artemis.Engine
 {
-    public sealed partial class ArtemisEngine
+    public sealed partial class ArtemisEngine : IDisposable
     {
         // Private instance fields
 
@@ -152,6 +152,40 @@ namespace Artemis.Engine
                             i, multiform));
                 }
                 i++;
+            }
+        }
+
+        private bool disposed = false;
+
+        ~ArtemisEngine()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Clean up and dispose this AssetGroup object.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Clean up and dispose this AssetGroup object.
+        /// </summary>
+        /// <param name="disposing"></param>
+        private void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    gameKernel.Dispose();
+                }
+
+                disposed = true;
             }
         }
     }

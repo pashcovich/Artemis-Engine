@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong in a DynamicFieldContainer.
     /// </summary>
+    [Serializable]
     public class DynamicFieldException : Exception
     {
         public DynamicFieldException() : base() { }

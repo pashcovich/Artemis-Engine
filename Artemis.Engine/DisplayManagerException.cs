@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong in the DisplayManager.
     /// </summary>
+    [Serializable]
     public class DisplayManagerException : Exception
     {
         public DisplayManagerException() : base() { }

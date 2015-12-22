@@ -17,7 +17,7 @@ namespace Artemis.Engine.Utilities.UriTree
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="U"></typeparam>
-    public class UriTreeObserverNode<T, U> : UriTreeNode<T> where U : UriTreeNode<U>
+    public class UriTreeObserverNode<T, U> : UriTreeNode<T> where T : UriTreeNode<T> where U : UriTreeNode<U>
     {
 
         /// <summary>

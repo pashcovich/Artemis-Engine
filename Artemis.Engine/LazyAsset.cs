@@ -50,7 +50,7 @@ namespace Artemis.Engine
                     throw new AssetLoadException(
                         String.Format(
                             "LazyAsset with path '{0}' could not be loaded as " +
-                            "the given type ({0}).", AssetName, typeof(T)),
+                            "the given type ({1}).", AssetName, typeof(T)),
                         exception);
                 }
             }

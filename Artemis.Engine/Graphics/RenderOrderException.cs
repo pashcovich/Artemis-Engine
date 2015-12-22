@@ -10,6 +10,7 @@ namespace Artemis.Engine.Graphics
     /// <summary>
     /// An exception thrown when something goes wrong in when setting a render order.
     /// </summary>
+    [Serializable]
     public class RenderOrderException : Exception
     {
         public RenderOrderException() : base() { }

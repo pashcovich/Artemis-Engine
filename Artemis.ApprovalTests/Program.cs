@@ -1,7 +1,9 @@
 ﻿#region Using Statements
 
 using Artemis.Engine;
+
 using Microsoft.Xna.Framework.Graphics;
+
 using System;
 using System.IO;
 
@@ -75,9 +77,9 @@ namespace Artemis.ApprovalTests
         }
     }
 
-    public class TestAssetImporter : AbstractAssetImporter
+    public class TestAssetImporter : IAssetImporter
     {
-        public override object ImportFrom(string filePath)
+        public object ImportFrom(string filePath)
         {
             string text;
             using (var file = new StreamReader(filePath))

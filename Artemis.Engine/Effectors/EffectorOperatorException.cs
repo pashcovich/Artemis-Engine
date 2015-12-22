@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong with an EffectorOperator.
     /// </summary>
+    [Serializable]
     public class EffectorOperatorException : Exception
     {
         public EffectorOperatorException() : base() { }
