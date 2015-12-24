@@ -56,7 +56,7 @@ namespace Artemis.Engine
                     DirectoryUtils.MakeRelativePath(
                         AssetLoader.ContentFolderName, fileName));
 
-                Items.Add(assetName, AssetLoader.LoadAssetUsingExtension(fileName));
+                Items.Add(assetName, AssetLoader.LoadUsingExtension(fileName));
             }
 
             if (pruneEmptySubgroups)

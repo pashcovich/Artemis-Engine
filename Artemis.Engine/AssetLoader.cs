@@ -211,7 +211,7 @@ namespace Artemis.Engine
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static object LoadAssetUsingExtension(string name)
+        public static object LoadUsingExtension(string name)
         {
             var extension = Path.GetExtension(name).Substring(1);
             if (string.IsNullOrEmpty(extension))
