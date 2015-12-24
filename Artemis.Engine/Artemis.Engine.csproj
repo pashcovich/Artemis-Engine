@@ -97,6 +97,16 @@
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
     <Compile Include="LazyAsset.cs" />
+    <Compile Include="Math\Geometry\EllipseUtils.cs" />
+    <Compile Include="Math\Geometry\ITransformable.cs" />
+    <Compile Include="Math\Geometry\LinearUtils.cs" />
+    <Compile Include="Math\Geometry\RectUtils.cs" />
+    <Compile Include="Math\Geometry\VectorUtils.cs" />
+    <Compile Include="Math\Integrator.cs" />
+    <Compile Include="Math\NewtonsMethodException.cs" />
+    <Compile Include="Math\ODESolver.cs" />
+    <Compile Include="Math\RootSolver.cs" />
+    <Compile Include="Math\SpecialFunctions.cs" />
     <Compile Include="MultiformException.cs" />
     <Compile Include="Multiform.cs" />
     <Compile Include="MultiformManager.cs" />
