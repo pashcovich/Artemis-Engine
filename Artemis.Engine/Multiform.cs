@@ -3,6 +3,7 @@
 using Artemis.Engine.Utilities;
 
 using System;
+using System.Collections.Generic;
 
 #endregion
 
@@ -29,7 +30,14 @@ namespace Artemis.Engine
         public Multiform() : base()
         {
             var thisType = this.GetType();
-            Name = Reflection.GetFirstAttribute<NamedMultiformAttribute>(thisType).Name;
+            if (Reflection.HasAttribute<NamedMultiformAttribute>(thisType))
+            {
+                Name = Reflection.GetFirstAttribute<NamedMultiformAttribute>(thisType).Name;
+            }
+            else
+            {
+                Name = thisType.Name;
+            }
         }
 
         public Multiform(string name)
@@ -56,6 +64,5 @@ namespace Artemis.Engine
         {
             renderer();
         }
-
     }
 }

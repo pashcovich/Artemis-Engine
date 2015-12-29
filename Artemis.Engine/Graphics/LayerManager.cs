@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Graphics.LMRenderOrderActions;
 using Artemis.Engine.Utilities.UriTree;
 
 using System;
@@ -13,11 +14,11 @@ namespace Artemis.Engine.Graphics
     public class LayerManager : UriTreeObserver<RenderLayer>
     {
 
-        private List<AbstractRenderOrderAction> RenderOrder;
+        private List<AbstractLMRenderOrderAction> RenderOrder;
 
         public LayerManager()
         {
-            RenderOrder = new List<AbstractRenderOrderAction>();
+            RenderOrder = new List<AbstractLMRenderOrderAction>();
         }
 
         public void AddLayer(RenderLayer layer)
@@ -28,11 +29,11 @@ namespace Artemis.Engine.Graphics
         public void SetRenderOrder(params string[] names)
         {
             var renderOrder = from name in names 
-                              select (AbstractRenderOrderAction)new RenderLayerAction(name);
+                              select (AbstractLMRenderOrderAction)new RenderLayerLMRenderOrderAction(name);
             RenderOrder = renderOrder.ToList();
         }
 
-        public void SetRenderOrder(params AbstractRenderOrderAction[] actions)
+        public void SetRenderOrder(params AbstractLMRenderOrderAction[] actions)
         {
             RenderOrder = actions.ToList();
         }
@@ -42,21 +43,21 @@ namespace Artemis.Engine.Graphics
             RenderOrder.Clear();
 
             int index = 0;
-            AbstractRenderOrderAction currentRenderAction;
+            AbstractLMRenderOrderAction currentRenderAction;
             foreach (var obj in actions)
             {
                 var type = obj.GetType();
                 if (type == typeof(string))
                 {
-                    currentRenderAction = new RenderLayerAction((string)obj);
+                    currentRenderAction = new RenderLayerLMRenderOrderAction((string)obj);
                 }
                 else if (type == typeof(RenderPropertiesPacket))
                 {
-                    currentRenderAction = new SetRenderPropertiesAction((RenderPropertiesPacket)obj);
+                    currentRenderAction = new SetRenderPropertiesLMRenderOrderAction((RenderPropertiesPacket)obj);
                 }
                 else if (type == typeof(Action<LayerManager>))
                 {
-                    currentRenderAction = new RenderOrderAction((Action<LayerManager>)obj);
+                    currentRenderAction = new ImplementedLMRenderOrderAction((Action<LayerManager>)obj);
                 }
                 else
                 {

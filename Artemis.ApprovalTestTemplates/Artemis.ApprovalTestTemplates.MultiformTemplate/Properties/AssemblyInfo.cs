@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Artemis.ApprovalTests")]
-[assembly: AssemblyProduct("Artemis.ApprovalTests")]
+[assembly: AssemblyTitle("Artemis.ApprovalTestTemplates.MultiformTemplate")]
+[assembly: AssemblyProduct("Artemis.ApprovalTestTemplates.MultiformTemplate")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("468ac072-6579-4d87-ac71-7012ebb78168")]
+[assembly: Guid("2f2e5411-ab5d-4b9d-823a-71bf1ab0f046")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.3.0.2238")]
-[assembly: AssemblyFileVersion("3.3.0.2238")]
+[assembly: AssemblyVersion("3.4.0.456")]
+[assembly: AssemblyFileVersion("3.4.0.456")]

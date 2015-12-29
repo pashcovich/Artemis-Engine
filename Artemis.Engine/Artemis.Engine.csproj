@@ -85,28 +85,27 @@
     <Compile Include="Graphics\RenderablesGroup.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
-    <Compile Include="Graphics\AbstractRenderOrderAction.cs" />
-    <Compile Include="Graphics\RenderLayerAction.cs" />
-    <Compile Include="Graphics\RenderOrderAction.cs" />
+    <Compile Include="Graphics\LMRenderOrderActions\AbstractLMRenderOrderAction.cs" />
+    <Compile Include="Graphics\LMRenderOrderActions\RenderLayerLMRenderOrderAction.cs" />
+    <Compile Include="Graphics\LMRenderOrderActions\ImplementedLMRenderOrderAction.cs" />
     <Compile Include="Graphics\RenderPropertiesPacket.cs" />
-    <Compile Include="Graphics\RenderTopLayerAction.cs" />
-    <Compile Include="Graphics\SetRenderPropertiesAction.cs" />
+    <Compile Include="Graphics\LMRenderOrderActions\RenderTopLMRenderOrderAction.cs" />
+    <Compile Include="Graphics\LMRenderOrderActions\SetRenderPropertiesLMRenderOrderAction.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
     <Compile Include="LazyAsset.cs" />
-    <Compile Include="Math\Geometry\EllipseUtils.cs" />
-    <Compile Include="Math\Geometry\ITransformable.cs" />
-    <Compile Include="Math\Geometry\LinearUtils.cs" />
-    <Compile Include="Math\Geometry\RectUtils.cs" />
-    <Compile Include="Math\Geometry\VectorUtils.cs" />
-    <Compile Include="Math\Integrator.cs" />
-    <Compile Include="Math\NewtonsMethodException.cs" />
-    <Compile Include="Math\ODESolver.cs" />
-    <Compile Include="Math\RootSolver.cs" />
-    <Compile Include="Math\SpecialFunctions.cs" />
+    <Compile Include="Maths\Geometry\EllipseUtils.cs" />
+    <Compile Include="Maths\Geometry\LinearUtils.cs" />
+    <Compile Include="Maths\Geometry\RectUtils.cs" />
+    <Compile Include="Maths\Geometry\VectorUtils.cs" />
+    <Compile Include="Maths\Integrator.cs" />
+    <Compile Include="Maths\NewtonsMethodException.cs" />
+    <Compile Include="Maths\ODESolver.cs" />
+    <Compile Include="Maths\RootSolver.cs" />
+    <Compile Include="Maths\SpecialFunctions.cs" />
     <Compile Include="MultiformException.cs" />
     <Compile Include="Multiform.cs" />
     <Compile Include="MultiformManager.cs" />
@@ -125,6 +124,7 @@
     <Compile Include="Utilities\DirectoryUtils.cs" />
     <Compile Include="Utilities\GenericOperators.cs" />
     <Compile Include="Utilities\TreeTraversalOrder.cs" />
+    <Compile Include="Utilities\TreeTraversalOrderException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Graphics\Animation\" />
+    <Folder Include="Graphics\LRenderOrderActions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

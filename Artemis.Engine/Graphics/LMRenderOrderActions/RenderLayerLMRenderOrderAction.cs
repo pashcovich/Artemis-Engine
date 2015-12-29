@@ -1,11 +1,11 @@
 ﻿
-namespace Artemis.Engine.Graphics
+namespace Artemis.Engine.Graphics.LMRenderOrderActions
 {
-    public sealed class RenderLayerAction : AbstractRenderOrderAction
+    public sealed class RenderLayerLMRenderOrderAction : AbstractLMRenderOrderAction
     {
         private string layerName;
 
-        internal RenderLayerAction(string name)
+        internal RenderLayerLMRenderOrderAction(string name)
         {
             layerName = name;
         }

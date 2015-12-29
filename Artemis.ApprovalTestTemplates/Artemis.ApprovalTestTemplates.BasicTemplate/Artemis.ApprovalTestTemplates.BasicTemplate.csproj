@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5F1B33DF-3668-4E79-BB2D-62C255E09768}</ProjectGuid>
+    <ProjectGuid>{A084334F-2DFB-49DF-AB51-EEE961046166}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Artemis.ApprovalTests</RootNamespace>
-    <AssemblyName>Artemis.ApprovalTests</AssemblyName>
+    <RootNamespace>Artemis.ApprovalTestTemplates.BasicTemplate</RootNamespace>
+    <AssemblyName>Artemis.ApprovalTestTemplates.BasicTemplate</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <MonoGameContentBuilderExe>
@@ -42,7 +42,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -50,22 +49,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="gamesetup.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Artemis.Engine\Artemis.Engine.csproj">
+    <ProjectReference Include="..\..\Artemis.Engine\Artemis.Engine.csproj">
       <Project>{82995a65-f12c-4737-99c1-93ccc29e5456}</Project>
       <Name>Artemis.Engine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\test-group\test-asset.test">
+    <None Include="game.setup">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

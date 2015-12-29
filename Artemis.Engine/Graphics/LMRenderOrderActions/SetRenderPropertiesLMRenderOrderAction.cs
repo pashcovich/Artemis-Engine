@@ -1,11 +1,11 @@
 ﻿
-namespace Artemis.Engine.Graphics
+namespace Artemis.Engine.Graphics.LMRenderOrderActions
 {
-    public sealed class SetRenderPropertiesAction : AbstractRenderOrderAction
+    public sealed class SetRenderPropertiesLMRenderOrderAction : AbstractLMRenderOrderAction
     {
         private RenderPropertiesPacket packet;
 
-        internal SetRenderPropertiesAction(RenderPropertiesPacket packet)
+        internal SetRenderPropertiesLMRenderOrderAction(RenderPropertiesPacket packet)
         {
             this.packet = packet;
         }

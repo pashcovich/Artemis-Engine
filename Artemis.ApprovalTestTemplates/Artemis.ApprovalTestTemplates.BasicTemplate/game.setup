@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<GameSetup>
+  <!-- The default resolution of the screen. -->
+  <BaseResolution>800x600</BaseResolution>
+
+  <!-- Whether or not the window can be resized by dragging. -->
+  <WindowResizable>False</WindowResizable>
+
+  <!-- Whether or not the display is fullscreen. -->
+  <Fullscreen>False</Fullscreen>
+
+  <!-- Whether or not fullscreen display can be toggled during gameplay. -->
+  <FullscreenTogglable>False</FullscreenTogglable>
+
+  <!-- Whether or not the mouse cursor is visible within the screen boundaries. -->
+  <MouseVisible>True</MouseVisible>
+  
+  <!-- Whether or not the mouse cursor visibility can be toggled during gameplay. -->
+  <MouseVisibilityTogglable>False</MouseVisibilityTogglable>
+  
+  <!-- Whether or not the display has a border. -->
+  <Borderless>False</Borderless>
+  
+  <!-- Whether or not the border can be toggled during gameplay-->
+  <BorderTogglable>False</BorderTogglable>
+  
+  <!-- The name of the display window. -->
+  <WindowTitle>Basic Template</WindowTitle>
+  
+  <!-- Whether or not vertical synchronization is used. -->
+  <VSync>True</VSync>
+  
+  <!-- The default background colour of the display. -->
+  <BackgroundColour>Black</BackgroundColour>
+  <!-- Note: This value can be any colour in the Colors object (e.g. CornflowerBlue). -->
+
+  <!-- The name of the content folder. -->
+  <ContentFolder>Content</ContentFolder>
+</GameSetup>

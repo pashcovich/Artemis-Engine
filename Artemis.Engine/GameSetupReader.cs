@@ -3,6 +3,7 @@
 using Microsoft.Xna.Framework;
 
 using System;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -63,7 +64,22 @@ namespace Artemis.Engine
             var properties = new GameProperties();
 
             var setupFile = new XmlDocument();
-            setupFile.Load(SetupFileName);
+            try
+            {
+                setupFile.Load(SetupFileName);
+            }
+            catch (IOException)
+            {
+                throw new IOException(
+                    String.Format(
+                        "The setup file with name '{0}' could not be loaded. The most common causes for this error are " +
+                        "either the path was misspelled, or the 'Copy to Output Directory' property of your setup file " +
+                        "is not set to 'Copy if newer'. To change this in VS, right click on your setup file in the solution " +
+                        "explorer, select properties, and change the 'Copy to Output Directory' property to 'Copy if newer'.",
+                        SetupFileName
+                        )
+                    );
+            }
 
             XmlElement root;
             try
