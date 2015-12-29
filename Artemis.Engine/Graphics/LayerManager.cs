@@ -14,11 +14,34 @@ namespace Artemis.Engine.Graphics
     public class LayerManager : UriTreeObserver<RenderLayer>
     {
 
-        private List<AbstractLMRenderOrderAction> RenderOrder;
+        static class DefaultRenderOrderActions
+        {
+            public static Action<LayerManager> Render(string name)
+            {
+                return lm => lm.GetObservedNode(name).Render();
+            }
+
+            public static Action<LayerManager> RenderTop(string name)
+            {
+                return lm => lm.GetObservedNode(name).RenderTop();
+            }
+
+            public static Action<LayerManager> SetRenderProperties(RenderPropertiesPacket packet)
+            {
+                return lm => ArtemisEngine.RenderPipeline.SetRenderProperties(packet);
+            }
+
+            public static Action<LayerManager> ClearRenderProperties()
+            {
+                return lm => ArtemisEngine.RenderPipeline.ClearRenderProperties();
+            }
+        }
+
+        private List<Action<LayerManager>> RenderOrderActions;
 
         public LayerManager()
         {
-            RenderOrder = new List<AbstractLMRenderOrderAction>();
+            RenderOrderActions = new List<Action<LayerManager>>();
         }
 
         public void AddLayer(RenderLayer layer)
@@ -29,35 +52,36 @@ namespace Artemis.Engine.Graphics
         public void SetRenderOrder(params string[] names)
         {
             var renderOrder = from name in names 
-                              select (AbstractLMRenderOrderAction)new RenderLayerLMRenderOrderAction(name);
-            RenderOrder = renderOrder.ToList();
+                              select DefaultRenderOrderActions.Render(name);
+            RenderOrderActions = renderOrder.ToList();
         }
 
-        public void SetRenderOrder(params AbstractLMRenderOrderAction[] actions)
+        public void SetRenderOrder(params Action<LayerManager>[] actions)
         {
-            RenderOrder = actions.ToList();
+            RenderOrderActions = actions.ToList();
         }
 
         public void SetRenderOrder(params object[] actions)
         {
-            RenderOrder.Clear();
+            RenderOrderActions.Clear();
 
             int index = 0;
-            AbstractLMRenderOrderAction currentRenderAction;
+            Action<LayerManager> currentRenderAction;
             foreach (var obj in actions)
             {
                 var type = obj.GetType();
                 if (type == typeof(string))
                 {
-                    currentRenderAction = new RenderLayerLMRenderOrderAction((string)obj);
+                    currentRenderAction = DefaultRenderOrderActions.Render((string)obj);
                 }
                 else if (type == typeof(RenderPropertiesPacket))
                 {
-                    currentRenderAction = new SetRenderPropertiesLMRenderOrderAction((RenderPropertiesPacket)obj);
+                    currentRenderAction = DefaultRenderOrderActions.SetRenderProperties(
+                        (RenderPropertiesPacket)obj);
                 }
                 else if (type == typeof(Action<LayerManager>))
                 {
-                    currentRenderAction = new ImplementedLMRenderOrderAction((Action<LayerManager>)obj);
+                    currentRenderAction = (Action<LayerManager>)obj;
                 }
                 else
                 {
@@ -69,16 +93,16 @@ namespace Artemis.Engine.Graphics
                             )
                         );
                 }
-                RenderOrder.Add(currentRenderAction);
+                RenderOrderActions.Add(currentRenderAction);
                 index++;
             }
         }
 
         internal void Render()
         {
-            foreach (var action in RenderOrder)
+            foreach (var action in RenderOrderActions)
             {
-                action.Perform(this);
+                action(this);
             }
         }
     }
