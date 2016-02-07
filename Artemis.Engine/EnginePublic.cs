@@ -43,6 +43,11 @@ namespace Artemis.Engine
         public static GameProperties GameProperties { get { return Instance._GameProperties; } }
 
         /// <summary>
+        /// The display manager which handles all properties of the display.
+        /// </summary>
+        public static DisplayManager DisplayManager { get { return Instance._DisplayManager; } }
+
+        /// <summary>
         /// The global game timer which records total elapsed game time, frames passed, 
         /// and elapsed time since the last update.
         /// </summary>

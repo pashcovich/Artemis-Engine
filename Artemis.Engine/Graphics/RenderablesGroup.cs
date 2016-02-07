@@ -11,41 +11,16 @@ namespace Artemis.Engine.Graphics
     {
         public RenderablesGroup(string name) : base(name) { }
 
-        public void Render()
+        public void Render(AbstractLayer layer)
         {
-            Render(TreeTraversalOrder.Pre);
-        }
-
-        public void Render(TreeTraversalOrder order)
-        {
-            switch (order)
+            foreach (var subnode in Subnodes.Values)
             {
-                case TreeTraversalOrder.Pre:
-                    RenderSubgroups(order);
-                    RenderItems(order);
-                    break;
-                case TreeTraversalOrder.Post:
-                    RenderItems(order);
-                    RenderSubgroups(order);
-                    break;
-                default:
-                    throw new TreeTraversalOrderException(order);
+                subnode.Render(layer);
             }
-        }
 
-        private void RenderSubgroups(TreeTraversalOrder order)
-        {
-            foreach (var subgroup in Subnodes)
+            foreach (var item in Items.Values)
             {
-                subgroup.Value.Render(order);
-            }
-        }
-
-        private void RenderItems(TreeTraversalOrder order)
-        {
-            foreach (var item in Items)
-            {
-                // item.Render();   
+                layer.RenderIRenderable(item);
             }
         }
     }

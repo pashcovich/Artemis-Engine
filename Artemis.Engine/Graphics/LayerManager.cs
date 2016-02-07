@@ -1,6 +1,5 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Graphics.LMRenderOrderActions;
 using Artemis.Engine.Utilities.UriTree;
 
 using System;
@@ -11,98 +10,54 @@ using System.Linq;
 
 namespace Artemis.Engine.Graphics
 {
-    public class LayerManager : UriTreeObserver<RenderLayer>
+    public class LayerManager : UriTreeObserver<AbstractLayer>
     {
-
-        static class DefaultRenderOrderActions
-        {
-            public static Action<LayerManager> Render(string name)
-            {
-                return lm => lm.GetObservedNode(name).Render();
-            }
-
-            public static Action<LayerManager> RenderTop(string name)
-            {
-                return lm => lm.GetObservedNode(name).RenderTop();
-            }
-
-            public static Action<LayerManager> SetRenderProperties(RenderPropertiesPacket packet)
-            {
-                return lm => ArtemisEngine.RenderPipeline.SetRenderProperties(packet);
-            }
-
-            public static Action<LayerManager> ClearRenderProperties()
-            {
-                return lm => ArtemisEngine.RenderPipeline.ClearRenderProperties();
-            }
-        }
-
-        private List<Action<LayerManager>> RenderOrderActions;
+        /// <summary>
+        /// The list of names of layers to render.
+        /// </summary>
+        private List<string> RenderOrder;
 
         public LayerManager()
         {
-            RenderOrderActions = new List<Action<LayerManager>>();
+            RenderOrder = new List<string>();
         }
 
-        public void AddLayer(RenderLayer layer)
+        /// <summary>
+        /// Add a layer.
+        /// </summary>
+        /// <param name="layer"></param>
+        public void AddLayer(AbstractLayer layer)
         {
+            // This will automatically set the layer's parent to the proper
+            // parent in the UriTree.
             AddObservedNode(layer.tempFullName, layer);
         }
 
+        /// <summary>
+        /// Set the order in which to render the layers.
+        /// </summary>
+        /// <param name="names"></param>
         public void SetRenderOrder(params string[] names)
         {
-            var renderOrder = from name in names 
-                              select DefaultRenderOrderActions.Render(name);
-            RenderOrderActions = renderOrder.ToList();
-        }
-
-        public void SetRenderOrder(params Action<LayerManager>[] actions)
-        {
-            RenderOrderActions = actions.ToList();
-        }
-
-        public void SetRenderOrder(params object[] actions)
-        {
-            RenderOrderActions.Clear();
-
-            int index = 0;
-            Action<LayerManager> currentRenderAction;
-            foreach (var obj in actions)
-            {
-                var type = obj.GetType();
-                if (type == typeof(string))
-                {
-                    currentRenderAction = DefaultRenderOrderActions.Render((string)obj);
-                }
-                else if (type == typeof(RenderPropertiesPacket))
-                {
-                    currentRenderAction = DefaultRenderOrderActions.SetRenderProperties(
-                        (RenderPropertiesPacket)obj);
-                }
-                else if (type == typeof(Action<LayerManager>))
-                {
-                    currentRenderAction = (Action<LayerManager>)obj;
-                }
-                else
-                {
-                    throw new RenderOrderException(
-                        String.Format(
-                            "Don't know what to do with render order action object of type '{0}' at index '{1}'. " +
-                            "The supplied objects must be either a 'string', a 'RenderPropertiesPacket', or an " +
-                            "'Action<LayerManager>'.", type, index
-                            )
-                        );
-                }
-                RenderOrderActions.Add(currentRenderAction);
-                index++;
-            }
+            RenderOrder = names.ToList();
         }
 
         internal void Render()
         {
-            foreach (var action in RenderOrderActions)
+            // For now, remaining layers are just ignored.
+
+            foreach (var name in RenderOrder)
             {
-                action(this);
+                var layer = GetObservedNode(name);
+                if (layer.PreRender != null)
+                {
+                    layer.PreRender();
+                }
+                layer.Render();
+                if (layer.PostRender != null)
+                {
+                    layer.PostRender();
+                }
             }
         }
     }

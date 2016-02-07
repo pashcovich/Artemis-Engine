@@ -25,12 +25,21 @@ namespace Artemis.Engine
         internal const bool DEFAULT_BORDERLESS                 = false;
         internal const bool DEFAULT_BORDER_TOGGLABLE           = false;
         internal const bool DEFAULT_VSYNC                      = false;
+        internal const bool DEFAULT_FIXED_TIME_STEP            = true;
+        internal const bool DEFAULT_STATIC_RESOLUTION          = false;
+        internal const bool DEFAULT_STATIC_ASPECT_RATIO        = false;
+        internal const bool DEFAULT_ONLY_LANDSCAPE_RESOLUTIONS = false;
+        internal const bool DEFAULT_ONLY_PORTRAIT_RESOLUTIONS  = false;
 
+        internal const int DEFAULT_FRAMERATE                   = 60;
         internal const string DEFAULT_CONTENT_FOLDER           = "Content";
         internal static readonly Color DEFAULT_BG_COLOUR       = Color.Black;
         internal static readonly Resolution DEFAULT_RESOLUTION = new Resolution(800, 600);
 
         #endregion
+
+        // All the following have internal setters so that the user can't reset them
+        // at will, but if necessary *within* the assembly a class can change them.
 
         /// <summary>
         /// The game's base resolution. The base resolution acts as a "default" resolution,
@@ -39,7 +48,12 @@ namespace Artemis.Engine
         public Resolution BaseResolution { get; internal set; }
 
         /// <summary>
-        /// Whether or not the game's window can be resized.
+        /// Whether or not the game's window is resizable (via dragging by the user).
+        /// 
+        /// NOTE: If this is false this will not completely disallow changing the resolution,
+        /// it will just disallow the user from clicking and dragging to change the resolution.
+        /// If you want to completely disallow all resolution changes, then set StaticResolution
+        /// to true.
         /// </summary>
         public bool WindowResizable { get; internal set; }
 
@@ -93,6 +107,40 @@ namespace Artemis.Engine
         /// </summary>
         public string ContentFolder { get; internal set; }
 
+        /// <summary>
+        /// Whether or not the game updates with a fixed time step. If this is
+        /// false the game will update as fast as possible (i.e. no framerate limit).
+        /// </summary>
+        public bool FixedTimeStep { get; internal set; }
+
+        /// <summary>
+        /// The frame rate of the game (the FPS).
+        /// </summary>
+        public int FrameRate { get; internal set; }
+
+        /// <summary>
+        /// Whether or not the resolution can be changed.
+        /// </summary>
+        public bool StaticResolution { get; internal set; }
+
+        /// <summary>
+        /// If true, this will prevent the resolution from being changed to a different
+        /// aspect ratio (width/height) than the base resolution.
+        /// </summary>
+        public bool StaticAspectRatio { get; internal set; }
+
+        /// <summary>
+        /// If true, this will prevent the resolution from being changed to a resolution
+        /// that isn't landscape (width >= height).
+        /// </summary>
+        public bool OnlyLandscapeResolutions { get; internal set; }
+
+        /// <summary>
+        /// If true, this will prevent the resolution from being changed to a resolution
+        /// that isn't portrait (width <= height).
+        /// </summary>
+        public bool OnlyPortraitResolutions { get; internal set; }
+
         // Internal because we don't want any little kiddies creating their own instances
         // of GameProperties and messing things up.
         internal GameProperties()
@@ -108,6 +156,8 @@ namespace Artemis.Engine
             VSync                    = DEFAULT_VSYNC;
             BackgroundColour         = DEFAULT_BG_COLOUR;
             ContentFolder            = DEFAULT_CONTENT_FOLDER;
+            FixedTimeStep            = DEFAULT_FIXED_TIME_STEP;
+            FrameRate                = DEFAULT_FRAMERATE;
         }
 
     }

@@ -47,6 +47,10 @@
     <Compile Include="AssetImportException.cs" />
     <Compile Include="AssetLoadException.cs" />
     <Compile Include="BuiltinAssetImporter.cs" />
+    <Compile Include="GameSetupException.cs" />
+    <Compile Include="Graphics\AbstractLayer.cs" />
+    <Compile Include="Graphics\Layers\ResolutionRelativeLayer.cs" />
+    <Compile Include="Graphics\ResolutionScaleType.cs" />
     <Compile Include="IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
@@ -85,12 +89,7 @@
     <Compile Include="Graphics\RenderablesGroup.cs" />
     <Compile Include="Graphics\RenderComponent.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
-    <Compile Include="Graphics\LMRenderOrderActions\AbstractLMRenderOrderAction.cs" />
-    <Compile Include="Graphics\LMRenderOrderActions\RenderLayerLMRenderOrderAction.cs" />
-    <Compile Include="Graphics\LMRenderOrderActions\ImplementedLMRenderOrderAction.cs" />
     <Compile Include="Graphics\RenderPropertiesPacket.cs" />
-    <Compile Include="Graphics\LMRenderOrderActions\RenderTopLMRenderOrderAction.cs" />
-    <Compile Include="Graphics\LMRenderOrderActions\SetRenderPropertiesLMRenderOrderAction.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\KeyCombination.cs" />
@@ -123,8 +122,6 @@
     <Compile Include="TimeableObject.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
     <Compile Include="Utilities\GenericOperators.cs" />
-    <Compile Include="Utilities\TreeTraversalOrder.cs" />
-    <Compile Include="Utilities\TreeTraversalOrderException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
@@ -146,7 +143,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Graphics\Animation\" />
-    <Folder Include="Graphics\LRenderOrderActions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

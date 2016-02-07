@@ -3,6 +3,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using System;
+
 #endregion
 
 namespace Artemis.Engine
@@ -32,11 +34,28 @@ namespace Artemis.Engine
             : base()
         {
             this.engine = engine;
-            this.Window.Title = engine._GameProperties.WindowTitle;
+            var props = engine._GameProperties;
+
+            Window.Title = props.WindowTitle;
+
+            IsFixedTimeStep = props.FixedTimeStep;
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / (double)props.FrameRate);
+
+            if (props.WindowResizable && !props.StaticResolution)
+            {
+                Window.ClientSizeChanged += new EventHandler<EventArgs>(
+                (sender, e) =>
+                {
+                    engine._DisplayManager.SetResolution(new Resolution(
+                        Window.ClientBounds.Width,
+                        Window.ClientBounds.Height));
+                });
+            }
+            Window.AllowUserResizing = props.WindowResizable;
 
             graphics = new GraphicsDeviceManager(this);
 
-            Content.RootDirectory = engine._GameProperties.ContentFolder;
+            Content.RootDirectory = props.ContentFolder;
             AssetLoader.Initialize(Content);
         }
 
