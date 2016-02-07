@@ -3,6 +3,7 @@
 using Microsoft.Xna.Framework;
 
 using System;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -33,6 +34,12 @@ namespace Artemis.Engine
         public const string VSYNC_ELEMENT                      = "VSync";
         public const string BG_COLOUR_ELEMENT                  = "BackgroundColour";
         public const string CONTENT_FOLDER_ELEMENT             = "ContentFolder";
+        public const string FIXED_TIME_STEP_ELEMENT            = "FixedTimeStep";
+        public const string FRAMERATE_ELEMENT                  = "FrameRate";
+        public const string STATIC_ASPECT_RATIO_ELEMENT        = "StaticAspectRatio";
+        public const string STATIC_RESOLUTION_ELEMENT          = "StaticResolution";
+        public const string ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT = "OnlyLandscapeResolutions";
+        public const string ONLY_PORTRAIT_RESOLUTIONS_ELEMENT  = "OnlyPortraitResolutions";
 
         // Xml Inner Text Regexs
         public const string RESOLUTION_REGEX = @"[0-9]+x[0-9]+$";
@@ -63,7 +70,22 @@ namespace Artemis.Engine
             var properties = new GameProperties();
 
             var setupFile = new XmlDocument();
-            setupFile.Load(SetupFileName);
+            try
+            {
+                setupFile.Load(SetupFileName);
+            }
+            catch (IOException)
+            {
+                throw new IOException(
+                    String.Format(
+                        "The setup file with name '{0}' could not be loaded. The most common causes for this error are " +
+                        "either the path was misspelled, or the 'Copy to Output Directory' property of your setup file " +
+                        "is not set to 'Copy if newer'. To change this in VS, right click on your setup file in the solution " +
+                        "explorer, select properties, and change the 'Copy to Output Directory' property to 'Copy if newer'.",
+                        SetupFileName
+                        )
+                    );
+            }
 
             XmlElement root;
             try
@@ -146,6 +168,30 @@ namespace Artemis.Engine
                 case WINDOW_TITLE_ELEMENT:
                     properties.WindowTitle = element.InnerText;
                     break;
+                case FIXED_TIME_STEP_ELEMENT:
+                    properties.FixedTimeStep = ReadBool(
+                        element, GameProperties.DEFAULT_FIXED_TIME_STEP);
+                    break;
+                case FRAMERATE_ELEMENT:
+                    properties.FrameRate = ReadInt(
+                        element, GameProperties.DEFAULT_FRAMERATE);
+                    break;
+                case STATIC_RESOLUTION_ELEMENT:
+                    properties.StaticResolution = ReadBool(
+                        element, GameProperties.DEFAULT_STATIC_RESOLUTION);
+                    break;
+                case STATIC_ASPECT_RATIO_ELEMENT:
+                    properties.StaticAspectRatio = ReadBool(
+                        element, GameProperties.DEFAULT_STATIC_ASPECT_RATIO);
+                    break;
+                case ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT:
+                    properties.OnlyLandscapeResolutions = ReadBool(
+                        element, GameProperties.DEFAULT_ONLY_LANDSCAPE_RESOLUTIONS);
+                    break;
+                case ONLY_PORTRAIT_RESOLUTIONS_ELEMENT:
+                    properties.OnlyPortraitResolutions = ReadBool(
+                        element, GameProperties.DEFAULT_ONLY_PORTRAIT_RESOLUTIONS);
+                    break;
                 default:
                     break;
             }
@@ -165,6 +211,21 @@ namespace Artemis.Engine
             catch (FormatException)
             {
                 // Log that we couldn't get the value.
+                return defaultValue;
+            }
+            return val;
+        }
+
+        private int ReadInt(XmlElement element, int defaultValue)
+        {
+            var text = element.InnerText;
+            int val;
+            try
+            {
+                val = Convert.ToInt32(text);
+            }
+            catch (FormatException)
+            {
                 return defaultValue;
             }
             return val;
@@ -232,6 +293,53 @@ namespace Artemis.Engine
             var b = 0xff & val;
 
             return new Color(r, g, b);
+        }
+
+        /// <summary>
+        /// Ensure that none of the properties are self-conflicting.
+        /// </summary>
+        /// <param name="properties"></param>
+        public void CheckForContradictions(GameProperties properties)
+        {
+            if (properties.WindowResizable && properties.StaticResolution)
+            {
+                throw new GameSetupException(
+                    string.Format(
+                        "The game properties '{0}' and '{1}' cannot both be true.",
+                        WINDOW_RESIZABLE_ELEMENT, STATIC_RESOLUTION_ELEMENT
+                        )
+                    );
+            }
+
+            if (properties.OnlyLandscapeResolutions && properties.OnlyPortraitResolutions)
+            {
+                throw new GameSetupException(
+                    string.Format(
+                        "The game properties '{0}' and '{1}' cannot both be true.",
+                        ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT, ONLY_PORTRAIT_RESOLUTIONS_ELEMENT
+                        )
+                    );
+            }
+
+            if (properties.OnlyLandscapeResolutions && !properties.BaseResolution.IsLandscape)
+            {
+                throw new GameSetupException(
+                    string.Format(
+                        "Since '{0}' is true, the base resolution ({1}) cannot be portrait (width < height).",
+                        ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT, properties.BaseResolution
+                        )
+                    );
+            }
+
+            if (properties.OnlyPortraitResolutions && !properties.BaseResolution.IsPortrait)
+            {
+                throw new GameSetupException(
+                    string.Format(
+                        "Since '{0}' is true, the base resolution ({1}) cannot be landscape (width > height).",
+                        ONLY_PORTRAIT_RESOLUTIONS_ELEMENT, properties.BaseResolution
+                        )
+                    );
+            }
         }
 
     }

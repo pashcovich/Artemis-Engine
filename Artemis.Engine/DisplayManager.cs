@@ -166,6 +166,40 @@ namespace Artemis.Engine
             dirty = true;
         }
 
+        public void SetResolution(Resolution resolution)
+        {
+            if (properties.StaticResolution)
+            {
+                throw new DisplayManagerException(
+                    String.Format(
+                        "Cannot change resolution. (Game Property '{0}' set to true)",
+                        GameSetupReader.STATIC_RESOLUTION_ELEMENT
+                        )
+                    );   
+            }
+            if (properties.OnlyLandscapeResolutions && !resolution.IsLandscape)
+            {
+                throw new DisplayManagerException(
+                    String.Format(
+                        "Cannot change resolution to '{0}'; resolutions must be landscape. " + 
+                        "(GameProperty '{1}' set to true)", resolution, GameSetupReader.ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT
+                        )
+                    );
+            }
+            else if (properties.OnlyPortraitResolutions && !resolution.IsPortrait)
+            {
+                throw new DisplayManagerException(
+                    String.Format(
+                        "Cannot change resolution to '{0}'; resolutions must be portrait. " +
+                        "(GameProperty '{1}' set to true)", resolution, GameSetupReader.ONLY_PORTRAIT_RESOLUTIONS_ELEMENT
+                        )
+                    );
+            }
+
+            WindowResolution = resolution;
+            dirty = true;
+        }
+
         /// <summary>
         /// Set whether or not vertical synchronization is used.
         /// </summary>

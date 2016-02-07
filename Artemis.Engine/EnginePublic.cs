@@ -43,6 +43,11 @@ namespace Artemis.Engine
         public static GameProperties GameProperties { get { return Instance._GameProperties; } }
 
         /// <summary>
+        /// The display manager which handles all properties of the display.
+        /// </summary>
+        public static DisplayManager DisplayManager { get { return Instance._DisplayManager; } }
+
+        /// <summary>
         /// The global game timer which records total elapsed game time, frames passed, 
         /// and elapsed time since the last update.
         /// </summary>
@@ -90,24 +95,24 @@ namespace Artemis.Engine
         {
             var properties = new GameProperties();
 
-            properties.BaseResolution = baseResolution.HasValue ?
-                baseResolution.Value : GameProperties.DEFAULT_RESOLUTION;
+            properties.BaseResolution = baseResolution.HasValue ? baseResolution.Value 
+                                                                : GameProperties.DEFAULT_RESOLUTION;
 
-            properties.BackgroundColour = bgColour.HasValue ?
-                bgColour.Value : GameProperties.DEFAULT_BG_COLOUR;
+            properties.BackgroundColour = bgColour.HasValue ? bgColour.Value 
+                                                            : GameProperties.DEFAULT_BG_COLOUR;
 
             if (windowTitle != null)
             {
                 properties.WindowTitle = windowTitle;
             }
 
-            properties.Fullscreen = fullscreen;
-            properties.FullscreenTogglable = fullscreenTogglable;
-            properties.MouseVisible = mouseVisible;
+            properties.Fullscreen               = fullscreen;
+            properties.FullscreenTogglable      = fullscreenTogglable;
+            properties.MouseVisible             = mouseVisible;
             properties.MouseVisibilityTogglable = mouseVisibilityTogglable;
-            properties.Borderless = borderless;
-            properties.BorderTogglable = borderTogglable;
-            properties.VSync = vsync;
+            properties.Borderless               = borderless;
+            properties.BorderTogglable          = borderTogglable;
+            properties.VSync                    = vsync;
 
             Setup(properties, initializer);
         }

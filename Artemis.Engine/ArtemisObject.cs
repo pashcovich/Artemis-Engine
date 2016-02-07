@@ -15,7 +15,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An ArtemisObject is the most generic form of "game object" found in the ArtemisEngine.
     /// </summary>
-    public class ArtemisObject
+    public class ArtemisObject : TimeableObject
     {
 
         // The following dictionary maps from an Attribute Type object to a dictionary of known
@@ -78,8 +78,10 @@ namespace Artemis.Engine
         public bool NeedsUpdate { get; internal set; }
 
         private Action updater;
+        private bool managedByGlobalUpdater;
 
         protected ArtemisObject()
+            : base()
         {
             Fields = new DynamicFieldContainer();
 
@@ -94,7 +96,11 @@ namespace Artemis.Engine
 
             CheckForAttributeAndPerformAction(
                 thisType, typeof(ForceUpdateAttribute),
-                () => ArtemisEngine.GameUpdater.Add(this));
+                () =>
+                {
+                    ArtemisEngine.GameUpdater.Add(this);
+                    managedByGlobalUpdater = true;
+                });
         }
 
         /// <summary>
@@ -163,7 +169,7 @@ namespace Artemis.Engine
             Func<T> getter = () => (T)propGetter.Invoke(this, null);
             Action<T> setter = (obj) => propSetter.Invoke(this, new object[] { obj });
 
-            Fields.Set<T>(name, getter, setter);
+            Fields.SetGetterAndSetter<T>(name, getter, setter);
         }
 
         /// <summary>
@@ -174,17 +180,33 @@ namespace Artemis.Engine
             this.updater = updater;
         }
 
+        // NOTE: It may seem counterintuitive that the Update method is internal
+        // virtual instead of protected virtual or public virtual. This is because
+        // the ACTUAL way the user updates ArtemisObjects is by supplying an Updater
+        // function with SetUpdater. So they really have no reason to override this
+        // themselves and mess up things they don't know about.
+
         /// <summary>
         /// Updates the ArtemisObject by calling its updater
         /// </summary>
-        public void Update()
+        internal virtual void Update()
         {
+            UpdateTime();
+
             if (updater != null)
             {
                 updater();
             }
 
             NeedsUpdate = false;
+        }
+
+        public override void Kill()
+        {
+            if (managedByGlobalUpdater)
+            {
+                ArtemisEngine.GameUpdater.Remove(this);
+            }
         }
     }
 }

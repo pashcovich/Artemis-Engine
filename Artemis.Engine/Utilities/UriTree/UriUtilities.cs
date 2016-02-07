@@ -61,5 +61,15 @@ namespace Artemis.Engine.Utilities.UriTree
             return new String(name.SkipWhile(c => c != URI_SEPARATOR).Skip(1).ToArray());
         }
 
+        /// <summary>
+        /// Return everything in a Uri except for the last part of the name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string AllButLastPart(string name)
+        {
+            return name.Substring(0, name.LastIndexOf(URI_SEPARATOR));
+        }
+
     }
 }

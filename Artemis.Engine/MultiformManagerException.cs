@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception that occurs when something goes wrong in the MultiformManager.
     /// </summary>
+    [Serializable]
     public class MultiformManagerException : Exception
     {
         public MultiformManagerException() : base() { }

@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Graphics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -88,7 +90,7 @@ namespace Artemis.Engine
                           , Vector2 position
                           , Rectangle? sourceRectangle = null
                           , Color? colour              = null
-                          , float rotation             = 0
+                          , double rotation            = 0
                           , Vector2? origin            = null
                           , Vector2? scale             = null
                           , SpriteEffects effects      = SpriteEffects.None
@@ -101,7 +103,7 @@ namespace Artemis.Engine
                 var _scale  = scale.HasValue  ? scale.Value  : Vector2.One;
 
                 SpriteBatch.Draw(
-                    texture, position, sourceRectangle, _colour, rotation,
+                    texture, position, sourceRectangle, _colour, (float)rotation,
                     _origin, _scale, effects, layerDepth
                     );
             }
@@ -113,7 +115,9 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// Set the current render properties to be applied to everything rendered.
+        /// Set the current render properties, which are applied to everything rendered up
+        /// until ClearRenderProperties is called or SetRenderProperties is called with
+        /// different arguments.
         /// </summary>
         /// <param name="ssm"></param>
         /// <param name="bs"></param>
@@ -139,6 +143,22 @@ namespace Artemis.Engine
         }
 
         /// <summary>
+        /// Set the current render properties to those specified in the given packet.
+        /// </summary>
+        /// <param name="packet"></param>
+        public void SetRenderProperties(RenderPropertiesPacket packet)
+        {
+            SetRenderProperties(
+                packet.SpriteSortMode,
+                packet.BlendState,
+                packet.SamplerState,
+                packet.DepthStencilState,
+                packet.RasterizerState,
+                packet.Effect,
+                packet.Matrix);
+        }
+
+        /// <summary>
         /// Reset the current render properties to their default values. For the default
         /// values, see the default values of SetRenderProperties' parameters.
         /// </summary>
@@ -149,6 +169,44 @@ namespace Artemis.Engine
                 SpriteBatch.End();
             }
             SpriteBatch.Begin();
+        }
+
+        /// <summary>
+        /// Set the render target to the given target.
+        /// </summary>
+        /// <param name="target"></param>
+        public void SetRenderTarget(RenderTarget2D target)
+        {
+            GraphicsDevice.SetRenderTarget(target);
+        }
+
+        /// <summary>
+        /// Clear the current render target.
+        /// </summary>
+        public void ClearRenderTarget()
+        {
+            GraphicsDevice.SetRenderTarget(null);
+        }
+
+        /// <summary>
+        /// Create a basic RenderTarget object with dimensions equal to the current
+        /// resolution and fill colour equal to the given colour (or transparent if
+        /// null).
+        /// </summary>
+        /// <param name="fill"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateRenderTarget(Color? fill = null)
+        {
+            Color _fill = fill.HasValue ? fill.Value : Color.Transparent;
+
+            var res = ArtemisEngine.DisplayManager.WindowResolution;
+            var target = new RenderTarget2D(GraphicsDevice, res.Width, res.Height);
+
+            GraphicsDevice.SetRenderTarget(target);
+            GraphicsDevice.Clear(_fill);
+            GraphicsDevice.SetRenderTarget(null);
+
+            return target;
         }
     }
 }

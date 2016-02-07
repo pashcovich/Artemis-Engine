@@ -48,5 +48,10 @@ namespace Artemis.Engine
         /// </summary>
         public static Resolution Native = new Resolution(Screen.PrimaryScreen.Bounds.Width,
                                                          Screen.PrimaryScreen.Bounds.Height);
+
+        public override string ToString()
+        {
+            return Width.ToString() + "x" + Height.ToString();
+        }
     }
 }

@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-#region Using Statements
+﻿#region Using Statements
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
+using System.Collections.Generic;
 using System.Linq;
 
 #endregion

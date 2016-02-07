@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong in the RenderPipeline.
     /// </summary>
+    [Serializable]
     public class RenderPipelineException : Exception
     {
         public RenderPipelineException() { }

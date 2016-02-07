@@ -47,13 +47,33 @@
     <Compile Include="AssetImportException.cs" />
     <Compile Include="AssetLoadException.cs" />
     <Compile Include="BuiltinAssetImporter.cs" />
-    <Compile Include="AbstractAssetImporter.cs" />
+    <Compile Include="GameSetupException.cs" />
+    <Compile Include="Graphics\AbstractLayer.cs" />
+    <Compile Include="Graphics\Layers\ResolutionRelativeLayer.cs" />
+    <Compile Include="Graphics\ResolutionScaleType.cs" />
+    <Compile Include="IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="DynamicPropertyAttribute.cs" />
     <Compile Include="DynamicFieldContainer.cs" />
     <Compile Include="DynamicFieldException.cs" />
     <Compile Include="DynamicPropertyException.cs" />
+    <Compile Include="EffectableArtemisObject.cs" />
+    <Compile Include="Effectors\BigenericEffector.cs" />
+    <Compile Include="Effectors\Effector.cs" />
+    <Compile Include="Effectors\EffectorException.cs" />
+    <Compile Include="Effectors\EffectorOperator.cs" />
+    <Compile Include="Effectors\EffectorOperatorException.cs" />
+    <Compile Include="Effectors\EffectorOperatorType.cs" />
+    <Compile Include="Effectors\EffectorValueType.cs" />
+    <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Effectors\PresetFunctions.cs" />
+    <Compile Include="Effectors\Special\DoubleEffector.cs" />
+    <Compile Include="Effectors\Special\IntEffector.cs" />
+    <Compile Include="Effectors\Special\VectorEffector.cs" />
+    <Compile Include="Effectors\Special\XCoordEffector.cs" />
+    <Compile Include="Effectors\Special\YCoordEffector.cs" />
+    <Compile Include="ForceUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
     <Compile Include="GlobalUpdater.cs" />
@@ -63,11 +83,28 @@
     <Compile Include="EngineSetupException.cs" />
     <Compile Include="GameProperties.cs" />
     <Compile Include="GameSetupReader.cs" />
+    <Compile Include="Graphics\IRenderable.cs" />
+    <Compile Include="Graphics\LayerManager.cs" />
+    <Compile Include="Graphics\RenderOrderException.cs" />
+    <Compile Include="Graphics\RenderablesGroup.cs" />
+    <Compile Include="Graphics\RenderComponent.cs" />
+    <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\RenderPropertiesPacket.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
+    <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
     <Compile Include="LazyAsset.cs" />
+    <Compile Include="Maths\Geometry\EllipseUtils.cs" />
+    <Compile Include="Maths\Geometry\LinearUtils.cs" />
+    <Compile Include="Maths\Geometry\RectUtils.cs" />
+    <Compile Include="Maths\Geometry\VectorUtils.cs" />
+    <Compile Include="Maths\Integrator.cs" />
+    <Compile Include="Maths\NewtonsMethodException.cs" />
+    <Compile Include="Maths\ODESolver.cs" />
+    <Compile Include="Maths\RootSolver.cs" />
+    <Compile Include="Maths\SpecialFunctions.cs" />
     <Compile Include="MultiformException.cs" />
     <Compile Include="Multiform.cs" />
     <Compile Include="MultiformManager.cs" />
@@ -82,11 +119,17 @@
     <Compile Include="AssetGroup.cs" />
     <Compile Include="SpriteFontAssetImporter.cs" />
     <Compile Include="Texture2DAssetImporter.cs" />
+    <Compile Include="TimeableObject.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
-    <Compile Include="Utilities\Groups\UriTreeGroup.cs" />
-    <Compile Include="Utilities\Groups\UriTreeGroupException.cs" />
-    <Compile Include="Utilities\Groups\UriTreeNode.cs" />
-    <Compile Include="Utilities\Groups\UriUtilities.cs" />
+    <Compile Include="Utilities\GenericOperators.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeException.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeNode.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserver.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserverMixin.cs" />
+    <Compile Include="Utilities\UriTree\UriTreeObserverNode.cs" />
+    <Compile Include="Utilities\UriTree\UriUtilities.cs" />
     <Compile Include="Utilities\Reflection.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -98,7 +141,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Graphics\Animation\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

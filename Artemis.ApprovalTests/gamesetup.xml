@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<GameSetup>
-  <BaseResolution>1200x600</BaseResolution>
-  <WindowTitle>Test1</WindowTitle>
-  <ContentFolder>Content</ContentFolder>
-</GameSetup>

@@ -11,6 +11,11 @@ using System.Linq;
 
 namespace Artemis.Engine
 {
+
+    /// <summary>
+    /// A recursive AssetGroup which maintains a dictionary of loaded (or lazy) assets
+    /// and a dictionary of sub-AssetGroups.
+    /// </summary>
     public class AssetGroup : UriTreeGroup<AssetGroup, object>, IDisposable
     {
         internal AssetGroup( string pathName
@@ -36,7 +41,7 @@ namespace Artemis.Engine
                     }
 
                     subgroup.SetParent(this);
-                    Subgroups.Add(subgroup.Name, subgroup);
+                    Subnodes.Add(subgroup.Name, subgroup);
                 }
             }
             // Otherwise, option == SearchOption.TopDirectoryOnly, and we only have to look for
@@ -51,19 +56,13 @@ namespace Artemis.Engine
                     DirectoryUtils.MakeRelativePath(
                         AssetLoader.ContentFolderName, fileName));
 
-                Items.Add(assetName, AssetLoader.LoadAssetUsingExtension(fileName));
+                Items.Add(assetName, AssetLoader.LoadUsingExtension(fileName));
             }
-
-            // Prune empty subgroups.
-            // 
-            // ...
-            //
-            // I really have no good reason why anyone would not want to do this.
 
             if (pruneEmptySubgroups)
             {
-                Subgroups = Subgroups.Where(kvp => !kvp.Value.IsEmpty)
-                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                Subnodes = Subnodes.Where(kvp => !kvp.Value.IsEmpty)
+                                   .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
         /// <summary>
@@ -86,7 +85,7 @@ namespace Artemis.Engine
 
         ~AssetGroup()
         {
-            Dispose();
+            Dispose(false);
         }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace Artemis.Engine
                 if (disposing)
                 {
                     // Recursively dispose subgroups.
-                    foreach (var group in Subgroups)
+                    foreach (var group in Subnodes)
                     {
                         group.Value.Dispose(disposing);
                     }

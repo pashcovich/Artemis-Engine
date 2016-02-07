@@ -10,6 +10,7 @@ namespace Artemis.Engine
     /// <summary>
     /// An exception thrown when something goes wrong in a DynamicProperty.
     /// </summary>
+    [Serializable]
     public class DynamicPropertyException : Exception
     {
         public DynamicPropertyException() : base() { }

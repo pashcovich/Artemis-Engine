@@ -12,9 +12,9 @@ namespace Artemis.Engine
     /// Builtin IAssetImporter for object types T already known by the ContentManager.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class BuiltinAssetImporter<T> : AbstractAssetImporter
+    internal class BuiltinAssetImporter<T> : IAssetImporter
     {
-        public override object ImportFrom(string filePath)
+        public object ImportFrom(string filePath)
         {
             var cfName = AssetLoader.ContentFolderName;
             return AssetLoader.Content.Load<T>(
