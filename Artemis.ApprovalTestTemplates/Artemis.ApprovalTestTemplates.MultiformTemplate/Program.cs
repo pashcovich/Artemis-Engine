@@ -24,7 +24,7 @@ namespace Artemis.ApprovalTestTemplates.MultiformTemplate
         }
 
         static void Initialize()
-        {
+       {
             ArtemisEngine.RegisterMultiforms(typeof(MultiformTemplate));
 
             /* Alternative Ways of registering the MultiformTemplate:
