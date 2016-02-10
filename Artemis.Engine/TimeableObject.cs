@@ -33,9 +33,7 @@ namespace Artemis.Engine
 
         public TimeableObject()
         {
-            ElapsedFrames   = 0;
-            ElapsedTime     = 0;
-            PrevElapsedTime = 0;
+            ResetTime();
 
             ArtemisEngine.GameTimer.AddTimeableObject(this);
         }
@@ -45,6 +43,13 @@ namespace Artemis.Engine
             PrevElapsedTime = ElapsedTime;
             ElapsedTime += ArtemisEngine.GameTimer.DeltaTime;
             ElapsedFrames++;
+        }
+
+        public void ResetTime()
+        {
+            ElapsedFrames   = 0;
+            ElapsedTime     = 0;
+            PrevElapsedTime = 0;
         }
 
         /// <summary>

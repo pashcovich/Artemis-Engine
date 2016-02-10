@@ -31,7 +31,7 @@ namespace Artemis.Engine
 
         static ArtemisObject()
         {
-            knownSubclassAttributes.Add(typeof(HasDynamicPropertiesAttribute), new Dictionary<Type, bool>());
+            knownSubclassAttributes.Add(typeof(ReconstructMultiformAttribute), new Dictionary<Type, bool>());
             knownSubclassAttributes.Add(typeof(ForceUpdateAttribute), new Dictionary<Type, bool>());
         }
 
@@ -91,7 +91,7 @@ namespace Artemis.Engine
             // we have to add all the properties marked with DynamicPropertyAttribute
             // to the DynamicFieldContainer.
             CheckForAttributeAndPerformAction(
-                thisType, typeof(HasDynamicPropertiesAttribute),  
+                thisType, typeof(ReconstructMultiformAttribute),  
                 () => SetupDynamicProperties(thisType));
 
             CheckForAttributeAndPerformAction(
