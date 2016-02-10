@@ -105,6 +105,14 @@ namespace Artemis.Engine
         public virtual void Deconstruct() { }
 
         /// <summary>
+        /// Deactivate this multiform.
+        /// </summary>
+        public void Deactivate()
+        {
+            Manager.Deactivate(this);
+        }
+
+        /// <summary>
         /// Set the current renderer for this multiform.
         /// </summary>
         /// <param name="action"></param>
