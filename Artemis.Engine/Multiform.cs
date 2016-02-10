@@ -73,16 +73,16 @@ namespace Artemis.Engine
             Manager = manager;
         }
 
-        internal void DelegateConstruction()
+        internal void DelegateConstruction(MultiformConstructionArgs args)
         {
             TimesActivated++;
             if (reconstructable && TimesActivated > 1)
             {
-                Reconstruct();
+                Reconstruct(args);
             }
             else
             {
-                Construct();
+                Construct(args);
             }
         }
 
@@ -90,14 +90,14 @@ namespace Artemis.Engine
         /// The main constructor for the multiform. This is called every time this multiform
         /// instance is switched to by the MultiformManager.
         /// </summary>
-        public abstract void Construct();
+        public abstract void Construct(MultiformConstructionArgs args);
 
         /// <summary>
         /// The auxiliary constructor called every time after the first time the multiform is
         /// activated. This is only used if the multiform is decorated with a ReconstructMultiform
         /// attribute.
         /// </summary>
-        public virtual void Reconstruct() { }
+        public virtual void Reconstruct(MultiformConstructionArgs args) { }
 
         /// <summary>
         /// The deconstructor for the multiform. This is called when the multiform is deactivated.

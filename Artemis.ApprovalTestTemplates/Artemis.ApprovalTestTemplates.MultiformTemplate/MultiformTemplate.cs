@@ -7,7 +7,7 @@ namespace Artemis.ApprovalTestTemplates.MultiformTemplate
         public MultiformTemplate() : base() { }
         public MultiformTemplate(string name) : base(name) { }
 
-        public override void Construct()
+        public override void Construct(MultiformConstructionArgs args)
         {
             SetUpdater(Update);
             SetRenderer(Render);
