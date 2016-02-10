@@ -152,7 +152,7 @@ namespace Artemis.Engine
                 throw new EngineSetupException(
                     "Must call Engine.Setup before call to Engine.StartWith.");
             }
-            MultiformManager.Activate(multiformName);
+            MultiformManager.Activate(multiformName, new MultiformConstructionArgs(null));
         }
     }
 }

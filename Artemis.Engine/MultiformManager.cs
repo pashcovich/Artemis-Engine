@@ -22,9 +22,11 @@ namespace Artemis.Engine
         private class ActivateEvent : MultiformPostUpdateEvent
         {
             string name;
-            public ActivateEvent(string name)
+            MultiformConstructionArgs args;
+            public ActivateEvent(string name, MultiformConstructionArgs args)
             {
                 this.name = name;
+                this.args = args;
             }
             public override void Perform(
                 Dictionary<string, Multiform> registered, 
@@ -42,7 +44,7 @@ namespace Artemis.Engine
                         String.Format("No multiform with name '{0}' exists.", name));
                 }
                 var multiform = registered[name];
-                multiform.DelegateConstruction();
+                multiform.DelegateConstruction(args);
                 active.Add(name, multiform);
             }
         }
@@ -168,9 +170,9 @@ namespace Artemis.Engine
         /// Activate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Activate(string name)
+        public void Activate(string name, MultiformConstructionArgs args)
         {
-            ApplyOrQueueEvent(new ActivateEvent(name));
+            ApplyOrQueueEvent(new ActivateEvent(name, args));
         }
 
         /// <summary>

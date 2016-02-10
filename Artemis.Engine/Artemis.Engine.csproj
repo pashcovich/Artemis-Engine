@@ -105,6 +105,7 @@
     <Compile Include="Maths\ODESolver.cs" />
     <Compile Include="Maths\RootSolver.cs" />
     <Compile Include="Maths\SpecialFunctions.cs" />
+    <Compile Include="MultiformConstructionArgs.cs" />
     <Compile Include="MultiformException.cs" />
     <Compile Include="Multiform.cs" />
     <Compile Include="MultiformManager.cs" />
