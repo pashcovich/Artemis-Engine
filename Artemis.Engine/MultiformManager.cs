@@ -17,12 +17,12 @@ namespace Artemis.Engine
     {
 
         /// <summary>
-        /// An event that indicates to construct the multiform with the given name.
+        /// An event that indicates to activate the multiform with the given name.
         /// </summary>
-        private class ConstructEvent : MultiformPostUpdateEvent
+        private class ActivateEvent : MultiformPostUpdateEvent
         {
             string name;
-            public ConstructEvent(string name)
+            public ActivateEvent(string name)
             {
                 this.name = name;
             }
@@ -42,18 +42,18 @@ namespace Artemis.Engine
                         String.Format("No multiform with name '{0}' exists.", name));
                 }
                 var multiform = registered[name];
-                multiform.Construct();
+                multiform.DelegateConstruction();
                 active.Add(name, multiform);
             }
         }
 
         /// <summary>
-        /// An event that indicates to close the multiform with the given name.
+        /// An event that indicates to deactivate the multiform with the given name.
         /// </summary>
-        private class CloseEvent : MultiformPostUpdateEvent
+        private class DeactivateEvent : MultiformPostUpdateEvent
         {
             string name;
-            public CloseEvent(string name)
+            public DeactivateEvent(string name)
             {
                 this.name = name;
             }
@@ -66,6 +66,9 @@ namespace Artemis.Engine
                     throw new MultiformManagerException(
                         String.Format("Multiform with name '{0}' has not been constructed.", name));
                 }
+                var multiform = active[name];
+                multiform.Deconstruct();
+                multiform.ResetTime();
                 active.Remove(name);
             }
         }
@@ -116,7 +119,16 @@ namespace Artemis.Engine
         /// <param name="instance"></param>
         internal void RegisterMultiform(Multiform instance)
         {
+            if (RegisteredMultiforms.ContainsKey(instance.Name) || instance.Registered)
+            {
+                throw new MultiformManagerException(
+                    String.Format(
+                        "The multiform with name '{0}' has already been registered.", instance.Name
+                        )
+                    );
+            }
             RegisteredMultiforms.Add(instance.Name, instance);
+            instance.PostRegister(this);
         }
 
         /// <summary>
@@ -153,21 +165,30 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// Construct the multiform with the given name.
+        /// Activate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Construct(string name)
+        public void Activate(string name)
         {
-            ApplyOrQueueEvent(new ConstructEvent(name));
+            ApplyOrQueueEvent(new ActivateEvent(name));
         }
 
         /// <summary>
-        /// Close the multiform with the given name.
+        /// Deactivate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Close(string name)
+        public void Deactivate(string name)
         {
-            ApplyOrQueueEvent(new CloseEvent(name));
+            ApplyOrQueueEvent(new DeactivateEvent(name));
+        }
+
+        /// <summary>
+        /// Deactivate the given multiform instance.
+        /// </summary>
+        /// <param name="multiform"></param>
+        public void Deactivate(Multiform multiform)
+        {
+            Deactivate(multiform.Name);
         }
 
         /// <summary>
@@ -199,10 +220,8 @@ namespace Artemis.Engine
             // Add the queued PostUpdate events to the list of PostUpdateEvents to be performed 
             // next time Update is called. The reason we need this is because there are certain 
             // post update events that can alter the PostUpdateEvents list whilst iterating. For 
-            // example, a PostUpdateEvent can Construct a multiform, which can in turn call something 
+            // example, a PostUpdateEvent can Activate a multiform, which can in turn call something 
             // that adds a PostUpdateEvent to the list.
-            //
-            // So to avoid 
 
             foreach (var queuedEvt in PostUpdateEventQueue)
             {
