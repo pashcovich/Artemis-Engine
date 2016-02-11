@@ -170,8 +170,9 @@ namespace Artemis.Engine
         /// Activate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Activate(string name, MultiformConstructionArgs args)
+        public void Activate(string name, MultiformConstructionArgs args = null)
         {
+            args = args == null ? new MultiformConstructionArgs(null) : args;
             ApplyOrQueueEvent(new ActivateEvent(name, args));
         }
 
