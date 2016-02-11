@@ -4,6 +4,7 @@ using Artemis.Engine.Utilities;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -54,14 +55,20 @@ namespace Artemis.Engine
                  ? Reflection.GetFirstAttribute<NamedMultiformAttribute>(thisType).Name
                  : thisType.Name;
 
-            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(thisType);
+            CommonInit(thisType);
+            
         }
 
         public Multiform(string name)
         {
             Name = name;
 
-            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(this.GetType());
+            CommonInit(this.GetType());
+        }
+
+        private void CommonInit(Type thisType)
+        {
+            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(thisType);
         }
 
         /// <summary>
