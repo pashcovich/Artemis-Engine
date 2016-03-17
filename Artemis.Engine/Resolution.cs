@@ -53,5 +53,20 @@ namespace Artemis.Engine
         {
             return Width.ToString() + "x" + Height.ToString();
         }
+
+        public static bool operator ==(Resolution a, Resolution b)
+        {
+            return a.Width == b.Width && a.Height == b.Height;
+        }
+
+        public static bool operator !=(Resolution a, Resolution b)
+        {
+            return !(a == b);
+        }
+
+        public static Vector2 operator /(Resolution a, Resolution b)
+        {
+            return new Vector2((float)a.Width / b.Width, (float)a.Height / b.Height);
+        }
     }
 }

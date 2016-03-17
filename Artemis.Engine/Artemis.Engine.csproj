@@ -48,8 +48,12 @@
     <Compile Include="AssetLoadException.cs" />
     <Compile Include="BuiltinAssetImporter.cs" />
     <Compile Include="GameSetupException.cs" />
-    <Compile Include="Graphics\AbstractLayer.cs" />
-    <Compile Include="Graphics\Layers\ResolutionRelativeLayer.cs" />
+    <Compile Include="Graphics\AbstractManipulableRenderable.cs" />
+    <Compile Include="Graphics\AbstractRenderable.cs" />
+    <Compile Include="Graphics\RenderableGroup.cs" />
+    <Compile Include="Graphics\RenderComponents.cs" />
+    <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\ResolutionScaleRules.cs" />
     <Compile Include="Graphics\ResolutionScaleType.cs" />
     <Compile Include="IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
@@ -83,13 +87,6 @@
     <Compile Include="EngineSetupException.cs" />
     <Compile Include="GameProperties.cs" />
     <Compile Include="GameSetupReader.cs" />
-    <Compile Include="Graphics\IRenderable.cs" />
-    <Compile Include="Graphics\LayerManager.cs" />
-    <Compile Include="Graphics\RenderOrderException.cs" />
-    <Compile Include="Graphics\RenderablesGroup.cs" />
-    <Compile Include="Graphics\RenderComponent.cs" />
-    <Compile Include="Graphics\RenderLayer.cs" />
-    <Compile Include="Graphics\RenderPropertiesPacket.cs" />
     <Compile Include="HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\KeyCombination.cs" />
@@ -115,8 +112,11 @@
     <Compile Include="NamedMultiformAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReconstructMultiformAttribute.cs" />
+    <Compile Include="RelativePosition.cs" />
+    <Compile Include="RelativePositionType.cs" />
     <Compile Include="RenderPipeline.cs" />
     <Compile Include="RenderPipelineException.cs" />
+    <Compile Include="RenderPropertiesPacket.cs" />
     <Compile Include="Resolution.cs" />
     <Compile Include="AssetGroup.cs" />
     <Compile Include="SpriteFontAssetImporter.cs" />
@@ -143,9 +143,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\Animation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
