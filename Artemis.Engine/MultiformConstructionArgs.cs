@@ -1,7 +1,12 @@
-﻿
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities.Dynamics;
+
+#endregion
+
 namespace Artemis.Engine
 {
-    public class MultiformConstructionArgs : DynamicFieldContainer
+    public class MultiformConstructionArgs : DynamicPropertyCollection
     {
         public Multiform Sender { get; private set; }
 

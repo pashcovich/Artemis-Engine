@@ -12,6 +12,11 @@ namespace Artemis.Engine.Maths.Geometry
     public static class VectorUtils
     {
 
+        public static Vector2 ComponentwiseProduct(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.X * b.X, a.Y * b.Y);
+        }
+
         public static Vector2 ToVec(Point p)
         {
             return new Vector2(p.X, p.Y);

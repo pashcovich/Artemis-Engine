@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{54AC6204-595C-47F8-ABF4-F57B9EFE4CA8}</ProjectGuid>
+    <ProjectGuid>{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Artemis.UnitTests</RootNamespace>
-    <AssemblyName>Artemis.UnitTests</AssemblyName>
+    <RootNamespace>Artemis.Tests</RootNamespace>
+    <AssemblyName>Artemis.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,8 +50,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="DynamicFieldContainerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Artemis.Engine\Artemis.Engine.csproj">
+      <Project>{82995a65-f12c-4737-99c1-93ccc29e5456}</Project>
+      <Name>Artemis.Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

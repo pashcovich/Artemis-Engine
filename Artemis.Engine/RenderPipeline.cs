@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Graphics;
+using Artemis.Engine.Maths.Geometry;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -94,7 +95,7 @@ namespace Artemis.Engine
                           , Vector2? origin            = null
                           , Vector2? scale             = null
                           , SpriteEffects effects      = SpriteEffects.None
-                          , float layerDepth           = 0)
+                          , float layerDepth           = 0 )
         {
             if (BegunRenderCycle)
             {
@@ -112,6 +113,38 @@ namespace Artemis.Engine
                 throw new RenderPipelineException(
                     "Rendering must occur in the render cycle.");
             }
+        }
+
+        public void Render(Texture2D texture
+                          , RelativePosition position
+                          , Rectangle? sourceRectangle = null
+                          , Color? colour              = null
+                          , double rotation            = 0
+                          , Vector2? scale             = null
+                          , SpriteEffects effects      = SpriteEffects.None
+                          , float layerDepth           = 0 )
+        {
+            Rectangle rect;
+            if (sourceRectangle.HasValue)
+            {
+                rect = (Rectangle)sourceRectangle;
+            }
+            else
+            {
+                rect = texture.Bounds;
+            }
+            var rel = position.RelativeTo;
+            var origin = new Vector2(rect.Width * rel.xOffset, rect.Height * rel.yOffset);
+
+            Render( texture
+                  , position.Position
+                  , sourceRectangle
+                  , colour
+                  , rotation
+                  , origin
+                  , scale
+                  , effects
+                  , layerDepth );
         }
 
         /// <summary>
@@ -159,6 +192,15 @@ namespace Artemis.Engine
         }
 
         /// <summary>
+        /// Clear the graphics device with the given color.
+        /// </summary>
+        /// <param name="color"></param>
+        public void ClearGraphicsDevice(Color color)
+        {
+            GraphicsDevice.Clear(color);
+        }
+
+        /// <summary>
         /// Reset the current render properties to their default values. For the default
         /// values, see the default values of SetRenderProperties' parameters.
         /// </summary>
@@ -181,9 +223,9 @@ namespace Artemis.Engine
         }
 
         /// <summary>
-        /// Clear the current render target.
+        /// Unset the current render target.
         /// </summary>
-        public void ClearRenderTarget()
+        public void UnsetRenderTarget()
         {
             GraphicsDevice.SetRenderTarget(null);
         }
@@ -195,18 +237,28 @@ namespace Artemis.Engine
         /// </summary>
         /// <param name="fill"></param>
         /// <returns></returns>
-        public RenderTarget2D CreateRenderTarget(Color? fill = null)
+        public RenderTarget2D CreateRenderTarget(int width, int height, Color? fill = null)
         {
             Color _fill = fill.HasValue ? fill.Value : Color.Transparent;
 
-            var res = ArtemisEngine.DisplayManager.WindowResolution;
-            var target = new RenderTarget2D(GraphicsDevice, res.Width, res.Height);
+            var target = new RenderTarget2D(GraphicsDevice, width, height);
 
             GraphicsDevice.SetRenderTarget(target);
             GraphicsDevice.Clear(_fill);
             GraphicsDevice.SetRenderTarget(null);
 
             return target;
+        }
+
+        public RenderTarget2D CreateRenderTarget(Color? fill = null)
+        {
+            var res = ArtemisEngine.DisplayManager.WindowResolution;
+            return CreateRenderTarget(res.Width, res.Height, fill);
+        }
+
+        public RenderTarget2D CreateRenderTarget(Resolution resolution, Color? fill = null)
+        {
+            return CreateRenderTarget(resolution.Width, resolution.Height, fill);
         }
     }
 }

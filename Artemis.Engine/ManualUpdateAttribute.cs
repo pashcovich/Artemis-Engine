@@ -11,5 +11,5 @@ namespace Artemis.Engine
     /// frame by the GlobalUpdater.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class ForceUpdateAttribute : Attribute { }
+    public class ManualUpdateAttribute : Attribute { }
 }

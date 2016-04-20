@@ -47,33 +47,39 @@
     <Compile Include="AssetImportException.cs" />
     <Compile Include="AssetLoadException.cs" />
     <Compile Include="BuiltinAssetImporter.cs" />
+    <Compile Include="Effectors\CoerciveEffector.cs" />
+    <Compile Include="Effectors\EffectableObject.cs" />
+    <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="GameSetupException.cs" />
-    <Compile Include="Graphics\AbstractLayer.cs" />
-    <Compile Include="Graphics\Layers\ResolutionRelativeLayer.cs" />
+    <Compile Include="Graphics\IManipulableRenderable.cs" />
+    <Compile Include="Graphics\IRenderable.cs" />
+    <Compile Include="Graphics\LayerManager.cs" />
+    <Compile Include="Graphics\RenderableGroup.cs" />
+    <Compile Include="Graphics\RenderComponents.cs" />
+    <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\ResolutionScaleRules.cs" />
     <Compile Include="Graphics\ResolutionScaleType.cs" />
     <Compile Include="IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
-    <Compile Include="DynamicPropertyAttribute.cs" />
-    <Compile Include="DynamicFieldContainer.cs" />
-    <Compile Include="DynamicFieldException.cs" />
-    <Compile Include="DynamicPropertyException.cs" />
-    <Compile Include="EffectableArtemisObject.cs" />
-    <Compile Include="Effectors\BigenericEffector.cs" />
+    <Compile Include="MultipleUpdateException.cs" />
+    <Compile Include="UpdatableObject.cs" />
+    <Compile Include="Updater.cs" />
+    <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
+    <Compile Include="Utilities\Dynamics\DynamicPropertyAttribute.cs" />
     <Compile Include="Effectors\Effector.cs" />
     <Compile Include="Effectors\EffectorException.cs" />
     <Compile Include="Effectors\EffectorOperator.cs" />
     <Compile Include="Effectors\EffectorOperatorException.cs" />
     <Compile Include="Effectors\EffectorOperatorType.cs" />
     <Compile Include="Effectors\EffectorValueType.cs" />
-    <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="Effectors\PresetFunctions.cs" />
     <Compile Include="Effectors\Special\DoubleEffector.cs" />
     <Compile Include="Effectors\Special\IntEffector.cs" />
     <Compile Include="Effectors\Special\VectorEffector.cs" />
     <Compile Include="Effectors\Special\XCoordEffector.cs" />
     <Compile Include="Effectors\Special\YCoordEffector.cs" />
-    <Compile Include="ForceUpdateAttribute.cs" />
+    <Compile Include="ManualUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
     <Compile Include="GlobalUpdater.cs" />
@@ -83,14 +89,8 @@
     <Compile Include="EngineSetupException.cs" />
     <Compile Include="GameProperties.cs" />
     <Compile Include="GameSetupReader.cs" />
-    <Compile Include="Graphics\IRenderable.cs" />
-    <Compile Include="Graphics\LayerManager.cs" />
-    <Compile Include="Graphics\RenderOrderException.cs" />
-    <Compile Include="Graphics\RenderablesGroup.cs" />
-    <Compile Include="Graphics\RenderComponent.cs" />
-    <Compile Include="Graphics\RenderLayer.cs" />
-    <Compile Include="Graphics\RenderPropertiesPacket.cs" />
-    <Compile Include="HasDynamicPropertiesAttribute.cs" />
+    <Compile Include="Utilities\Dynamics\Getter.cs" />
+    <Compile Include="Utilities\Dynamics\HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
     <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\MouseButton.cs" />
@@ -115,15 +115,26 @@
     <Compile Include="NamedMultiformAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReconstructMultiformAttribute.cs" />
+    <Compile Include="RelativePosition.cs" />
+    <Compile Include="RelativePositionType.cs" />
     <Compile Include="RenderPipeline.cs" />
     <Compile Include="RenderPipelineException.cs" />
+    <Compile Include="RenderPropertiesPacket.cs" />
     <Compile Include="Resolution.cs" />
     <Compile Include="AssetGroup.cs" />
     <Compile Include="SpriteFontAssetImporter.cs" />
     <Compile Include="Texture2DAssetImporter.cs" />
     <Compile Include="TimeableObject.cs" />
+    <Compile Include="Utilities\AttributeMemoService.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />
+    <Compile Include="Utilities\Dynamics\DynamicPropertyCollection.cs" />
+    <Compile Include="Utilities\Dynamics\DynamicPropertyException.cs" />
+    <Compile Include="Utilities\Dynamics\IDynamicProperty.cs" />
+    <Compile Include="Utilities\Dynamics\Setter.cs" />
+    <Compile Include="Utilities\Dynamics\SimpleDynamicProperty.cs" />
     <Compile Include="Utilities\GenericOperators.cs" />
+    <Compile Include="Utilities\Partial\PartialEngineAdapter.cs" />
+    <Compile Include="Utilities\Partial\PartialEngineAttribute.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
@@ -143,9 +154,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\Animation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

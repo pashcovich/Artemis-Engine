@@ -3,10 +3,10 @@ namespace Artemis.Engine.Graphics
 {
     public enum ResolutionScaleType
     {
-        Static,
-        ByWidth,
-        ByHeight,
-        ByMax,
-        ByMin
+        BY_MIN,
+        BY_MAX,
+        BY_WIDTH,
+        BY_HEIGHT,
+        WITH_RES
     }
 }

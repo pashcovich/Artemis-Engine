@@ -29,6 +29,13 @@ namespace Artemis.Engine
         /// </summary>
         public Resolution WindowResolution { get; private set; }
 
+        public bool IsBaseResolution { get { return WindowResolution == properties.BaseResolution; } }
+
+        public Vector2 ResolutionScale { get { return WindowResolution / properties.BaseResolution;  } }
+
+        public bool ResolutionChanged { get { return resChangedCounter > 0; } }
+        private int resChangedCounter = 0;
+
         /// <summary>
         /// Whether or not ReinitDisplayProperties has to be called. 
         /// </summary>

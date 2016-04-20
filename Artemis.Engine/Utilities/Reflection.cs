@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities.UriTree;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -405,8 +407,71 @@ namespace Artemis.Engine.Utilities
             {
                 throw new ArgumentException("Generic parameter must be an enum.");
             }
-            return new List<T>((T[])Enum.GetValues(typeof(T)));
-            
+            return new List<T>((T[])Enum.GetValues(typeof(T)));   
+        }
+
+        /// <summary>
+        /// Get the value of a property with the given name from an object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static object GetPropertyValue(object obj, string name)
+        {
+            return obj.GetType().GetProperty(name).GetValue(obj, null);
+        }
+
+        /// <summary>
+        /// Get the value of a property with the given name and type from an object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static T GetPropertyValue<T>(object obj, string name)
+        {
+            return (T)GetPropertyValue(obj, name);
+        }
+
+        /// <summary>
+        /// Get the value of a nested property with the given URI from an object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="nameParts"></param>
+        /// <returns></returns>
+        public static object GetNestedPropertyValue(object obj, string[] nameParts)
+        {
+            string crntName;
+            while (nameParts.Length > 0)
+            {
+                crntName = nameParts[0];
+                obj = GetPropertyValue(obj, crntName);
+                nameParts = nameParts.Skip(1).ToArray();
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// Get the value of a nested property with the given URI from an object.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static object GetNestedPropertyValue(object obj, string name)
+        {
+            return GetNestedPropertyValue(obj, UriUtilities.GetParts(name));
+        }
+
+        /// <summary>
+        /// Get the value of a nested property with the given URI and type from an object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static T GetNestedProperty<T>(object obj, string name)
+        {
+            return (T)GetNestedPropertyValue(obj, name);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Artemis.Engine.Effectors
     /// of that instance over time.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Effector<T> : BigenericEffector<T, T>
+    public class Effector<T> : CoerciveEffector<T, T>
     {
 
         // Because constructor inheritance is blasphemy.
@@ -48,14 +48,14 @@ namespace Artemis.Engine.Effectors
 
         #endregion
 
-        internal override T ConvertToEffectable(T val)
+        protected override T CoerceTo(T val)
         {
             return val;
         }
 
-        internal override void ConvertAndAssign(DynamicFieldContainer fields, T nextVal)
+        protected override void AssignNextValue(T val)
         {
-            fields.Set<T>(EffectedFieldName, nextVal);
+            Set(EffectedPropertyName, val);
         }
     }
 }

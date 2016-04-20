@@ -1,63 +1,38 @@
-﻿#region Using Statements
-
-using Artemis.Engine.Utilities.UriTree;
+﻿using Artemis.Engine.Utilities.UriTree;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#endregion
+using System.Text;
 
 namespace Artemis.Engine.Graphics
 {
-    public class LayerManager : UriTreeObserver<AbstractLayer>
+    public class LayerManager : UriTreeObserver<RenderLayer>
     {
-        /// <summary>
-        /// The list of names of layers to render.
-        /// </summary>
-        private List<string> RenderOrder;
+
+        public List<string> RenderOrder;
 
         public LayerManager()
         {
             RenderOrder = new List<string>();
         }
 
-        /// <summary>
-        /// Add a layer.
-        /// </summary>
-        /// <param name="layer"></param>
-        public void AddLayer(AbstractLayer layer)
+        public void Add(RenderLayer layer)
         {
-            // This will automatically set the layer's parent to the proper
-            // parent in the UriTree.
-            AddObservedNode(layer.tempFullName, layer);
+            AddObservedNode(layer.tempName, layer);
+            layer.Managed = true;
         }
 
-        /// <summary>
-        /// Set the order in which to render the layers.
-        /// </summary>
-        /// <param name="names"></param>
-        public void SetRenderOrder(params string[] names)
+        public void SetRenderOrder(params string[] order)
         {
-            RenderOrder = names.ToList();
+            RenderOrder = order.ToList();
         }
 
-        internal void Render()
+        public void Render()
         {
-            // For now, remaining layers are just ignored.
-
-            foreach (var name in RenderOrder)
+            foreach (var layerName in RenderOrder)
             {
-                var layer = GetObservedNode(name);
-                if (layer.PreRender != null)
-                {
-                    layer.PreRender();
-                }
-                layer.Render();
-                if (layer.PostRender != null)
-                {
-                    layer.PostRender();
-                }
+                GetObservedNode(layerName).Render();
             }
         }
     }

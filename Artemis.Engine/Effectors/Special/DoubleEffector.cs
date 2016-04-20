@@ -38,5 +38,10 @@ namespace Artemis.Engine.Effectors.Special
             : base(fieldName, effectorName, func, op, valueType, reusable) { }
 
         #endregion
+
+        protected override double Combine_InPlaceAndRelativeToStart(double init, double combined)
+        {
+            return init + combined;
+        }
     }
 }

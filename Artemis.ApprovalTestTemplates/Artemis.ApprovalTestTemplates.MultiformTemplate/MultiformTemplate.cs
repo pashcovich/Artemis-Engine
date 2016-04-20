@@ -9,16 +9,16 @@ namespace Artemis.ApprovalTestTemplates.MultiformTemplate
 
         public override void Construct(MultiformConstructionArgs args)
         {
-            SetUpdater(Update);
-            SetRenderer(Render);
+            SetUpdater(MainUpdate);
+            SetRenderer(MainRender);
         }
 
-        private void Update()
+        private void MainUpdate()
         {
             // Updating code here...
         }
 
-        private void Render()
+        private void MainRender()
         {
             // Rendering code here...
         }

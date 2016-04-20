@@ -1,7 +1,6 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Utilities;
-
 using System;
 using System.Collections.Generic;
 
@@ -9,42 +8,15 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Effectors
 {
-    /// <summary>
-    /// A BigenericEffector is an abstract effector where the type of the effected 
-    /// field and the type returned by the effector function itself differ.
-    /// 
-    /// There are two generic parameters, T1 and T2. T1 represents the type of the
-    /// actual effected field, whereas T2 represents the type of the values returned
-    /// by the supplied Func object.
-    /// 
-    /// When implementing this class, two methods must be implemented; ConvertToEffectable
-    /// and ConvertAndAssign. ConvertToEffectable takes the field of type T1 and converts 
-    /// it to a T2 object. This is used when recording the initial value of an effector, 
-    /// since the initial value starts off as a T2 object and must be converted to a T1 
-    /// to actual be used as an initial value.
-    /// 
-    /// The ConvertAndAssign method takes a DynamicFieldContainer `fields` and a `T2`
-    /// object `nextVal`. This method must set the effected field in `fields` to the given
-    /// `T2` value after converting it to a `T1` object.
-    /// 
-    /// The reason ConvertAndAssign is all one operation is for things like XCoordEffector
-    /// to work, since it's function returns a double object that must then be assigned
-    /// to the X property of a Vector2 object.
-    /// </summary>
-    /// <typeparam name="T1"></typeparam>
-    /// <typeparam name="T2"></typeparam>
-    public abstract class BigenericEffector<T1, T2> : TimeableObject, IEffector
+    public abstract class CoerciveEffector<T1, T2> : TimeableObject, IEffector
     {
-        /// <summary>
-        /// The name of the field we're effecting. This MUST be a field
-        /// in the effected object's DynamicFieldContainer object.
-        /// </summary>
-        public string EffectedFieldName { get; private set; }
+
+        public string EffectedPropertyName { get; private set; }
 
         /// <summary>
         /// The name of this effector.
         /// </summary>
-        public string EffectorName { get; private set; }
+        public string EffectorName { get; set; }
 
         /// <summary>
         /// Whether or not this effector is anonymous (has a name or not).
@@ -71,7 +43,7 @@ namespace Artemis.Engine.Effectors
         /// <summary>
         /// The object this effector has been added to.
         /// </summary>
-        protected EffectableArtemisObject Object { get; private set; }
+        protected EffectableObject Object { get; private set; }
 
         /// <summary>
         /// A dictionary mapping from ArtemisObject instances to their initial values.
@@ -79,8 +51,8 @@ namespace Artemis.Engine.Effectors
         /// RelativeToStart not using the same initial value for multiple instances with
         /// potentially different initial values.
         /// </summary>
-        protected readonly Dictionary<EffectableArtemisObject, T2> InitialValues
-            = new Dictionary<EffectableArtemisObject, T2>();
+        protected readonly Dictionary<EffectableObject, T2> InitialValues
+            = new Dictionary<EffectableObject, T2>();
 
         private Func<double, int, T2> Func;
         private EffectorValueType ValueType;
@@ -88,37 +60,33 @@ namespace Artemis.Engine.Effectors
         private T2 Prev;
         private bool inPlace_and_relativeToStart;
 
-        #region Alternative Constructors
-
-        public BigenericEffector( string fieldName
+        public CoerciveEffector(string propertyName
                                 , string effectorName
                                 , Func<double, int, T2> func
                                 , EffectorOperatorType opType = EffectorOperatorType.InPlace
                                 , EffectorValueType valueType = EffectorValueType.RelativeToStart
                                 , bool reusable = false )
-            : this( fieldName
+            : this( propertyName
                   , effectorName
                   , func
                   , new EffectorOperator<T2>(opType)
                   , valueType
                   , reusable) { }
 
-        public BigenericEffector( string fieldName
+        public CoerciveEffector( string propertyName
                                 , string effectorName
                                 , Func<double, int, T2> func
                                 , Func<T2, T2, T2> op
                                 , EffectorValueType valueType = EffectorValueType.RelativeToStart
                                 , bool reusable = false )
-            : this( fieldName
+            : this( propertyName
                   , effectorName
                   , func
                   , new EffectorOperator<T2>(op)
                   , valueType
                   , reusable) { }
 
-        #endregion
-
-        public BigenericEffector( string fieldName
+        public CoerciveEffector( string propertyName
                                 , string effectorName
                                 , Func<double, int, T2> func
                                 , EffectorOperator<T2> op
@@ -126,7 +94,7 @@ namespace Artemis.Engine.Effectors
                                 , bool reusable = false )
             : base()
         {
-            EffectedFieldName = fieldName;
+            EffectedPropertyName = propertyName;
             EffectorName = effectorName;
             Func = func;
 
@@ -142,50 +110,36 @@ namespace Artemis.Engine.Effectors
                 valueType == EffectorValueType.RelativeToStart;
         }
 
-        /// <summary>
-        /// Convert the effected field to a type usable by the effector.
-        /// This method is essentially an explicit conversion operator from
-        /// T1 to T2.
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        internal abstract T2 ConvertToEffectable(T1 val);
+        protected abstract T2 CoerceTo(T1 t1);
 
-        /// <summary>
-        /// Convert the value returned by the effector into a type assignable to
-        /// the effected field, and then perform the assignment.
-        /// </summary>
-        /// <param name="fields"></param>
-        /// <param name="nextVal"></param>
-        internal abstract void ConvertAndAssign(DynamicFieldContainer fields, T2 nextVal);
+        protected abstract void AssignNextValue(T2 t2);
 
-        internal void InternalInitialize(EffectableArtemisObject obj)
+        public virtual void InternalInitialize(EffectableObject obj)
         {
             if (Initialized)
             {
-                string exceptionMessage;
+                string exceptionMessage = "The most likely cause for this is the same effector " +
+                    "was added to multiple objects. Check to ensure you aren't reusing the same " +
+                    "effector instance.";
                 if (Anonymous)
                 {
                     exceptionMessage = String.Format(
-                        "Anonymous effector of type '{0}' was initialized twice. The most " +
-                        "likely cause for this is the same effector was added to multiple " +
-                        "objects. Check to ensure you aren't reusing the same effector instance.",
-                        this.GetType());
+                        "Anonymous effector of type '{0}' was initialized twice.", this.GetType()) +
+                        exceptionMessage;
                 }
                 else
                 {
                     exceptionMessage = String.Format(
-                        "Effector with name '{0}' and type '{1}' was initialized twice. The " +
-                        "most likely cause for this is the same effector was added to multiple " +
-                        "objects. Check to ensure you aren't reusing the same effector instance.",
-                        EffectorName, this.GetType());
+                        "Effector with name '{0}' and type '{1}' was initialized twice.",
+                        EffectorName, this.GetType()) +
+                        exceptionMessage;
                 }
                 throw new EffectorException(exceptionMessage);
             }
 
             if (ValueType == EffectorValueType.RelativeToStart)
             {
-                InitialValues.Add(obj, ConvertToEffectable(obj.Fields.Get<T1>(EffectedFieldName)));
+                InitialValues.Add(obj, CoerceTo((T1)obj.Get(EffectedPropertyName)));
             }
 
             // If this effector is reusable, then it may be used for multiple
@@ -205,18 +159,14 @@ namespace Artemis.Engine.Effectors
             Initialized = true;
         }
 
-        /// <summary>
-        /// Initialize the effector. This is done after the object is added
-        /// to an EffectableArtemisObject.
-        /// </summary>
-        protected virtual void Initialize() { }
+        public virtual void Initialize() { }
 
         /// <summary>
         /// Return the next value of the effector.
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        protected virtual T2 GetNext(EffectableArtemisObject obj)
+        protected virtual T2 GetNext(EffectableObject obj)
         {
             var next = Func(ElapsedTime, ElapsedFrames);
             if (Prev != null)
@@ -268,7 +218,7 @@ namespace Artemis.Engine.Effectors
 
                     #endregion
 
-                    return inPlace_and_relativeToStart ? GenericOperators.Add<T2>(init, combined)
+                    return inPlace_and_relativeToStart ? Combine_InPlaceAndRelativeToStart(init, combined)
                                                        : Op.Operate(init, combined);
                 }
                 return combined;
@@ -276,10 +226,26 @@ namespace Artemis.Engine.Effectors
             return next;
         }
 
-        public void UpdateEffector(EffectableArtemisObject obj)
+        /// <summary>
+        /// When the effector is InPlace and RelativeToStart, this
+        /// combines the initial and combined values created in "GetNext".
+        /// 
+        /// This exists for optimization purposes. InPlace RelativeToStart
+        /// effectors are common, and GenericOperators.Add is really slow
+        /// by comparison to simply adding the two values. Thus, for extra
+        /// speed, child classes with explicit T2 values can reimplement a
+        /// faster version of this method.
+        /// </summary>
+        /// <param name="init"></param>
+        /// <param name="combined"></param>
+        /// <returns></returns>
+        protected virtual T2 Combine_InPlaceAndRelativeToStart(T2 init, T2 combined)
         {
-            UpdateTime();
+            return GenericOperators.Add<T2>(init, combined);
+        }
 
+        public void UpdateEffector(EffectableObject obj)
+        {
             if (!Reusable)
             {
                 obj = Object;
@@ -288,7 +254,7 @@ namespace Artemis.Engine.Effectors
             var next = GetNext(obj);
             Prev = next;
 
-            ConvertAndAssign(obj.Fields, next);
+            AssignNextValue(next);
         }
     }
 }
