@@ -66,13 +66,11 @@ namespace Artemis.Engine.Utilities.Dynamics
 
             foreach (var property in properties)
             {
-                if (Reflection.HasAttribute<DynamicPropertyAttribute>(property))
+                if (exclusive || Reflection.HasAttribute<DynamicPropertyAttribute>(property))
                 {
-                    var type = property.PropertyType;
-
                     AddDynamicProperty(property);
                 }
-                else if (exclusive)
+                else
                 {
                     throw new DynamicPropertyException(
                         String.Format(
