@@ -11,7 +11,7 @@ namespace Artemis.Engine.Effectors.Special
     /// <summary>
     /// An effector that acts on the y-component of a Vector2 object.
     /// </summary>
-    public class YCoordEffector : BigenericEffector<Vector2, float>
+    public class YCoordEffector : CoerciveEffector<Vector2, float>
     {
         #region Constructors
 
@@ -41,16 +41,21 @@ namespace Artemis.Engine.Effectors.Special
 
         #endregion
 
-        internal override float ConvertToEffectable(Vector2 val)
+        protected override float CoerceTo(Vector2 val)
         {
             return val.Y;
         }
 
-        internal override void ConvertAndAssign(DynamicFieldContainer fields, float nextVal)
+        protected override void AssignNextValue(float nextVal)
         {
-            var prevVec = fields.Get<Vector2>(EffectedFieldName);
+            var prevVec = Get<Vector2>(EffectedPropertyName);
             prevVec.Y = nextVal;
-            fields.Set<Vector2>(EffectedFieldName, prevVec);
+            Set(EffectedPropertyName, prevVec);
+        }
+
+        protected override float Combine_InPlaceAndRelativeToStart(float init, float combined)
+        {
+            return init + combined;
         }
     }
 }

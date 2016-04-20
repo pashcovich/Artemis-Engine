@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Utilities.Dynamics
 {
     /// <summary>
     /// An attribute representing whether or not a class has DynamicProperties.

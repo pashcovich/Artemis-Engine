@@ -42,5 +42,10 @@ namespace Artemis.Engine.Effectors.Special
 
         #endregion
 
+        protected override Vector2 Combine_InPlaceAndRelativeToStart(Vector2 init, Vector2 combined)
+        {
+            return init + combined;
+        }
+
     }
 }

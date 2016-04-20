@@ -50,12 +50,12 @@ namespace Artemis.Engine
 
         public Multiform() : base()
         {
-            var thisType = this.GetType();
-            Name = Reflection.HasAttribute<NamedMultiformAttribute>(thisType) 
-                 ? Reflection.GetFirstAttribute<NamedMultiformAttribute>(thisType).Name
-                 : thisType.Name;
+            var type = GetType();
+            Name = Reflection.HasAttribute<NamedMultiformAttribute>(type) 
+                 ? Reflection.GetFirstAttribute<NamedMultiformAttribute>(type).Name
+                 : type.Name;
 
-            CommonInit(thisType);
+            initialize();
             
         }
 
@@ -63,12 +63,13 @@ namespace Artemis.Engine
         {
             Name = name;
 
-            CommonInit(this.GetType());
+            initialize();
         }
 
-        private void CommonInit(Type thisType)
+        private void initialize()
         {
-            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(thisType);
+            var type = GetType();
+            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(type);
         }
 
         /// <summary>

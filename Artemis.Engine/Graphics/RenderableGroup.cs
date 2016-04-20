@@ -4,20 +4,20 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderableGroup : UriTreeGroup<RenderableGroup, AbstractRenderable>
+    public class RenderableGroup : UriTreeGroup<RenderableGroup, IRenderable>
     {
         public RenderableGroup(string name) : base(name) { }
 
-        public List<AbstractRenderable> RetrieveAll()
+        public List<IRenderable> RetrieveAll()
         {
-            var list = new List<AbstractRenderable>();
+            var list = new List<IRenderable>();
 
             RetrieveAll(list);
 
             return list;
         }
 
-        private void RetrieveAll(List<AbstractRenderable> renderables)
+        private void RetrieveAll(List<IRenderable> renderables)
         {
             foreach (var subgroup in Subnodes.Values)
             {

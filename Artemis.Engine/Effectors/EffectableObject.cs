@@ -1,19 +1,13 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Effectors;
 using System.Collections.Generic;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Effectors
 {
-    /// <summary>
-    /// An EffectableArtemisObject is an ArtemisObject to which Effectors can
-    /// be added.
-    /// </summary>
-    public class EffectableArtemisObject : ArtemisObject
+    public class EffectableObject : TimeableObject
     {
-
         /// <summary>
         /// The dictionary of effectors applied to this object that have names.
         /// </summary>
@@ -25,14 +19,14 @@ namespace Artemis.Engine
         /// </summary>
         internal readonly List<IEffector> AnonymousEffectors = new List<IEffector>();
 
-        public EffectableArtemisObject() : base() { }
+        public EffectableObject() : base() { }
 
         /// <summary>
         /// Add an effector to this object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="effector"></param>
-        public void AddEffector<T>(Effector<T> effector)
+        public void AddEffector(IEffector effector)
         {
             if (effector.Anonymous)
             {
@@ -45,18 +39,21 @@ namespace Artemis.Engine
             effector.InternalInitialize(this);
         }
 
-        internal override void Update()
+        internal override void AutomaticUpdate()
         {
-            base.Update();
+            base.AutomaticUpdate();
 
-            foreach (var kvp in NamedEffectors)
+            if (!IsPaused)
             {
-                kvp.Value.UpdateEffector(this);
-            }
+                foreach (var kvp in NamedEffectors)
+                {
+                    kvp.Value.UpdateEffector(this);
+                }
 
-            foreach (var effector in AnonymousEffectors)
-            {
-                effector.UpdateEffector(this);
+                foreach (var effector in AnonymousEffectors)
+                {
+                    effector.UpdateEffector(this);
+                }
             }
         }
     }

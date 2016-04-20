@@ -40,5 +40,10 @@ namespace Artemis.Engine.Effectors.Special
 
         #endregion
 
+        protected override int Combine_InPlaceAndRelativeToStart(int init, int combined)
+        {
+            return init + combined;
+        }
+
     }
 }

@@ -13,7 +13,7 @@ namespace Artemis.Engine
     /// </summary>
     public struct Resolution
     {
-        public int Width, Height;
+        public readonly int Width, Height;
 
         /// <summary>
         /// The aspect ratio of the screen.
@@ -52,6 +52,21 @@ namespace Artemis.Engine
         public override string ToString()
         {
             return Width.ToString() + "x" + Height.ToString();
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            Resolution resItem = (Resolution)obj;
+
+            return resItem.Width == Width && resItem.Height == Height;
         }
 
         public static bool operator ==(Resolution a, Resolution b)

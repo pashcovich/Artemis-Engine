@@ -1,5 +1,8 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
+using Artemis.Engine.Utilities.Partial;
+
 using System;
 
 #endregion
@@ -13,8 +16,14 @@ namespace Artemis.Engine
     /// object's life (for example, AtFrame determines if the current number of elapsed
     /// frames the object has been alive for is equal to a given number of frames).
     /// </summary>
-    public class TimeableObject
+    public class TimeableObject : UpdatableObject
     {
+
+        /// <summary>
+        /// The default value of ArtemisEngine.GameTimer.DeltaTime, used when running in
+        /// a partial engine environment.
+        /// </summary>
+        private const double DEFAULT_DELTA_TIME = 16.66666666666;
 
         /// <summary>
         /// The previous elapsed time in milliseconds.
@@ -31,18 +40,46 @@ namespace Artemis.Engine
         /// </summary>
         public int ElapsedFrames { get; private set; }
 
-        public TimeableObject()
+        private Action UpdateTime { get; set; }
+
+        public TimeableObject() : base()
         {
             ResetTime();
 
-            ArtemisEngine.GameTimer.AddTimeableObject(this);
+            // This is probably overkill...
+            //
+            // We assign a different updater function depending on the partial
+            // state of the engine so that we're not making the check for IsPartial
+            // every time UpdateTime is called (which is a lot).
+            if (!IsPartial)
+            {
+                UpdateTime = updateTime;
+            }
+            else
+            {
+                UpdateTime = updateTime_Partial;
+            }
         }
 
-        internal void UpdateTime()
+        private void updateTime()
         {
             PrevElapsedTime = ElapsedTime;
             ElapsedTime += ArtemisEngine.GameTimer.DeltaTime;
             ElapsedFrames++;
+        }
+
+        private void updateTime_Partial()
+        {
+            PrevElapsedTime = ElapsedTime;
+            ElapsedTime += DEFAULT_DELTA_TIME;
+            ElapsedFrames++;
+        }
+
+        internal override void AutomaticUpdate()
+        {
+            base.AutomaticUpdate();
+
+            UpdateTime();
         }
 
         public void ResetTime()
@@ -309,11 +346,6 @@ namespace Artemis.Engine
         public bool DuringIntervals(double interval, double start = 0, double end = Double.PositiveInfinity)
         {
             return DuringOrAt(start, end) && (ElapsedTime - start) % (2 * interval) < interval;
-        }
-
-        public virtual void Kill()
-        {
-            ArtemisEngine.GameTimer.RemoveTimeableObject(this);
         }
     }
 }

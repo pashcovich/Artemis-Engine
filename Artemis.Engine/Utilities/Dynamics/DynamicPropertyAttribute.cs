@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Utilities.Dynamics
 {
     /// <summary>
     /// An attribute used to indicate when a field should be tracked as a

@@ -19,9 +19,14 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public bool ScaleUniformly { get; set; }
 
-        public ResolutionScaleRules LayerResolutionScaleRules { get; set; }
+        public ResolutionScaleRules LayerResolutionScaleRules { get; set; } // CURRENTLY NOT USED
 
         protected RenderTarget2D LayerTarget { get; private set; }
+
+        /// <summary>
+        /// Whether or not this render layer is managed by a LayerManager or not.
+        /// </summary>
+        public bool Managed { get; internal set; }
 
         public RenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
@@ -37,8 +42,12 @@ namespace Artemis.Engine.Graphics
             
             ScaleUniformly = false;
             LayerResolutionScaleRules = null;
+            Managed = false;
         }
 
+        /// <summary>
+        /// Render all items and sublayers on this layer.
+        /// </summary>
         public void RenderAll()
         {
             foreach (var layer in Subnodes.Values)
@@ -46,6 +55,14 @@ namespace Artemis.Engine.Graphics
                 layer.RenderAll();
             }
 
+            Render();
+        }
+
+        /// <summary>
+        /// Render all items on this layer.
+        /// </summary>
+        public void Render()
+        {
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
                 // Create a new render target with dimensions matching the current resolution.
@@ -64,26 +81,20 @@ namespace Artemis.Engine.Graphics
 
             foreach (var renderable in renderables)
             {
-                if (renderable.Valid)
-                {
-                    ProcessRenderable(renderable, resolution, isBaseRes, resScale);
-                }
+                ProcessRenderable(renderable, resolution, isBaseRes, resScale);
             }
 
             ArtemisEngine.RenderPipeline.UnsetRenderTarget();
 
-            if (true /* should only be called when not added to a render layer */)
-            {
-                FinalizeRender();
-            }
+            FinalizeRender();
         }
 
-        private void ProcessRenderable( AbstractRenderable renderable
+        private void ProcessRenderable( IRenderable renderable
                                       , Resolution resolution
                                       , bool isBaseRes
                                       , Vector2 resScale )
         {
-            var asManipulable = renderable as AbstractManipulableRenderable;
+            var asManipulable = renderable as IManipulableRenderable;
             if (asManipulable == null)
             {
                 renderable.Render();
@@ -94,7 +105,14 @@ namespace Artemis.Engine.Graphics
             }
         }
 
-        private void ProcessManipulableRenderable( AbstractManipulableRenderable renderable
+        private enum _scaleDirection
+        {
+            Width,
+            Height,
+            Both
+        }
+
+        private void ProcessManipulableRenderable( IManipulableRenderable renderable
                                                  , Resolution res
                                                  , bool isBaseRes
                                                  , Vector2 resScale )
@@ -111,34 +129,34 @@ namespace Artemis.Engine.Graphics
             else if (isBaseRes)
             {
                 float scaleFactor;
-                int scaleDirection; // 0 - width, 1 - height, 2 - both
+                _scaleDirection scaleDirection; // 0 - width, 1 - height, 2 - both
                 switch (resScaleRules.ScaleType)
                 {
                     case ResolutionScaleType.BY_MIN:
                         scaleFactor = MathHelper.Min(resScale.X, resScale.Y);
-                        scaleDirection = Convert.ToInt32(scaleFactor == resScale.X);
+                        scaleDirection = (_scaleDirection)Convert.ToInt32(scaleFactor == resScale.X);
                         break;
                     case ResolutionScaleType.BY_MAX:
                         scaleFactor = MathHelper.Max(resScale.X, resScale.Y);
-                        scaleDirection = Convert.ToInt32(scaleFactor == resScale.X);
+                        scaleDirection = (_scaleDirection)Convert.ToInt32(scaleFactor == resScale.X);
                         break;
                     case ResolutionScaleType.BY_WIDTH:
                         scaleFactor = resScale.X;
-                        scaleDirection = 0;
+                        scaleDirection = _scaleDirection.Width;
                         break;
                     case ResolutionScaleType.BY_HEIGHT:
                         scaleFactor = resScale.Y;
-                        scaleDirection = 1;
+                        scaleDirection = _scaleDirection.Height;
                         break;
                     case ResolutionScaleType.WITH_RES:
                         scaleFactor = 0;
-                        scaleDirection = 2;
+                        scaleDirection = _scaleDirection.Both;
                         break;
                     default:
                         throw new Exception();
                 }
 
-                if (scaleDirection == 2)
+                if (scaleDirection == _scaleDirection.Both)
                 {
                     if (resScaleRules.MaintainAspectRatio)
                     {
@@ -155,7 +173,7 @@ namespace Artemis.Engine.Graphics
                     if (components.Scale.HasValue)
                     {
                         var c_scale = components.Scale.Value;
-                        if (scaleDirection == 0)
+                        if (scaleDirection == _scaleDirection.Width)
                         {
                             scale = new Vector2(c_scale.X * scaleFactor, c_scale.Y);
                         }
@@ -166,7 +184,7 @@ namespace Artemis.Engine.Graphics
                     }
                     else
                     {
-                        scale = scaleDirection == 0 ?
+                        scale = scaleDirection == _scaleDirection.Width ?
                                 new Vector2(scaleFactor, 1) :
                                 new Vector2(1, scaleFactor);
                     }
@@ -187,7 +205,23 @@ namespace Artemis.Engine.Graphics
                 components.Rotation,
                 scale,
                 components.SpriteEffects);
-            renderable.Render(newPos, newComponents);
+
+            RenderIManipulable(renderable, newPos, newComponents);
+        }
+
+        private void RenderIManipulable(
+            IManipulableRenderable renderable, RelativePosition newPos, RenderComponents newComponents)
+        {
+            var oldPos = renderable.Position;
+            var oldComps = renderable.Components;
+
+            renderable.Position = newPos;
+            renderable.Components = newComponents;
+
+            renderable.Render();
+
+            renderable.Position = oldPos;
+            renderable.Components = oldComps;
         }
 
         private void FinalizeRender()

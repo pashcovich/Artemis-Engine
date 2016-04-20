@@ -9,19 +9,19 @@ namespace Artemis.Engine
     public sealed class GlobalUpdater
     {
         // HashSet because HashSets have fast insertion, removal, and iteration
-        internal HashSet<ArtemisObject> Objects = new HashSet<ArtemisObject>();
+        internal HashSet<UpdatableObject> Objects = new HashSet<UpdatableObject>();
 
         internal GlobalUpdater() { }
 
         /// <summary>
         /// Adds an object to the global ticker (unless it's already been added)
         /// </summary>
-        internal void Add(ArtemisObject obj)
+        internal void Add(UpdatableObject obj)
         {
             Objects.Add(obj);
         }
 
-        internal void Remove(ArtemisObject obj)
+        internal void Remove(UpdatableObject obj)
         {
             Objects.Remove(obj);
         }
@@ -37,7 +37,12 @@ namespace Artemis.Engine
             {
                 if (obj.NeedsUpdate)
                 {
-                    obj.Update();
+                    obj.AutomaticUpdate();
+
+                    if (!(obj.IsPaused || obj.ManuallyUpdate))
+                    {
+                        obj.AuxiliaryUpdate();
+                    }
                 }
                 obj.NeedsUpdate = true;
             }

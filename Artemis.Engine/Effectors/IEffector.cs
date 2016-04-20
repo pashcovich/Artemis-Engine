@@ -2,15 +2,16 @@
 namespace Artemis.Engine.Effectors
 {
     /// <summary>
-    /// A base interface used to represent an arbitrary effector with no
-    /// generic parameter.
+    /// The base non-generic interface for an effector.
     /// </summary>
-    interface IEffector
+    public interface IEffector
     {
-        /// <summary>
-        /// Update a given EffectableArtemisObject using this effector.
-        /// </summary>
-        /// <param name="obj"></param>
-        void UpdateEffector(EffectableArtemisObject obj);
+        bool Anonymous { get; }
+
+        string EffectorName { get; set; }
+
+        void InternalInitialize(EffectableObject obj);
+
+        void UpdateEffector(EffectableObject obj);
     }
 }
