@@ -49,6 +49,7 @@
     <Compile Include="BuiltinAssetImporter.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
+    <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="GameSetupException.cs" />
     <Compile Include="Graphics\IManipulableRenderable.cs" />
@@ -154,7 +155,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -15,7 +15,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public DoubleEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, double> func
+                             , EffectorFunction<double> func
                              , EffectorOperatorType opType = EffectorOperatorType.InPlace
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -23,7 +23,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public DoubleEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, double> func
+                             , EffectorFunction<double> func
                              , Func<double, double, double> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -31,7 +31,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public DoubleEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, double> func
+                             , EffectorFunction<double> func
                              , EffectorOperator<double> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )

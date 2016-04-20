@@ -54,7 +54,7 @@ namespace Artemis.Engine.Effectors
         protected readonly Dictionary<EffectableObject, T2> InitialValues
             = new Dictionary<EffectableObject, T2>();
 
-        private Func<double, int, T2> Func;
+        private EffectorFunction<T2> Func;
         private EffectorValueType ValueType;
         private EffectorOperator<T2> Op;
         private T2 Prev;
@@ -62,7 +62,7 @@ namespace Artemis.Engine.Effectors
 
         public CoerciveEffector(string propertyName
                                 , string effectorName
-                                , Func<double, int, T2> func
+                                , EffectorFunction<T2> func
                                 , EffectorOperatorType opType = EffectorOperatorType.InPlace
                                 , EffectorValueType valueType = EffectorValueType.RelativeToStart
                                 , bool reusable = false )
@@ -75,7 +75,7 @@ namespace Artemis.Engine.Effectors
 
         public CoerciveEffector( string propertyName
                                 , string effectorName
-                                , Func<double, int, T2> func
+                                , EffectorFunction<T2> func
                                 , Func<T2, T2, T2> op
                                 , EffectorValueType valueType = EffectorValueType.RelativeToStart
                                 , bool reusable = false )
@@ -88,7 +88,7 @@ namespace Artemis.Engine.Effectors
 
         public CoerciveEffector( string propertyName
                                 , string effectorName
-                                , Func<double, int, T2> func
+                                , EffectorFunction<T2> func
                                 , EffectorOperator<T2> op
                                 , EffectorValueType valueType = EffectorValueType.RelativeToStart
                                 , bool reusable = false )

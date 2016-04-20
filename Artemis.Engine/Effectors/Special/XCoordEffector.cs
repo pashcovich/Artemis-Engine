@@ -17,7 +17,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public XCoordEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, float> func
+                             , EffectorFunction<float> func
                              , EffectorOperatorType opType = EffectorOperatorType.InPlace
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -25,7 +25,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public XCoordEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, float> func
+                             , EffectorFunction<float> func
                              , Func<float, float, float> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -33,7 +33,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public XCoordEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, float> func
+                             , EffectorFunction<float> func
                              , EffectorOperator<float> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
