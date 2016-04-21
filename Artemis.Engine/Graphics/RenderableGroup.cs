@@ -1,6 +1,10 @@
-﻿using Artemis.Engine.Utilities.UriTree;
+﻿#region Using Statements
+
+using Artemis.Engine.Utilities.UriTree;
 
 using System.Collections.Generic;
+
+#endregion
 
 namespace Artemis.Engine.Graphics
 {
