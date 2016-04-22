@@ -9,11 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.ApprovalTestTemplat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.ApprovalTestTemplates.MultiformTemplate", "Artemis.ApprovalTestTemplates\Artemis.ApprovalTestTemplates.MultiformTemplate\Artemis.ApprovalTestTemplates.MultiformTemplate.csproj", "{B8111ED2-2298-4034-AC6E-6518710E6109}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D00208AE-B4A5-494D-8DD9-DE4E91C96F5D}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.Test", "Artemis.Tests\Artemis.Test.csproj", "{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}"
 EndProject
 Global

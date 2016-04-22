@@ -1,10 +1,14 @@
-﻿using Artemis.Engine.Maths.Geometry;
+﻿#region Using Statements
+
+using Artemis.Engine.Maths.Geometry;
 using Artemis.Engine.Utilities.UriTree;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
+
+#endregion
 
 namespace Artemis.Engine.Graphics
 {

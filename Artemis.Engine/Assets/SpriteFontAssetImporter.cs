@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Assets
 {
     /// <summary>
     /// Builtin IAssetImporter for SpriteFont objects.

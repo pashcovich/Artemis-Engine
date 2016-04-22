@@ -6,7 +6,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Assets
 {
     public sealed class LazyAsset
     {

@@ -43,12 +43,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ArtemisObject.cs" />
-    <Compile Include="AssetImporterRegistrationException.cs" />
-    <Compile Include="AssetImportException.cs" />
-    <Compile Include="AssetLoadException.cs" />
-    <Compile Include="BuiltinAssetImporter.cs" />
+    <Compile Include="Assets\AssetImporterRegistrationException.cs" />
+    <Compile Include="Assets\AssetImportException.cs" />
+    <Compile Include="Assets\AssetLoadException.cs" />
+    <Compile Include="Assets\BuiltinAssetImporter.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
+    <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="GameSetupException.cs" />
     <Compile Include="Graphics\IManipulableRenderable.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="Graphics\ResolutionScaleRules.cs" />
     <Compile Include="Graphics\ResolutionScaleType.cs" />
-    <Compile Include="IAssetImporter.cs" />
+    <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="MultipleUpdateException.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
     <Compile Include="GlobalUpdater.cs" />
-    <Compile Include="AssetLoader.cs" />
+    <Compile Include="Assets\AssetLoader.cs" />
     <Compile Include="EnginePrivate.cs" />
     <Compile Include="EnginePublic.cs" />
     <Compile Include="EngineSetupException.cs" />
@@ -95,7 +96,7 @@
     <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\MouseButton.cs" />
     <Compile Include="Input\MouseInput.cs" />
-    <Compile Include="LazyAsset.cs" />
+    <Compile Include="Assets\LazyAsset.cs" />
     <Compile Include="Maths\Geometry\EllipseUtils.cs" />
     <Compile Include="Maths\Geometry\LinearUtils.cs" />
     <Compile Include="Maths\Geometry\RectUtils.cs" />
@@ -121,9 +122,9 @@
     <Compile Include="RenderPipelineException.cs" />
     <Compile Include="RenderPropertiesPacket.cs" />
     <Compile Include="Resolution.cs" />
-    <Compile Include="AssetGroup.cs" />
-    <Compile Include="SpriteFontAssetImporter.cs" />
-    <Compile Include="Texture2DAssetImporter.cs" />
+    <Compile Include="Assets\AssetGroup.cs" />
+    <Compile Include="Assets\SpriteFontAssetImporter.cs" />
+    <Compile Include="Assets\Texture2DAssetImporter.cs" />
     <Compile Include="TimeableObject.cs" />
     <Compile Include="Utilities\AttributeMemoService.cs" />
     <Compile Include="Utilities\DirectoryUtils.cs" />

@@ -9,7 +9,7 @@ using System.Linq;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Assets
 {
 
     /// <summary>

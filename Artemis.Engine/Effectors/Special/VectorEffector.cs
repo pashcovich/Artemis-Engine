@@ -18,7 +18,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public VectorEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, Vector2> func
+                             , EffectorFunction<Vector2> func
                              , EffectorOperatorType opType = EffectorOperatorType.InPlace
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -26,7 +26,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public VectorEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, Vector2> func
+                             , EffectorFunction<Vector2> func
                              , Func<Vector2, Vector2, Vector2> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
@@ -34,7 +34,7 @@ namespace Artemis.Engine.Effectors.Special
 
         public VectorEffector( string fieldName
                              , string effectorName
-                             , Func<double, int, Vector2> func
+                             , EffectorFunction<Vector2> func
                              , EffectorOperator<Vector2> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
