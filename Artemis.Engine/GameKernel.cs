@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Assets;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

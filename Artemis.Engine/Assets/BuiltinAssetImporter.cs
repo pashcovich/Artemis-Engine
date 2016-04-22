@@ -6,7 +6,7 @@ using System.IO;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Assets
 {
     /// <summary>
     /// Builtin IAssetImporter for object types T already known by the ContentManager.
