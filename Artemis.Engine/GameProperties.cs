@@ -18,20 +18,14 @@ namespace Artemis.Engine
         // Defaults
 
         internal const bool DEFAULT_WINDOW_RESIZABLE           = false;
-        internal const bool DEFAULT_FULLSCREEN                 = false;
         internal const bool DEFAULT_FULLSCREEN_TOGGLABLE       = false;
-        internal const bool DEFAULT_MOUSE_VISIBLE              = true;
         internal const bool DEFAULT_MOUSE_VISIBILITY_TOGGLABLE = false;
-        internal const bool DEFAULT_BORDERLESS                 = false;
         internal const bool DEFAULT_BORDER_TOGGLABLE           = false;
-        internal const bool DEFAULT_VSYNC                      = false;
-        internal const bool DEFAULT_FIXED_TIME_STEP            = true;
         internal const bool DEFAULT_STATIC_RESOLUTION          = false;
         internal const bool DEFAULT_STATIC_ASPECT_RATIO        = false;
         internal const bool DEFAULT_ONLY_LANDSCAPE_RESOLUTIONS = false;
         internal const bool DEFAULT_ONLY_PORTRAIT_RESOLUTIONS  = false;
 
-        internal const int DEFAULT_FRAMERATE                   = 60;
         internal const string DEFAULT_CONTENT_FOLDER           = "Content";
         internal static readonly Color DEFAULT_BG_COLOUR       = Color.Black;
         internal static readonly Resolution DEFAULT_RESOLUTION = new Resolution(800, 600);
@@ -58,29 +52,14 @@ namespace Artemis.Engine
         public bool WindowResizable { get; internal set; }
 
         /// <summary>
-        /// Whether or not the game is fullscreen on startup.
-        /// </summary>
-        public bool Fullscreen { get; internal set; }
-
-        /// <summary>
         /// Whether or not fullscreen is togglable.
         /// </summary>
         public bool FullscreenTogglable { get; internal set; }
 
         /// <summary>
-        /// Whether or not the mouse is visible on startup.
-        /// </summary>
-        public bool MouseVisible { get; internal set; }
-
-        /// <summary>
         /// Whether or not mouse visibility is togglable.
         /// </summary>
         public bool MouseVisibilityTogglable { get; internal set; }
-
-        /// <summary>
-        /// Whether or not the window is borderless on startup.
-        /// </summary>
-        public bool Borderless { get; internal set; }
 
         /// <summary>
         /// Whether or not the window border is togglable.
@@ -106,17 +85,6 @@ namespace Artemis.Engine
         /// The content folder name.
         /// </summary>
         public string ContentFolder { get; internal set; }
-
-        /// <summary>
-        /// Whether or not the game updates with a fixed time step. If this is
-        /// false the game will update as fast as possible (i.e. no framerate limit).
-        /// </summary>
-        public bool FixedTimeStep { get; internal set; }
-
-        /// <summary>
-        /// The frame rate of the game (the FPS).
-        /// </summary>
-        public int FrameRate { get; internal set; }
 
         /// <summary>
         /// Whether or not the resolution can be changed.
@@ -147,17 +115,11 @@ namespace Artemis.Engine
         {
             // Setup default values.
             BaseResolution           = DEFAULT_RESOLUTION;
-            Fullscreen               = DEFAULT_FULLSCREEN;
             FullscreenTogglable      = DEFAULT_FULLSCREEN_TOGGLABLE;
-            MouseVisible             = DEFAULT_MOUSE_VISIBLE;
             MouseVisibilityTogglable = DEFAULT_MOUSE_VISIBILITY_TOGGLABLE;
-            Borderless               = DEFAULT_BORDERLESS;
             BorderTogglable          = DEFAULT_BORDER_TOGGLABLE;
-            VSync                    = DEFAULT_VSYNC;
             BackgroundColour         = DEFAULT_BG_COLOUR;
             ContentFolder            = DEFAULT_CONTENT_FOLDER;
-            FixedTimeStep            = DEFAULT_FIXED_TIME_STEP;
-            FrameRate                = DEFAULT_FRAMERATE;
         }
 
     }

@@ -24,18 +24,18 @@ namespace Artemis.Engine
         // Xml Tags
         public const string BASE_RESOLUTION_ELEMENT            = "BaseResolution";
         public const string WINDOW_RESIZABLE_ELEMENT           = "WindowResizable";
-        public const string FULLSCREEN_ELEMENT                 = "Fullscreen";
+        // public const string FULLSCREEN_ELEMENT                 = "Fullscreen";
         public const string FULLSCREEN_TOGGLABLE_ELEMENT       = "FullscreenTogglable";
-        public const string MOUSE_VISIBLE_ELEMENT              = "MouseVisible";
+        // public const string MOUSE_VISIBLE_ELEMENT              = "MouseVisible";
         public const string MOUSE_VISIBILITY_TOGGLABLE_ELEMENT = "MouseVisibilityTogglable";
-        public const string BORDERLESS_ELEMENT                 = "Borderless";
+        // public const string BORDERLESS_ELEMENT                 = "Borderless";
         public const string BORDER_TOGGLABLE_ELEMENT           = "BorderTogglable";
         public const string WINDOW_TITLE_ELEMENT               = "WindowTitle";
-        public const string VSYNC_ELEMENT                      = "VSync";
+        // public const string VSYNC_ELEMENT                      = "VSync";
         public const string BG_COLOUR_ELEMENT                  = "BackgroundColour";
         public const string CONTENT_FOLDER_ELEMENT             = "ContentFolder";
-        public const string FIXED_TIME_STEP_ELEMENT            = "FixedTimeStep";
-        public const string FRAMERATE_ELEMENT                  = "FrameRate";
+        // public const string FIXED_TIME_STEP_ELEMENT            = "FixedTimeStep";
+        // public const string FRAMERATE_ELEMENT                  = "FrameRate";
         public const string STATIC_ASPECT_RATIO_ELEMENT        = "StaticAspectRatio";
         public const string STATIC_RESOLUTION_ELEMENT          = "StaticResolution";
         public const string ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT = "OnlyLandscapeResolutions";
@@ -130,33 +130,17 @@ namespace Artemis.Engine
                     properties.WindowResizable = ReadBool(
                         element, GameProperties.DEFAULT_WINDOW_RESIZABLE);
                     break;
-                case FULLSCREEN_ELEMENT:
-                    properties.Fullscreen = ReadBool(
-                        element, GameProperties.DEFAULT_FULLSCREEN);
-                    break;
                 case FULLSCREEN_TOGGLABLE_ELEMENT:
                     properties.FullscreenTogglable = ReadBool(
                         element, GameProperties.DEFAULT_FULLSCREEN_TOGGLABLE);
-                    break;
-                case MOUSE_VISIBLE_ELEMENT:
-                    properties.MouseVisible = ReadBool(
-                        element, GameProperties.DEFAULT_MOUSE_VISIBLE);
                     break;
                 case MOUSE_VISIBILITY_TOGGLABLE_ELEMENT:
                     properties.MouseVisibilityTogglable = ReadBool(
                         element, GameProperties.DEFAULT_MOUSE_VISIBILITY_TOGGLABLE);
                     break;
-                case BORDERLESS_ELEMENT:
-                    properties.Borderless = ReadBool(
-                        element, GameProperties.DEFAULT_BORDERLESS);
-                    break;
                 case BORDER_TOGGLABLE_ELEMENT:
                     properties.BorderTogglable = ReadBool(
                         element, GameProperties.DEFAULT_BORDER_TOGGLABLE);
-                    break;
-                case VSYNC_ELEMENT:
-                    properties.VSync = ReadBool(
-                        element, GameProperties.DEFAULT_VSYNC);
                     break;
                 case BG_COLOUR_ELEMENT:
                     properties.BackgroundColour = ReadColour(
@@ -167,14 +151,6 @@ namespace Artemis.Engine
                     break;
                 case WINDOW_TITLE_ELEMENT:
                     properties.WindowTitle = element.InnerText;
-                    break;
-                case FIXED_TIME_STEP_ELEMENT:
-                    properties.FixedTimeStep = ReadBool(
-                        element, GameProperties.DEFAULT_FIXED_TIME_STEP);
-                    break;
-                case FRAMERATE_ELEMENT:
-                    properties.FrameRate = ReadInt(
-                        element, GameProperties.DEFAULT_FRAMERATE);
                     break;
                 case STATIC_RESOLUTION_ELEMENT:
                     properties.StaticResolution = ReadBool(

@@ -64,6 +64,8 @@
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="MultipleUpdateException.cs" />
+    <Compile Include="Persistence\UserOptions.cs" />
+    <Compile Include="Persistence\UserOptionsRecord.cs" />
     <Compile Include="UpdatableObject.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />

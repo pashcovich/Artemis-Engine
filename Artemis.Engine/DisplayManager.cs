@@ -69,11 +69,11 @@ namespace Artemis.Engine
                 return;
             }
 
-            game.IsMouseVisible      = properties.MouseVisible;
-            window.IsBorderless      = properties.Borderless;
+            // game.IsMouseVisible      = properties.MouseVisible;
+            // window.IsBorderless      = properties.Borderless;
             window.AllowUserResizing = properties.WindowResizable;
 
-            graphicsManager.IsFullScreen              = properties.Fullscreen;
+            // graphicsManager.IsFullScreen              = properties.Fullscreen;
             graphicsManager.PreferredBackBufferWidth  = WindowResolution.Width;
             graphicsManager.PreferredBackBufferHeight = WindowResolution.Height;
 
@@ -84,6 +84,7 @@ namespace Artemis.Engine
                 (Resolution.Native.Height - WindowResolution.Height) / 2
                 );
 
+            /*
             // This offset seems to width and height of the windows border,
             // so it accounts for the slight off-centering (unless the window
             // is larger than the native display).
@@ -92,6 +93,7 @@ namespace Artemis.Engine
                 position.X -= WINDOW_BORDER_OFFSET_X;
                 position.Y -= WINDOW_BORDER_OFFSET_Y;
             }
+             */
 
             graphicsManager.ApplyChanges();
 
