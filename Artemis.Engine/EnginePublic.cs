@@ -1,6 +1,9 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Input;
+using Artemis.Engine.Persistence;
+using Artemis.Engine.Utilities.Dynamics;
+using Artemis.Engine.Utilities.Serialize;
 
 using Microsoft.Xna.Framework;
 
@@ -21,10 +24,12 @@ namespace Artemis.Engine
         /// </summary>
         private static ArtemisEngine Instance;
 
+        public static bool SetupCalled { get; private set; }
+
         /// <summary>
         /// Whether or not Engine.Setup has been called.
         /// </summary>
-        public static bool SetupCalled { get { return Instance != null; } }
+        public static bool BeginCalled { get { return Instance != null; } }
 
         /// <summary>
         /// The engine's global render pipeline. Controls all rendering that takes
@@ -36,11 +41,6 @@ namespace Artemis.Engine
         /// The engine's global multiform manager.
         /// </summary>
         public static MultiformManager MultiformManager { get { return Instance._MultiformManager; } }
-
-        /// <summary>
-        /// The global game properties.
-        /// </summary>
-        public static GameProperties GameProperties { get { return Instance._GameProperties; } }
 
         /// <summary>
         /// The display manager which handles all properties of the display.
@@ -69,62 +69,40 @@ namespace Artemis.Engine
         /// </summary>
         public static KeyboardInput Keyboard { get { return Instance._Keyboard; } }
 
-        /// <summary>
-        /// Setup the game's properties using the setup file with the supplied name.
-        /// </summary>
-        /// <param name="name"></param>
-        public static void Setup(string name, Action initializer)
+        public static void Setup(string setupFileName, Action setupAction)
         {
-            Setup(new GameSetupReader(name).Read(), initializer);
+            GameConstants.ReadFromFile(setupFileName);
+            AddOptions();
+            setupAction();
+
+            SetupCalled = true;
         }
 
-        /// <summary>
-        /// Setup the game's properties using the given setup parameters.
-        /// </summary>
-        public static void Setup( Action initializer
-                                , Resolution? baseResolution    = null
-                                , bool fullscreen               = GameProperties.DEFAULT_FULLSCREEN
-                                , bool fullscreenTogglable      = GameProperties.DEFAULT_FULLSCREEN_TOGGLABLE
-                                , bool mouseVisible             = GameProperties.DEFAULT_MOUSE_VISIBLE
-                                , bool mouseVisibilityTogglable = GameProperties.DEFAULT_MOUSE_VISIBILITY_TOGGLABLE
-                                , bool borderless               = GameProperties.DEFAULT_BORDERLESS
-                                , bool borderTogglable          = GameProperties.DEFAULT_BORDER_TOGGLABLE
-                                , bool vsync                    = GameProperties.DEFAULT_VSYNC
-                                , Color? bgColour               = null
-                                , string windowTitle            = null)
+        public static void Setup(string setupFileName, string optionFileName)
         {
-            var properties = new GameProperties();
+            GameConstants.ReadFromFile(setupFileName);
+            UserOptions.SetFileName(optionFileName);
+            AddOptions();
 
-            properties.BaseResolution = baseResolution.HasValue ? baseResolution.Value 
-                                                                : GameProperties.DEFAULT_RESOLUTION;
-
-            properties.BackgroundColour = bgColour.HasValue ? bgColour.Value 
-                                                            : GameProperties.DEFAULT_BG_COLOUR;
-
-            if (windowTitle != null)
-            {
-                properties.WindowTitle = windowTitle;
-            }
-
-            properties.Fullscreen               = fullscreen;
-            properties.FullscreenTogglable      = fullscreenTogglable;
-            properties.MouseVisible             = mouseVisible;
-            properties.MouseVisibilityTogglable = mouseVisibilityTogglable;
-            properties.Borderless               = borderless;
-            properties.BorderTogglable          = borderTogglable;
-            properties.VSync                    = vsync;
-
-            Setup(properties, initializer);
+            SetupCalled = true;
         }
 
-        internal static void Setup(GameProperties properties, Action initializer)
+        public static void Begin(Action initializer)
         {
-            if (SetupCalled)
+            if (!SetupCalled)
             {
-                throw new EngineSetupException("Engine.Setup called multiple times.");
+                throw new EngineSetupException("Engine.Setup has not yet been called.");
             }
-            Instance = new ArtemisEngine(properties, initializer);
+            if (BeginCalled)
+            {
+                throw new EngineSetupException("Engine.Begin called multiple times.");
+            }
+            Instance = new ArtemisEngine(initializer);
             Instance.Run();
+
+            // Anything that happens after the above line will happen after the game window closes.
+
+            UserOptions.Write();
         }
 
         /// <summary>
@@ -133,7 +111,7 @@ namespace Artemis.Engine
         /// <param name="multiforms"></param>
         public static void RegisterMultiforms(params object[] multiforms)
         {
-            if (!SetupCalled)
+            if (!BeginCalled)
             {
                 throw new EngineSetupException(
                     "Must call Engine.Setup before call to Engine.RegisterMultiforms.");
@@ -147,12 +125,73 @@ namespace Artemis.Engine
         /// <param name="multiform"></param>
         public static void StartWith(string multiformName)
         {
-            if (!SetupCalled)
+            if (!BeginCalled)
             {
                 throw new EngineSetupException(
                     "Must call Engine.Setup before call to Engine.StartWith.");
             }
             MultiformManager.Activate(multiformName, new MultiformConstructionArgs(null));
         }
+
+        #region Universal Game Options
+
+        private static void AddOptions()
+        {
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "Fullscreen",
+                    GameConstants.DefaultFullscreen,
+                    new BoolStringSerializer()),
+                new Getter(() => DisplayManager.Fullscreen),
+                new Setter((v) => { DisplayManager.SetFullscreen((bool)v); })
+                );
+
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "MouseVisible",
+                    GameConstants.DefaultMouseVisibility,
+                    new BoolStringSerializer()),
+                new Getter(() => DisplayManager.MouseVisible),
+                new Setter((v) => { DisplayManager.SetMouseVisibility((bool)v); })
+                );
+
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "Borderless",
+                    GameConstants.DefaultBorderless,
+                    new BoolStringSerializer()),
+                new Getter(() => DisplayManager.Borderless),
+                new Setter((v) => { DisplayManager.SetBorderless((bool)v); })
+                );
+
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "Resolution",
+                    GameConstants.DefaultResolution,
+                    new ResolutionStringSerializer()),
+                new Getter(() => DisplayManager.WindowResolution),
+                new Setter((v) => { DisplayManager.SetResolution((Resolution)v); })
+                );
+
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "VSync",
+                    GameConstants.DefaultVSync,
+                    new BoolStringSerializer()),
+                new Getter(() => DisplayManager.VSync),
+                new Setter((v) => { DisplayManager.SetVSync((bool)v); })
+                );
+
+            UserOptions.AddOption(
+                new SimpleOptionRecord(
+                    "FrameRate",
+                    GameConstants.DefaultFrameRate,
+                    new Int32StringSerializer()),
+                new Getter(() => Instance.gameKernel.FrameRate),
+                new Setter((v) => { Instance.gameKernel.FrameRate = (int)v; })
+                );
+        }
+
+        #endregion
     }
 }

@@ -61,7 +61,7 @@ namespace Artemis.Engine
             BegunRenderCycle = true;
             spriteBatchBegun = true;
 
-            GraphicsDevice.Clear(ArtemisEngine.GameProperties.BackgroundColour);
+            GraphicsDevice.Clear(ArtemisEngine.DisplayManager.BackgroundColour);
             SpriteBatch.Begin();
         }
 

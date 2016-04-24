@@ -46,11 +46,11 @@ namespace Artemis.Engine.Effectors.Special
             return val.Y;
         }
 
-        protected override void AssignNextValue(float nextVal)
+        protected override void AssignNextValue(EffectableObject obj, float nextVal)
         {
-            var prevVec = Get<Vector2>(EffectedPropertyName);
+            var prevVec = obj.Get<Vector2>(EffectedPropertyName);
             prevVec.Y = nextVal;
-            Set(EffectedPropertyName, prevVec);
+            obj.Set(EffectedPropertyName, prevVec);
         }
 
         protected override float Combine_InPlaceAndRelativeToStart(float init, float combined)

@@ -21,43 +21,37 @@ namespace Artemis.Engine
         /// <summary>
         /// A reference to the main engine instance. We need this so
         /// that we can initialize it's RenderPipeline from Initialize.
-        /// (Again, due to Monogame's dumb architecture)
         /// </summary>
         ArtemisEngine engine;
-
-        #region Dumb Fuckery
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        #endregion
+        private int _frameRate;
+        public int FrameRate
+        {
+            get
+            {
+                return _frameRate;
+            }
+            internal set
+            {
+                _frameRate = value;
+                TargetElapsedTime = TimeSpan.FromSeconds(1d / (double)value);
+            }
+        }
 
-        public GameKernel(ArtemisEngine engine)
+        public GameKernel(ArtemisEngine engine, string contentFolder, bool fixedTimeStep, int frameRate)
             : base()
         {
             this.engine = engine;
-            var props = engine._GameProperties;
 
-            Window.Title = props.WindowTitle;
-
-            IsFixedTimeStep = props.FixedTimeStep;
-            TargetElapsedTime = TimeSpan.FromSeconds(1d / (double)props.FrameRate);
-
-            if (props.WindowResizable && !props.StaticResolution)
-            {
-                Window.ClientSizeChanged += new EventHandler<EventArgs>(
-                (sender, e) =>
-                {
-                    engine._DisplayManager.SetResolution(new Resolution(
-                        Window.ClientBounds.Width,
-                        Window.ClientBounds.Height));
-                });
-            }
-            Window.AllowUserResizing = props.WindowResizable;
+            IsFixedTimeStep = fixedTimeStep;
+            FrameRate = frameRate;
 
             graphics = new GraphicsDeviceManager(this);
 
-            Content.RootDirectory = props.ContentFolder;
+            Content.RootDirectory = contentFolder;
             AssetLoader.Initialize(Content);
         }
 
@@ -68,7 +62,7 @@ namespace Artemis.Engine
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Due to Monogame's stupidity, we have to create the spriteBatch here, and not in
-            // the most logical location (GameKernel's constructor OR even better, we shouldn't
+            // the most logical location (GameKernel's constructor OR even better, WE shouldn't
             // have to create it at all), we have to initialize the render pipeline from here.
             
             engine.InitializeRenderPipeline(spriteBatch, GraphicsDevice, graphics);
@@ -83,6 +77,11 @@ namespace Artemis.Engine
 
             #region Angry Rant About Monogame
 
+            // 4/23/2016: This is all just for fun. In reality I love you guys at Monogame, and appreciate
+            // your hard, though sometimes questionable, work!
+
+            // WRITTEN: 11/15/2015
+            //
             // Alright, story time. Monogame's Game class is structured so that Initialize
             // has to get called before LoadContent, and LoadContent has to be called before Update.
             // Initialize must be called before the GraphicsDevice or the SpriteBatch can be used,
