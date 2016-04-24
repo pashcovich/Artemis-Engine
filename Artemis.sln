@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.ApprovalTestTemplat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.Test", "Artemis.Tests\Artemis.Test.csproj", "{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artemis.Editor", "Artemis.Editor\Artemis.Editor.csproj", "{60F8E30E-A114-40B0-9572-64318FB17AF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,16 @@ Global
 		{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2E48BD63-0DAF-4E2E-99C4-1F0D6D8C03ED}.Release|x86.ActiveCfg = Release|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{60F8E30E-A114-40B0-9572-64318FB17AF6}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
