@@ -117,9 +117,10 @@ namespace Artemis.Engine.Utilities.Dynamics
         /// <param name="getter"></param>
         /// <param name="setter"></param>
         public void Define(
-            string name, Getter getter, Setter setter, bool useInitialValue = false, object initialValue = null)
+            string name, Getter getter, Setter setter, bool useInitialValue = false, 
+            object initialValue = null, bool redefine = false )
         {
-            if (properties.ContainsKey(name))
+            if (properties.ContainsKey(name) && !redefine)
             {
                 throw new DynamicPropertyException(
                     String.Format(
@@ -140,9 +141,10 @@ namespace Artemis.Engine.Utilities.Dynamics
         /// <param name="name"></param>
         /// <param name="getter"></param>
         public void Define(
-            string name, Getter getter, bool useInitialValue = false, object initialValue = null)
+            string name, Getter getter, bool useInitialValue = false, 
+            object initialValue = null, bool redefine = false )
         {
-            Define(name, getter, null, useInitialValue, initialValue);
+            Define(name, getter, null, useInitialValue, initialValue, redefine);
         }
 
         /// <summary>
@@ -151,9 +153,10 @@ namespace Artemis.Engine.Utilities.Dynamics
         /// <param name="name"></param>
         /// <param name="setter"></param>
         public void Define(
-            string name, Setter setter, bool useInitialValue = false, object initialValue = null)
+            string name, Setter setter, bool useInitialValue = false, 
+            object initialValue = null, bool redefine = false )
         {
-            Define(name, null, setter, useInitialValue, initialValue);
+            Define(name, null, setter, useInitialValue, initialValue, redefine);
         }
 
         /// <summary>

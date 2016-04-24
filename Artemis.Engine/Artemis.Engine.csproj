@@ -51,6 +51,7 @@
     <Compile Include="Effectors\EffectableObject.cs" />
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
     <Compile Include="Graphics\IManipulableRenderable.cs" />
     <Compile Include="Graphics\IRenderable.cs" />
@@ -64,8 +65,13 @@
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="MultipleUpdateException.cs" />
+    <Compile Include="Persistence\AbstractOptionRecord.cs" />
+    <Compile Include="Persistence\OptionCoercer.cs" />
+    <Compile Include="Persistence\OptionRecordException.cs" />
+    <Compile Include="Persistence\OptionRecordService.cs" />
+    <Compile Include="Persistence\OptionValidator.cs" />
+    <Compile Include="Persistence\SimpleOptionRecord.cs" />
     <Compile Include="Persistence\UserOptions.cs" />
-    <Compile Include="Persistence\UserOptionsRecord.cs" />
     <Compile Include="UpdatableObject.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
@@ -90,8 +96,6 @@
     <Compile Include="EnginePrivate.cs" />
     <Compile Include="EnginePublic.cs" />
     <Compile Include="EngineSetupException.cs" />
-    <Compile Include="GameProperties.cs" />
-    <Compile Include="GameSetupReader.cs" />
     <Compile Include="Utilities\Dynamics\Getter.cs" />
     <Compile Include="Utilities\Dynamics\HasDynamicPropertiesAttribute.cs" />
     <Compile Include="Input\KeyboardInput.cs" />
@@ -138,6 +142,7 @@
     <Compile Include="Utilities\GenericOperators.cs" />
     <Compile Include="Utilities\Partial\PartialEngineAdapter.cs" />
     <Compile Include="Utilities\Partial\PartialEngineAttribute.cs" />
+    <Compile Include="Utilities\Serialize\AbstractStringSerializer.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Utilities\UriTree\UriTreeObserverNode.cs" />
     <Compile Include="Utilities\UriTree\UriUtilities.cs" />
     <Compile Include="Utilities\Reflection.cs" />
+    <Compile Include="Utilities\Xml\IXmlElementIO.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

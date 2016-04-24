@@ -23,6 +23,12 @@ namespace Artemis.Engine.Persistence
             OptionRecords.Add(record.Name, record);
         }
 
+        public void AddOptionRecord(AbstractOptionRecord record, Getter getter, Setter setter)
+        {
+            OptionRecords.Add(record.Name, record);
+            Define(record.Name, getter, setter);
+        }
+
         public void Read(string fileName)
         {
             var doc = new XmlDocument();

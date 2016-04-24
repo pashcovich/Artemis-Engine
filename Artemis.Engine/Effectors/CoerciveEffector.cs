@@ -112,7 +112,7 @@ namespace Artemis.Engine.Effectors
 
         protected abstract T2 CoerceTo(T1 t1);
 
-        protected abstract void AssignNextValue(T2 t2);
+        protected abstract void AssignNextValue(EffectableObject obj, T2 t2);
 
         public virtual void InternalInitialize(EffectableObject obj)
         {
@@ -254,7 +254,7 @@ namespace Artemis.Engine.Effectors
             var next = GetNext(obj);
             Prev = next;
 
-            AssignNextValue(next);
+            AssignNextValue(obj, next);
         }
     }
 }

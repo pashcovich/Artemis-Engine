@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Input;
+using Artemis.Engine.Persistence;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,7 +18,6 @@ namespace Artemis.Engine
 
         internal RenderPipeline   _RenderPipeline   { get; private set; }
         internal MultiformManager _MultiformManager { get; private set; }
-        internal GameProperties   _GameProperties   { get; private set; }
         internal DisplayManager   _DisplayManager   { get; private set; }
         internal GlobalTimer      _GameTimer        { get; private set; }
         internal GlobalUpdater    _GameUpdater      { get; private set; }
@@ -42,13 +42,16 @@ namespace Artemis.Engine
         /// </summary>
         internal bool Initialized { get; private set; }
 
-        private ArtemisEngine(GameProperties properties, Action initializer) : base()
+        private ArtemisEngine(Action initializer) : base()
         {
             this.initializer = initializer;
             Initialized = false;
 
-            _GameProperties = properties;
-            gameKernel = new GameKernel(this);
+            gameKernel = new GameKernel(
+                this, 
+                GameConstants.ContentFolder, 
+                GameConstants.FixedTimeStep, 
+                GameConstants.DefaultFrameRate);
 
             _MultiformManager = new MultiformManager();
             _GameTimer        = new GlobalTimer();
@@ -67,7 +70,17 @@ namespace Artemis.Engine
         internal void InitializeRenderPipeline(SpriteBatch sb, GraphicsDevice gd, GraphicsDeviceManager gdm)
         {
             _RenderPipeline = new RenderPipeline(sb, gd, gdm);
-            _DisplayManager = new DisplayManager(gameKernel, _GameProperties, _RenderPipeline);
+            _DisplayManager = new DisplayManager(
+                gameKernel, 
+                _RenderPipeline,
+                GameConstants.BaseResolution,
+                GameConstants.DefaultFullscreen,
+                GameConstants.DefaultMouseVisibility,
+                GameConstants.DefaultBorderless,
+                GameConstants.DefaultVSync,
+                GameConstants.InitialWindowTitle,
+                GameConstants.InitialBackgroundColour
+                );
         }
 
         /// <summary>
@@ -75,6 +88,7 @@ namespace Artemis.Engine
         /// </summary>
         internal void Initialize()
         {
+            UserOptions.Read();
             initializer();
             Initialized = true;
         }

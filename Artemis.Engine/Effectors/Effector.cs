@@ -53,9 +53,9 @@ namespace Artemis.Engine.Effectors
             return val;
         }
 
-        protected override void AssignNextValue(T val)
+        protected override void AssignNextValue(EffectableObject obj, T val)
         {
-            Set(EffectedPropertyName, val);
+            obj.Set(EffectedPropertyName, val);
         }
     }
 }

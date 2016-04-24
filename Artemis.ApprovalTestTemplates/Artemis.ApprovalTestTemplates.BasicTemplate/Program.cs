@@ -20,7 +20,13 @@ namespace Artemis.ApprovalTestTemplates.BasicTemplate
         [STAThread]
         static void Main()
         {
-            ArtemisEngine.Setup("game.setup", Initialize);
+            ArtemisEngine.Setup("game.setup", Setup);
+            ArtemisEngine.Begin(Initialize);
+        }
+
+        static void Setup()
+        {
+
         }
 
         static void Initialize()

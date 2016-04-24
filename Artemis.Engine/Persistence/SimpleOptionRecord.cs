@@ -7,6 +7,12 @@ namespace Artemis.Engine.Persistence
     {
         public AbstractStringSerializer Serializer { get; private set; }
 
+        public SimpleOptionRecord(string name, AbstractStringSerializer serializer)
+            : this(name, null, null, null, serializer) { }
+
+        public SimpleOptionRecord(string name, object defaultVal, AbstractStringSerializer serializer)
+            : this(name, defaultVal, null, null, serializer) { }
+
         public SimpleOptionRecord(
             string name, object defaultVal, OptionValidator validator,
             OptionCoercer coercer, AbstractStringSerializer serializer)

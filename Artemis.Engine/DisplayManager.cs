@@ -18,7 +18,6 @@ namespace Artemis.Engine
         public const int WINDOW_BORDER_OFFSET_Y = 30;
 
         private GameKernel game;
-        private GameProperties properties;
         private GraphicsDevice graphicsDevice;
         private GraphicsDeviceManager graphicsManager;
         private SpriteBatch spriteBatch;
@@ -29,12 +28,52 @@ namespace Artemis.Engine
         /// </summary>
         public Resolution WindowResolution { get; private set; }
 
-        public bool IsBaseResolution { get { return WindowResolution == properties.BaseResolution; } }
+        /// <summary>
+        /// Whether or not the current resolution is equal to the base resolution.
+        /// </summary>
+        public bool IsBaseResolution { get { return WindowResolution == GameConstants.BaseResolution; } }
 
-        public Vector2 ResolutionScale { get { return WindowResolution / properties.BaseResolution;  } }
+        public Vector2 ResolutionScale { get { return WindowResolution / GameConstants.BaseResolution; } }
 
         public bool ResolutionChanged { get { return resChangedCounter > 0; } }
         private int resChangedCounter = 0;
+
+        /// <summary>
+        /// Whether or not the display is fullscreen.
+        /// </summary>
+        public bool Fullscreen { get; private set; }
+
+        /// <summary>
+        /// Whether or not the mouse cursor is visible.
+        /// </summary>
+        public bool MouseVisible { get; private set; }
+
+        /// <summary>
+        /// Whether or not the window is bordered.
+        /// </summary>
+        public bool Borderless { get; private set; }
+
+        /// <summary>
+        /// Whether or not the display uses vertical synchronization.
+        /// </summary>
+        public bool VSync { get; private set; }
+
+        /// <summary>
+        /// The background colour of the display.
+        /// </summary>
+        public Color BackgroundColour { get; private set; }
+
+        public string WindowTitle
+        {
+            get
+            {
+                return window.Title;
+            }
+            private set
+            {
+                window.Title = value;
+            }
+        }
 
         /// <summary>
         /// Whether or not ReinitDisplayProperties has to be called. 
@@ -42,17 +81,29 @@ namespace Artemis.Engine
         private bool dirty;
 
         internal DisplayManager( GameKernel game
-                               , GameProperties properties
-                               , RenderPipeline renderPipeline)
+                               , RenderPipeline renderPipeline
+                               , Resolution baseResolution
+                               , bool fullscreen
+                               , bool mouseVisible
+                               , bool borderless
+                               , bool vsync
+                               , string windowTitle
+                               , Color bgColor )
         {
             this.game            = game;
-            this.properties      = properties;
             this.graphicsDevice  = renderPipeline.GraphicsDevice;
             this.graphicsManager = renderPipeline.GraphicsDeviceManager;
             this.spriteBatch     = renderPipeline.SpriteBatch;
 
             window = game.Window;
-            this.WindowResolution = properties.BaseResolution;
+            WindowResolution = baseResolution;
+
+            Fullscreen = fullscreen;
+            MouseVisible = mouseVisible;
+            Borderless = borderless;
+            VSync = vsync;
+            WindowTitle = windowTitle;
+            BackgroundColour = bgColor;
 
             ReinitDisplayProperties(true);
         }
@@ -62,18 +113,17 @@ namespace Artemis.Engine
         /// </summary>
         internal void ReinitDisplayProperties(bool overrideDirty = false)
         {
-            graphicsManager.SynchronizeWithVerticalRetrace = properties.VSync;
+            graphicsManager.SynchronizeWithVerticalRetrace = VSync;
 
             if (!dirty && !overrideDirty)
             {
                 return;
             }
 
-            // game.IsMouseVisible      = properties.MouseVisible;
-            // window.IsBorderless      = properties.Borderless;
-            window.AllowUserResizing = properties.WindowResizable;
+            game.IsMouseVisible = MouseVisible;
+            window.IsBorderless = Borderless;
 
-            // graphicsManager.IsFullScreen              = properties.Fullscreen;
+            graphicsManager.IsFullScreen              = Fullscreen;
             graphicsManager.PreferredBackBufferWidth  = WindowResolution.Width;
             graphicsManager.PreferredBackBufferHeight = WindowResolution.Height;
 
@@ -84,16 +134,14 @@ namespace Artemis.Engine
                 (Resolution.Native.Height - WindowResolution.Height) / 2
                 );
 
-            /*
             // This offset seems to width and height of the windows border,
             // so it accounts for the slight off-centering (unless the window
             // is larger than the native display).
-            if (!properties.Borderless)
+            if (!Borderless)
             {
                 position.X -= WINDOW_BORDER_OFFSET_X;
                 position.Y -= WINDOW_BORDER_OFFSET_Y;
             }
-             */
 
             graphicsManager.ApplyChanges();
 
@@ -112,7 +160,7 @@ namespace Artemis.Engine
         /// </summary>
         public void ToggleFullscreen()
         {
-            SetFullscreen(properties.Fullscreen);
+            SetFullscreen(!Fullscreen);
         }
 
         /// <summary>
@@ -120,7 +168,7 @@ namespace Artemis.Engine
         /// </summary>
         public void ToggleMouseVisibility()
         {
-            SetBorderless(!properties.MouseVisible);
+            SetBorderless(!MouseVisible);
         }
 
         /// <summary>
@@ -128,7 +176,7 @@ namespace Artemis.Engine
         /// </summary>
         public void ToggleBorderless()
         {
-            SetBorderless(!properties.Borderless);
+            SetBorderless(!Borderless);
         }
 
         /// <summary>
@@ -136,7 +184,7 @@ namespace Artemis.Engine
         /// </summary>
         public void ToggleVSync()
         {
-            SetVSync(!properties.VSync);
+            SetVSync(!VSync);
         }
 
         /// <summary>
@@ -145,9 +193,9 @@ namespace Artemis.Engine
         /// <param name="state"></param>
         public void SetFullscreen(bool state)
         {
-            if (!properties.FullscreenTogglable)
-                throw UntogglableException("Fullscreen", GameSetupReader.FULLSCREEN_TOGGLABLE_ELEMENT);
-            properties.Fullscreen = state;
+            if (state != Fullscreen && !GameConstants.FullscreenTogglable)
+                throw UntogglableException("Fullscreen", GameConstants.XmlElements.FULLSCREEN_TOGGLABLE);
+            Fullscreen = state;
             dirty = true;
         }
 
@@ -157,9 +205,9 @@ namespace Artemis.Engine
         /// <param name="state"></param>
         public void SetMouseVisibility(bool state)
         {
-            if (!properties.MouseVisibilityTogglable)
-                throw UntogglableException("Mouse visibility", GameSetupReader.MOUSE_VISIBILITY_TOGGLABLE_ELEMENT);
-            properties.MouseVisible = state;
+            if (state != MouseVisible && !GameConstants.MouseVisibilityTogglable)
+                throw UntogglableException("Mouse visibility", GameConstants.XmlElements.MOUSE_VISIBILITY_TOGGLABLE);
+            MouseVisible = state;
             dirty = true;
         }
 
@@ -169,38 +217,38 @@ namespace Artemis.Engine
         /// <param name="state"></param>
         public void SetBorderless(bool state)
         {
-            if (!properties.MouseVisibilityTogglable)
-                throw UntogglableException("Borderless", GameSetupReader.BORDER_TOGGLABLE_ELEMENT);
-            properties.Borderless = state;
+            if (state != Borderless && !GameConstants.BorderTogglable)
+                throw UntogglableException("Borderless", GameConstants.XmlElements.BORDER_TOGGLABLE);
+            Borderless = state;
             dirty = true;
         }
 
         public void SetResolution(Resolution resolution)
         {
-            if (properties.StaticResolution)
+            if (resolution != WindowResolution && GameConstants.StaticResolution)
             {
                 throw new DisplayManagerException(
                     String.Format(
                         "Cannot change resolution. (Game Property '{0}' set to true)",
-                        GameSetupReader.STATIC_RESOLUTION_ELEMENT
+                        GameConstants.XmlElements.STATIC_RESOLUTION
                         )
                     );   
             }
-            if (properties.OnlyLandscapeResolutions && !resolution.IsLandscape)
+            if (GameConstants.OnlyLandscapeResolutions && !resolution.IsLandscape)
             {
                 throw new DisplayManagerException(
                     String.Format(
                         "Cannot change resolution to '{0}'; resolutions must be landscape. " + 
-                        "(GameProperty '{1}' set to true)", resolution, GameSetupReader.ONLY_LANDSCAPE_RESOLUTIONS_ELEMENT
+                        "(GameProperty '{1}' set to true)", resolution, GameConstants.XmlElements.ONLY_LANDSCAPE_RESOLUTIONS
                         )
                     );
             }
-            else if (properties.OnlyPortraitResolutions && !resolution.IsPortrait)
+            else if (GameConstants.OnlyPortraitResolutions && !resolution.IsPortrait)
             {
                 throw new DisplayManagerException(
                     String.Format(
                         "Cannot change resolution to '{0}'; resolutions must be portrait. " +
-                        "(GameProperty '{1}' set to true)", resolution, GameSetupReader.ONLY_PORTRAIT_RESOLUTIONS_ELEMENT
+                        "(GameProperty '{1}' set to true)", resolution, GameConstants.XmlElements.ONLY_PORTRAIT_RESOLUTIONS
                         )
                     );
             }
@@ -215,7 +263,7 @@ namespace Artemis.Engine
         /// <param name="state"></param>
         public void SetVSync(bool state)
         {
-            properties.VSync = state;
+            VSync = state;
             dirty = true;
         }
 
@@ -236,8 +284,12 @@ namespace Artemis.Engine
         /// <param name="name"></param>
         public void SetWindowTitle(string name)
         {
-            properties.WindowTitle = name;
-            window.Title = name;
+            WindowTitle = name;
+        }
+
+        public void SetBackgroundColour(Color colour)
+        {
+            BackgroundColour = colour;
         }
     }
 }

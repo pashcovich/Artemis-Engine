@@ -23,7 +23,8 @@ namespace Artemis.Engine.Utilities.Dynamics
             {
                 if (setter != null)
                     setter(value);
-                throw new DynamicPropertyException();
+                else
+                    throw new DynamicPropertyException();
             }
         }
 
