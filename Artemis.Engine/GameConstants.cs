@@ -42,6 +42,8 @@ namespace Artemis.Engine
             public const string ContentFolder = "Content";
             public const string WindowTitle = "Game";
             public static readonly Color BackgroundColour = Color.Black;
+
+            public const bool DisableUserOptionsWriteOnClose = false;
         }
 
         public static class XmlElements
@@ -51,6 +53,7 @@ namespace Artemis.Engine
             public const string KERNEL_CONSTANTS         = "Kernel";
             public const string DISPLAY_CONSTANTS        = "Display";
             public const string OPTION_DEFAULT_CONSTANTS = "OptionDefaults";
+            public const string DEBUG_CONSTANTS          = "Debug";
 
             public const string FULLSCREEN_TOGGLABLE       = "FullscreenTogglable";
             public const string MOUSE_VISIBILITY_TOGGLABLE = "MouseVisibilityTogglable";
@@ -70,6 +73,7 @@ namespace Artemis.Engine
             public const string CONTENT_FOLDER             = "ContentFolder";
             public const string WINDOW_TITLE               = "WindowTitle";
             public const string BACKGROUND_COLOUR          = "BackgroundColour";
+            public const string DISABLE_USER_OPTIONS_WRITE_ON_CLOSE = "DisableUserOptionsWriteOnClose";
         }
 
         private static GameConstants Instance = new GameConstants();
@@ -170,6 +174,12 @@ namespace Artemis.Engine
         /// </summary>
         public static Color InitialBackgroundColour { get { return Instance.bgColour; } }
 
+        /// <summary>
+        /// Debug property: if enabled, prevents the UserOptions from being written to a file on
+        /// exiting the game.
+        /// </summary>
+        public static bool DisableUserOptionsWriteOnClose { get { return Instance.disableUserOptionsWriteOnClose; } }
+
         private bool fullscreenTogglable      = Defaults.FullscreenTogglable; // display
         private bool mouseVisibilityTogglable = Defaults.MouseVisibilityTogglable;// display
         private bool borderTogglable          = Defaults.BorderTogglable;// display
@@ -188,6 +198,7 @@ namespace Artemis.Engine
         private string contentFolder          = Defaults.ContentFolder;//kernel
         private string windowTitle            = Defaults.WindowTitle;//kernel
         private Color bgColour                = Defaults.BackgroundColour;// display
+        private bool disableUserOptionsWriteOnClose = Defaults.DisableUserOptionsWriteOnClose;// debug
 
         private Dictionary<string, Action<string>> kernelConstantReaders
             = new Dictionary<string, Action<string>>();
@@ -196,6 +207,9 @@ namespace Artemis.Engine
             = new Dictionary<string, Action<string>>();
 
         private Dictionary<string, Action<string>> optionDefaultsConstantReaders
+            = new Dictionary<string, Action<string>>();
+
+        private Dictionary<string, Action<string>> debugConstantReaders
             = new Dictionary<string, Action<string>>();
 
         private GameConstants() 
@@ -220,6 +234,8 @@ namespace Artemis.Engine
             optionDefaultsConstantReaders.Add(XmlElements.DEFAULT_VSYNC,            s => { defaultVSync           = ReadBool(s, defaultVSync); });
             optionDefaultsConstantReaders.Add(XmlElements.DEFAULT_RESOLUTION,       s => { defaultResolution      = ReadResolution(s, defaultResolution); });
             optionDefaultsConstantReaders.Add(XmlElements.DEFAULT_FRAME_RATE,       s => { defaultFrameRate       = ReadInt(s, defaultFrameRate); });
+
+            debugConstantReaders.Add(XmlElements.DISABLE_USER_OPTIONS_WRITE_ON_CLOSE, s => { disableUserOptionsWriteOnClose = ReadBool(s, disableUserOptionsWriteOnClose); });
         }
 
         private bool ReadBool(string s, bool defaultVal)
@@ -320,6 +336,9 @@ namespace Artemis.Engine
                         break;
                     case XmlElements.OPTION_DEFAULT_CONSTANTS:
                         ReadElements(element, optionDefaultsConstantReaders);
+                        break;
+                    case XmlElements.DEBUG_CONSTANTS:
+                        ReadElements(element, debugConstantReaders);
                         break;
                 }
             }

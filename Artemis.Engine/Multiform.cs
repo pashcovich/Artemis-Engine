@@ -56,7 +56,6 @@ namespace Artemis.Engine
                  : type.Name;
 
             initialize();
-            
         }
 
         public Multiform(string name)

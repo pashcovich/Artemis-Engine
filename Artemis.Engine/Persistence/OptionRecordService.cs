@@ -50,6 +50,8 @@ namespace Artemis.Engine.Persistence
             foreach (var child in root.ChildNodes)
             {
                 var element = child as XmlElement;
+                if (element == null)
+                    continue;
                 var name = element.Name;
 
                 // If we don't have a record for this option, just ignore it.

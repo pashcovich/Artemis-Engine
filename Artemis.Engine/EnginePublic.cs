@@ -102,7 +102,8 @@ namespace Artemis.Engine
 
             // Anything that happens after the above line will happen after the game window closes.
 
-            UserOptions.Write();
+            if (!GameConstants.DisableUserOptionsWriteOnClose)
+                UserOptions.Write();
         }
 
         /// <summary>

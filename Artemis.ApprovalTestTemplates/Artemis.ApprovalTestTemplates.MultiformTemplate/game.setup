@@ -49,4 +49,10 @@
     <!-- The default value of GameKernel.FrameRate. -->
     <DefaultFrameRate>60</DefaultFrameRate>
   </OptionDefaults>
+
+  <!-- These are constants that aid in debugging the engine and the game. -->
+  <Debug>
+    <!-- Whether or not the UserOptions is written to a file on exiting the game. -->
+    <DisableUserOptionsWriteOnClose>True</DisableUserOptionsWriteOnClose>
+  </Debug>
 </GameConstants>
