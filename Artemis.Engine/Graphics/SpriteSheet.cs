@@ -23,8 +23,9 @@ namespace Artemis.Engine.Graphics
 
         private Dictionary<string, Dictionary<string, Rectangle>> TileGroups;
 
-        public SpriteSheet(Dictionary<string, Dictionary<string, Rectangle>> tileGroups)
+        public SpriteSheet(Texture2D texture, Dictionary<string, Dictionary<string, Rectangle>> tileGroups)
         {
+            Texture = texture;
             GlobalTileGroup = tileGroups[GLOBAL_TILE_GROUP_NAME];
             TileGroups = tileGroups.Where(v => v.Key != GLOBAL_TILE_GROUP_NAME).ToDictionary(v => v.Key, v => v.Value);
         }
