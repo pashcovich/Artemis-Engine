@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Persistence;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -26,7 +28,17 @@ namespace Artemis.Engine
         /// <summary>
         /// The current resolution of the window.
         /// </summary>
-        public Resolution WindowResolution { get; private set; }
+        public Resolution WindowResolution
+        {
+            get
+            {
+                return UserOptions.Get<Resolution>("Resolution");
+            }
+            set
+            {
+                UserOptions.Set("Resolution", value);
+            }
+        }
 
         /// <summary>
         /// Whether or not the current resolution is equal to the base resolution.
@@ -41,28 +53,71 @@ namespace Artemis.Engine
         /// <summary>
         /// Whether or not the display is fullscreen.
         /// </summary>
-        public bool Fullscreen { get; private set; }
+        public bool Fullscreen 
+        { 
+            get 
+            { 
+                return UserOptions.Get<bool>("Fullscreen"); 
+            } 
+            private set 
+            { 
+                UserOptions.Set("Fullscreen", value); 
+            } 
+        }
 
         /// <summary>
         /// Whether or not the mouse cursor is visible.
         /// </summary>
-        public bool MouseVisible { get; private set; }
+        public bool MouseVisible
+        {
+            get
+            {
+                return UserOptions.Get<bool>("MouseVisible");
+            }
+            private set
+            {
+                UserOptions.Set("MouseVisible", value);
+            }
+        }
 
         /// <summary>
         /// Whether or not the window is bordered.
         /// </summary>
-        public bool Borderless { get; private set; }
+        public bool Borderless
+        {
+            get
+            {
+                return UserOptions.Get<bool>("Borderless");
+            }
+            private set
+            {
+                UserOptions.Set("Borderless", value);
+            }
+        }
 
         /// <summary>
         /// Whether or not the display uses vertical synchronization.
         /// </summary>
-        public bool VSync { get; private set; }
+        public bool VSync
+        {
+            get
+            {
+                return UserOptions.Get<bool>("VSync");
+            }
+            set
+            {
+                UserOptions.Set("VSync", value);
+            }
+        }
 
         /// <summary>
         /// The background colour of the display.
         /// </summary>
         public Color BackgroundColour { get; private set; }
 
+        /// <summary>
+        /// The title of the game window.
+        /// </summary>
         public string WindowTitle
         {
             get
@@ -83,10 +138,6 @@ namespace Artemis.Engine
         internal DisplayManager( GameKernel game
                                , RenderPipeline renderPipeline
                                , Resolution baseResolution
-                               , bool fullscreen
-                               , bool mouseVisible
-                               , bool borderless
-                               , bool vsync
                                , string windowTitle
                                , Color bgColor )
         {
@@ -98,10 +149,6 @@ namespace Artemis.Engine
             window = game.Window;
             WindowResolution = baseResolution;
 
-            Fullscreen = fullscreen;
-            MouseVisible = mouseVisible;
-            Borderless = borderless;
-            VSync = vsync;
             WindowTitle = windowTitle;
             BackgroundColour = bgColor;
 

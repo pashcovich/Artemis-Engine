@@ -80,6 +80,7 @@
     <Compile Include="Graphics\AnimationStepActions\WaitAnimationStepAction.cs" />
     <Compile Include="MultipleUpdateException.cs" />
     <Compile Include="Persistence\AbstractOptionRecord.cs" />
+    <Compile Include="Persistence\OptionChangedEventHandler.cs" />
     <Compile Include="Persistence\OptionCoercer.cs" />
     <Compile Include="Persistence\OptionRecordException.cs" />
     <Compile Include="Persistence\OptionRecordService.cs" />

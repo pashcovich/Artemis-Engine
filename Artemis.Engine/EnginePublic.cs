@@ -140,57 +140,42 @@ namespace Artemis.Engine
         {
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "Fullscreen",
+                    UserOptions.Builtins.Fullscreen,
                     GameConstants.DefaultFullscreen,
-                    new BoolStringSerializer()),
-                new Getter(() => DisplayManager.Fullscreen),
-                new Setter((v) => { DisplayManager.SetFullscreen((bool)v); })
-                );
+                    new BoolStringSerializer()));
 
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "MouseVisible",
+                    UserOptions.Builtins.MouseVisible,
                     GameConstants.DefaultMouseVisibility,
-                    new BoolStringSerializer()),
-                new Getter(() => DisplayManager.MouseVisible),
-                new Setter((v) => { DisplayManager.SetMouseVisibility((bool)v); })
-                );
+                    new BoolStringSerializer()));
 
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "Borderless",
+                    UserOptions.Builtins.Borderless,
                     GameConstants.DefaultBorderless,
-                    new BoolStringSerializer()),
-                new Getter(() => DisplayManager.Borderless),
-                new Setter((v) => { DisplayManager.SetBorderless((bool)v); })
-                );
+                    new BoolStringSerializer()));
 
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "Resolution",
+                    UserOptions.Builtins.Resolution,
                     GameConstants.DefaultResolution,
-                    new ResolutionStringSerializer()),
-                new Getter(() => DisplayManager.WindowResolution),
-                new Setter((v) => { DisplayManager.SetResolution((Resolution)v); })
-                );
+                    new ResolutionStringSerializer()));
 
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "VSync",
+                    UserOptions.Builtins.VSync,
                     GameConstants.DefaultVSync,
-                    new BoolStringSerializer()),
-                new Getter(() => DisplayManager.VSync),
-                new Setter((v) => { DisplayManager.SetVSync((bool)v); })
-                );
+                    new BoolStringSerializer()));
 
             UserOptions.AddOption(
                 new SimpleOptionRecord(
-                    "FrameRate",
+                    UserOptions.Builtins.FrameRate,
                     GameConstants.DefaultFrameRate,
-                    new Int32StringSerializer()),
-                new Getter(() => Instance.gameKernel.FrameRate),
-                new Setter((v) => { Instance.gameKernel.FrameRate = (int)v; })
-                );
+                    new Int32StringSerializer()));
+
+            UserOptions.AddOptionChangedEventHandler(UserOptions.Builtins.FrameRate, 
+                (s, e) => { Instance.gameKernel.FrameRate = UserOptions.Get<int>(UserOptions.Builtins.FrameRate); });
         }
 
         #endregion

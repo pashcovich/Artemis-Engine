@@ -53,6 +53,13 @@ namespace Artemis.Engine
                 GameConstants.FixedTimeStep, 
                 GameConstants.DefaultFrameRate);
 
+            // This should really be called *before* the ArtemisEngine singleton instance
+            // is even created, but right now we have to call it after created the gameKernel
+            // since gameKernel.FrameRate gets changed by an event that gets raised when the
+            // "FrameRate" option gets changed in UserOptions (which will throw a NullReferenceException
+            // if gameKernel is null).
+            UserOptions.Read();
+
             _MultiformManager = new MultiformManager();
             _GameTimer        = new GlobalTimer();
             _GameUpdater      = new GlobalUpdater();
@@ -74,10 +81,6 @@ namespace Artemis.Engine
                 gameKernel, 
                 _RenderPipeline,
                 GameConstants.BaseResolution,
-                GameConstants.DefaultFullscreen,
-                GameConstants.DefaultMouseVisibility,
-                GameConstants.DefaultBorderless,
-                GameConstants.DefaultVSync,
                 GameConstants.InitialWindowTitle,
                 GameConstants.InitialBackgroundColour
                 );
@@ -88,7 +91,6 @@ namespace Artemis.Engine
         /// </summary>
         internal void Initialize()
         {
-            UserOptions.Read();
             initializer();
             Initialized = true;
         }
