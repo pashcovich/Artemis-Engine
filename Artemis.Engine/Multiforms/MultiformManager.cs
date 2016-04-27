@@ -4,6 +4,7 @@ using Artemis.Engine.Utilities;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -32,17 +33,6 @@ namespace Artemis.Engine.Multiforms
                 Dictionary<string, Multiform> registered, 
                 Dictionary<string, Multiform> active)
             {
-                if (active.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("Multiform with name '{0}' has already been constructed.", name));
-                }
-
-                if (!registered.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("No multiform with name '{0}' exists.", name));
-                }
                 var multiform = registered[name];
                 multiform.DelegateConstruction(args);
                 active.Add(name, multiform);
@@ -63,11 +53,6 @@ namespace Artemis.Engine.Multiforms
                 Dictionary<string, Multiform> registered, 
                 Dictionary<string, Multiform> active)
             {
-                if (!active.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("Multiform with name '{0}' has not been constructed.", name));
-                }
                 var multiform = active[name];
                 multiform.Deconstruct();
                 multiform.ResetTime();
@@ -111,6 +96,16 @@ namespace Artemis.Engine.Multiforms
         /// the next call to Update to apply them.
         /// </summary>
         private List<MultiformPostUpdateEvent> PostUpdateEventQueue = new List<MultiformPostUpdateEvent>();
+
+        /// <summary>
+        /// The order in which multiforms are updated.
+        /// 
+        /// Note: the order in which the multiforms are rendered is the reverse of this order.
+        /// To visualize this, consider the multiforms as sheets of paper layered on top of each other.
+        /// The ones at the top are updated first, but they have to be rendered on top of everything else,
+        /// meaning they have to be rendered last.
+        /// </summary>
+        private string[] GlobalProcessOrder = null;
 
         public MultiformManager() { }
 
@@ -170,9 +165,46 @@ namespace Artemis.Engine.Multiforms
         /// Activate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Activate(string name, MultiformConstructionArgs args = null)
+        public void Activate(Multiform sender, string name, MultiformConstructionArgs args = null)
         {
-            args = args == null ? new MultiformConstructionArgs(null) : args;
+            if (ActiveMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("Multiform with name '{0}' has already been constructed.", name));
+            }
+
+            if (!RegisteredMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("No multiform with name '{0}' exists.", name));
+            }
+
+            var multiform = RegisteredMultiforms[name];
+            if (multiform.TransitionConstraints != null)
+            {
+                var constraints = multiform.TransitionConstraints;
+                var senderName = sender == null ? null : sender.Name;
+                if ((constraints.AllowedFrom != null && !constraints.AllowedFrom.Contains(senderName)) ||
+                    (constraints.NotAllowedFrom != null && constraints.NotAllowedFrom.Contains(senderName)))
+                {
+                    if (senderName == null)
+                    {
+                        throw new MultiformManagerException(
+                            String.Format(
+                                "The transition constraints on multiform '{0}' prevent it from " +
+                                "being used as the initial multiform in the engine.", name
+                                )
+                            );
+                    }
+                    throw new MultiformManagerException(
+                        String.Format(
+                            "The transition constraints on multiform '{0}' prevent the multiform '{1}' from " +
+                            "being able to transition to it.", name, senderName
+                        )
+                    );
+                }
+            }
+            args = args == null ? new MultiformConstructionArgs(sender) : args;
             ApplyOrQueueEvent(new ActivateEvent(name, args));
         }
 
@@ -182,6 +214,11 @@ namespace Artemis.Engine.Multiforms
         /// <param name="name"></param>
         public void Deactivate(string name)
         {
+            if (!ActiveMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("Multiform with name '{0}' has not been constructed.", name));
+            }
             ApplyOrQueueEvent(new DeactivateEvent(name));
         }
 
@@ -195,15 +232,34 @@ namespace Artemis.Engine.Multiforms
         }
 
         /// <summary>
+        /// Set the global process order, which is the order multiforms are updated in.
+        /// 
+        /// The global process order may only be set once before the game begins running.
+        /// </summary>
+        /// <param name="names"></param>
+        public void SetProcessOrder(string[] names)
+        {
+            if (Updating)
+            {
+                throw new MultiformException(
+                    "Cannot set global multiform process order mid-update. This " +
+                    "can only be set once before the game begins.");
+            }
+            GlobalProcessOrder = names;
+        }
+
+        /// <summary>
         /// Update all the multiforms.
         /// </summary>
         internal void Update()
         {
             Updating = true;
 
-            foreach (var kvp in ActiveMultiforms)
+            foreach (var name in GlobalProcessOrder)
             {
-                kvp.Value.Update();
+                if (!ActiveMultiforms.ContainsKey(name))
+                    continue;
+                ActiveMultiforms[name].Update();
             }
 
             Updating = false;
@@ -225,6 +281,12 @@ namespace Artemis.Engine.Multiforms
             // post update events that can alter the PostUpdateEvents list whilst iterating. For 
             // example, a PostUpdateEvent can Activate a multiform, which can in turn call something 
             // that adds a PostUpdateEvent to the list.
+            //
+            // Potential problem: this might cause a sort of "waterfall" effect of queued events, causing
+            // a number of events which were intended to happen simultaneously to happen sequentially instead.
+            // For example, consider a multiform, which constructs another multiform, which constructs another
+            // multiform in it's constructor, which does the same, and so on. Each consecutive multiform would
+            // be constructed the next frame.
 
             foreach (var queuedEvt in PostUpdateEventQueue)
             {
@@ -239,9 +301,11 @@ namespace Artemis.Engine.Multiforms
         /// </summary>
         internal void Render()
         {
-            foreach (var kvp in ActiveMultiforms)
+            foreach (var name in GlobalProcessOrder.Reverse())
             {
-                kvp.Value.Render();
+                if (!ActiveMultiforms.ContainsKey(name))
+                    continue;
+                ActiveMultiforms[name].Render();
             }
         }
     }

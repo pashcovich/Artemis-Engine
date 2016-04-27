@@ -217,7 +217,7 @@ namespace Artemis.Engine.Assets
             if (string.IsNullOrEmpty(extension))
             {
                 throw new ArgumentException(
-                    String.Format("Cannot load asset '{0}'.", name)
+                    String.Format("Cannot load asset '{0}'; indeterminate file type.", name)
                     );
             }
             if (extension == "xnb")

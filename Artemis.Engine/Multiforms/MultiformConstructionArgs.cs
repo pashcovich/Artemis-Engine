@@ -10,7 +10,7 @@ namespace Artemis.Engine.Multiforms
     {
         public Multiform Sender { get; private set; }
 
-        public string SenderName { get { return Sender.Name; } }
+        public string SenderName { get { return Sender == null ? null : Sender.Name; } }
 
         public MultiformConstructionArgs(Multiform sender)
         {

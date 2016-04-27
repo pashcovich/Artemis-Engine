@@ -132,7 +132,7 @@ namespace Artemis.Engine
                 throw new EngineSetupException(
                     "Must call Engine.Setup before call to Engine.StartWith.");
             }
-            MultiformManager.Activate(multiformName, new MultiformConstructionArgs(null));
+            MultiformManager.Activate(null, multiformName, new MultiformConstructionArgs(null));
         }
 
         #region Universal Game Options
