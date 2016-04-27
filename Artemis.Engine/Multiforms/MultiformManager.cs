@@ -183,13 +183,23 @@ namespace Artemis.Engine.Multiforms
             if (multiform.TransitionConstraints != null)
             {
                 var constraints = multiform.TransitionConstraints;
-                if ((constraints.AllowedFrom != null && !constraints.AllowedFrom.Contains(sender.Name)) ||
-                    (constraints.NotAllowedFrom != null && constraints.NotAllowedFrom.Contains(sender.Name)))
+                var senderName = sender == null ? null : sender.Name;
+                if ((constraints.AllowedFrom != null && !constraints.AllowedFrom.Contains(senderName)) ||
+                    (constraints.NotAllowedFrom != null && constraints.NotAllowedFrom.Contains(senderName)))
                 {
+                    if (senderName == null)
+                    {
+                        throw new MultiformManagerException(
+                            String.Format(
+                                "The transition constraints on multiform '{0}' prevent it from " +
+                                "being used as the initial multiform in the engine.", name
+                                )
+                            );
+                    }
                     throw new MultiformManagerException(
                         String.Format(
                             "The transition constraints on multiform '{0}' prevent the multiform '{1}' from " +
-                            "being able to transition to it.", name, sender.Name
+                            "being able to transition to it.", name, senderName
                         )
                     );
                 }
