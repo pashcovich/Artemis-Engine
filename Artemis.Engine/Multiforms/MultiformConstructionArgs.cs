@@ -4,7 +4,7 @@ using Artemis.Engine.Utilities.Dynamics;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
     public class MultiformConstructionArgs : DynamicPropertyCollection
     {

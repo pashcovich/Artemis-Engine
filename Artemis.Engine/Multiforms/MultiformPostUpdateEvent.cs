@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
     /// <summary>
     /// An object which represents an event to perform on the multiform manager after

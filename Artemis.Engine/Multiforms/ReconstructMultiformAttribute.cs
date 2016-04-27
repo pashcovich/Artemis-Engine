@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
     /// <summary>
     /// An attribute indicating that a multiform uses its `Reconstruct` method.

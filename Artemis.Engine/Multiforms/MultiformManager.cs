@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
     /// <summary>
     /// A class that records currently registered and active multiforms and controls

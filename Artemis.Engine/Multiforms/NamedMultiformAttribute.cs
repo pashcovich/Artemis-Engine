@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
     /// <summary>
     /// An attribute that represents the name to be given to instances of

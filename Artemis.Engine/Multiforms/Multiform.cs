@@ -8,7 +8,7 @@ using System.Linq;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Multiforms
 {
 
     /// <summary>

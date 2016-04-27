@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Input;
+using Artemis.Engine.Multiforms;
 using Artemis.Engine.Persistence;
 
 using Microsoft.Xna.Framework;
