@@ -33,17 +33,6 @@ namespace Artemis.Engine.Multiforms
                 Dictionary<string, Multiform> registered, 
                 Dictionary<string, Multiform> active)
             {
-                if (active.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("Multiform with name '{0}' has already been constructed.", name));
-                }
-
-                if (!registered.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("No multiform with name '{0}' exists.", name));
-                }
                 var multiform = registered[name];
                 multiform.DelegateConstruction(args);
                 active.Add(name, multiform);
@@ -64,11 +53,6 @@ namespace Artemis.Engine.Multiforms
                 Dictionary<string, Multiform> registered, 
                 Dictionary<string, Multiform> active)
             {
-                if (!active.ContainsKey(name))
-                {
-                    throw new MultiformManagerException(
-                        String.Format("Multiform with name '{0}' has not been constructed.", name));
-                }
                 var multiform = active[name];
                 multiform.Deconstruct();
                 multiform.ResetTime();
@@ -181,9 +165,36 @@ namespace Artemis.Engine.Multiforms
         /// Activate the multiform with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void Activate(string name, MultiformConstructionArgs args = null)
+        public void Activate(Multiform sender, string name, MultiformConstructionArgs args = null)
         {
-            args = args == null ? new MultiformConstructionArgs(null) : args;
+            if (ActiveMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("Multiform with name '{0}' has already been constructed.", name));
+            }
+
+            if (!RegisteredMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("No multiform with name '{0}' exists.", name));
+            }
+
+            var multiform = RegisteredMultiforms[name];
+            if (multiform.TransitionConstraints != null)
+            {
+                var constraints = multiform.TransitionConstraints;
+                if ((constraints.AllowedFrom != null && !constraints.AllowedFrom.Contains(sender.Name)) ||
+                    (constraints.NotAllowedFrom != null && constraints.NotAllowedFrom.Contains(sender.Name)))
+                {
+                    throw new MultiformManagerException(
+                        String.Format(
+                            "The transition constraints on multiform '{0}' prevent the multiform '{1}' from " +
+                            "being able to transition to it.", name, sender.Name
+                        )
+                    );
+                }
+            }
+            args = args == null ? new MultiformConstructionArgs(sender) : args;
             ApplyOrQueueEvent(new ActivateEvent(name, args));
         }
 
@@ -193,6 +204,11 @@ namespace Artemis.Engine.Multiforms
         /// <param name="name"></param>
         public void Deactivate(string name)
         {
+            if (!ActiveMultiforms.ContainsKey(name))
+            {
+                throw new MultiformManagerException(
+                    String.Format("Multiform with name '{0}' has not been constructed.", name));
+            }
             ApplyOrQueueEvent(new DeactivateEvent(name));
         }
 

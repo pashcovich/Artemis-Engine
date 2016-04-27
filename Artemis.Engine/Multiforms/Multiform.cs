@@ -18,6 +18,14 @@ namespace Artemis.Engine.Multiforms
     public abstract class Multiform : ArtemisObject
     {
 
+        private static AttributeMemoService<Multiform> attrMemoService
+            = new AttributeMemoService<Multiform>();
+
+        static Multiform()
+        {
+            attrMemoService.RegisterHandler<ReconstructMultiformAttribute>(m => { m.reconstructable = true; });
+        }
+
         /// <summary>
         /// The name of the multiform instance.
         /// </summary>
@@ -48,6 +56,11 @@ namespace Artemis.Engine.Multiforms
         /// </summary>
         private bool reconstructable;
 
+        /// <summary>
+        /// The transition constraints on this multiform.
+        /// </summary>
+        public TransitionConstraintsAttribute TransitionConstraints { get; private set; }
+
         public Multiform() : base()
         {
             var type = GetType();
@@ -55,20 +68,19 @@ namespace Artemis.Engine.Multiforms
                  ? Reflection.GetFirstAttribute<NamedMultiformAttribute>(type).Name
                  : type.Name;
 
-            initialize();
+            attrMemoService.Handle(this);
         }
 
         public Multiform(string name)
         {
             Name = name;
 
-            initialize();
+            attrMemoService.Handle(this);
         }
 
-        private void initialize()
+        private void HandleTransitionConstraints()
         {
-            var type = GetType();
-            reconstructable = Reflection.HasAttribute<ReconstructMultiformAttribute>(type);
+            TransitionConstraints = Reflection.GetFirstAttribute<TransitionConstraintsAttribute>(GetType());
         }
 
         /// <summary>
