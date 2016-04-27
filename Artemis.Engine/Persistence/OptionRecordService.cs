@@ -16,6 +16,9 @@ namespace Artemis.Engine.Persistence
         private Dictionary<string, AbstractOptionRecord> OptionRecords
             = new Dictionary<string, AbstractOptionRecord>();
 
+        private Dictionary<string, OptionChangedEventHandler> OptionChangedEvents
+            = new Dictionary<string, OptionChangedEventHandler>();
+
         internal OptionRecordService() : base() { }
 
         public void AddOptionRecord(AbstractOptionRecord record)
@@ -27,6 +30,18 @@ namespace Artemis.Engine.Persistence
         {
             OptionRecords.Add(record.Name, record);
             Define(record.Name, getter, setter);
+        }
+
+        public void AddOptionChangedEventHandler(string record, OptionChangedEventHandler handler)
+        {
+            if (OptionChangedEvents.ContainsKey(record))
+            {
+                OptionChangedEvents[record] += handler;
+            }
+            else
+            {
+                OptionChangedEvents.Add(record, handler);
+            }
         }
 
         public void Read(string fileName)

@@ -1,4 +1,5 @@
 ﻿using Artemis.Engine;
+using Artemis.Engine.Multiforms;
 
 namespace Artemis.ApprovalTestTemplates.MultiformTemplate
 {

@@ -8,6 +8,15 @@ namespace Artemis.Engine.Persistence
 {
     public static class UserOptions
     {
+        public static class Builtins
+        {
+            public const string Fullscreen = "Fullscreen";
+            public const string MouseVisible = "MouseVisible";
+            public const string Borderless = "Borderless";
+            public const string VSync = "VSync";
+            public const string FrameRate = "FrameRate";
+            public const string Resolution = "Resolution";
+        }
 
         public const string DefaultOptionsFileName = "user_options.xml";
 
@@ -55,6 +64,12 @@ namespace Artemis.Engine.Persistence
             optionRecordService.AddOptionRecord(record, getter, setter);
         }
 
+        public static void AddOptionChangedEventHandler(string record, OptionChangedEventHandler handler)
+        {
+            optionRecordService.AddOptionChangedEventHandler(record, handler);
+        }
+
+        // Should this really be public?
         public static void Read()
         {
             optionRecordService.Read(OptionFileName);
