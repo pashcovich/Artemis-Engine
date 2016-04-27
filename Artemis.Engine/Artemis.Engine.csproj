@@ -78,6 +78,7 @@
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="Graphics\SpriteSheet.cs" />
     <Compile Include="Graphics\AnimationStepActions\WaitAnimationStepAction.cs" />
+    <Compile Include="Multiforms\TransitionConstraintsAttribute.cs" />
     <Compile Include="MultipleUpdateException.cs" />
     <Compile Include="Persistence\AbstractOptionRecord.cs" />
     <Compile Include="Persistence\OptionChangedEventHandler.cs" />
