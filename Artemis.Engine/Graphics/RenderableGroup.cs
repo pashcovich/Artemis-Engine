@@ -8,20 +8,20 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderableGroup : UriTreeGroup<RenderableGroup, IRenderable>
+    public class RenderableGroup : UriTreeGroup<RenderableGroup, RenderableObject>
     {
         public RenderableGroup(string name) : base(name) { }
 
-        public List<IRenderable> RetrieveAll()
+        public List<RenderableObject> RetrieveAll()
         {
-            var list = new List<IRenderable>();
+            var list = new List<RenderableObject>();
 
             RetrieveAll(list);
 
             return list;
         }
 
-        private void RetrieveAll(List<IRenderable> renderables)
+        private void RetrieveAll(List<RenderableObject> renderables)
         {
             foreach (var subgroup in Subnodes.Values)
             {

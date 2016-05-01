@@ -1,10 +1,13 @@
-﻿
+﻿#region Using Statements
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#endregion
+
 namespace Artemis.Engine
 {
-    public class RenderPropertiesPacket
+    public class SpriteBatchPropertiesPacket
     {
         public SpriteSortMode SpriteSortMode { get; set; }
         public BlendState BlendState { get; set; }
@@ -14,7 +17,7 @@ namespace Artemis.Engine
         public Effect Effect { get; set; }
         public Matrix? Matrix { get; set; }
 
-        public RenderPropertiesPacket( SpriteSortMode ssm    = SpriteSortMode.Deferred
+        public SpriteBatchPropertiesPacket( SpriteSortMode ssm    = SpriteSortMode.Deferred
                                      , BlendState bs         = null
                                      , SamplerState ss       = null
                                      , DepthStencilState dss = null

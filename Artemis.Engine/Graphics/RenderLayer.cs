@@ -3,10 +3,14 @@
 using Artemis.Engine.Maths.Geometry;
 using Artemis.Engine.Utilities.UriTree;
 
+using FarseerPhysics.Dynamics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -15,17 +19,21 @@ namespace Artemis.Engine.Graphics
     public class RenderLayer : UriTreeObserverNode<RenderLayer, RenderableGroup>
     {
         private const string TOP_LEVEL = "ALL";
-        protected RenderableGroup AllRenderables;
+        private RenderPipeline rp;
+        private Matrix _targetTransform;
+        private World _world;
+
         internal string tempName { get; private set; }
 
-        /// <summary>
-        /// Whether or not to scale the layer uniformly.
-        /// </summary>
-        public bool ScaleUniformly { get; set; }
-
-        public ResolutionScaleRules LayerResolutionScaleRules { get; set; } // CURRENTLY NOT USED
-
         protected RenderTarget2D LayerTarget { get; private set; }
+
+        protected RenderableGroup AllRenderables { get; private set; }
+
+        public GlobalLayerScaleType LayerScaleType;
+
+        public UniformLayerScaleType UniformScaleType;
+
+        public AbstractCamera Camera;
 
         /// <summary>
         /// Whether or not this render layer is managed by a LayerManager or not.
@@ -33,20 +41,84 @@ namespace Artemis.Engine.Graphics
         public bool Managed { get; internal set; }
 
         public RenderLayer(string fullName)
+            : this(fullName, new NullCamera()) { }
+
+        public RenderLayer( string fullName
+                          , AbstractCamera camera
+                          , GlobalLayerScaleType layerScaleType    = GlobalLayerScaleType.Dynamic
+                          , UniformLayerScaleType uniformScaleType = UniformLayerScaleType.Stretch
+                          , World world = null )
             : base(UriUtilities.GetLastPart(fullName))
         {
+            rp = ArtemisEngine.RenderPipeline;
+
             // We have to store the full name until the layer gets added to 
             // a LayerManager.
             tempName = fullName;
+            Managed = false;
 
             AllRenderables = new RenderableGroup(TOP_LEVEL);
             AddObservedNode(TOP_LEVEL, AllRenderables);
 
             LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
-            
-            ScaleUniformly = false;
-            LayerResolutionScaleRules = null;
-            Managed = false;
+
+            LayerScaleType = layerScaleType;
+            UniformScaleType = uniformScaleType;
+            _targetTransform = RecalculateTargetTransform();
+
+            Camera = camera;
+            camera.TargetToScreenTransform = _targetTransform;
+
+            _world = world;
+        }
+
+        /// <summary>
+        /// Attach this layer to a world.
+        /// </summary>
+        /// <param name="world"></param>
+        public void AttachToWorld(World world)
+        {
+            _world = world;
+        }
+
+        private Matrix RecalculateTargetTransform()
+        {
+            if (LayerScaleType == GlobalLayerScaleType.Uniform)
+                return Matrix.Identity;
+
+            if (ArtemisEngine.DisplayManager.IsBaseResolution)
+                return Matrix.Identity;
+
+            var baseRes = GameConstants.BaseResolution;
+            var scale = ArtemisEngine.DisplayManager.ResolutionScale;
+                
+            switch (UniformScaleType)
+            {
+                case UniformLayerScaleType.Stretch:
+                    return Matrix.CreateScale(scale.X, scale.Y, 1);
+                case UniformLayerScaleType.Fit:
+                    if (scale.X == scale.Y)
+                        return Matrix.CreateScale(scale.X, scale.X, 1);
+                    else if (scale.X > scale.Y)
+                    {
+                        return Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                               Matrix.CreateTranslation(baseRes.Width * (1 - scale.X) / 2f, 0, 0);
+                    }
+                    return Matrix.CreateScale(scale.X, scale.X, 1) *
+                           Matrix.CreateTranslation(0, baseRes.Height * (1 - scale.Y) / 2f, 0);
+                case UniformLayerScaleType.Fill:
+                    if (scale.X == scale.Y)
+                        return Matrix.CreateScale(scale.X, scale.X, 1);
+                    else if (scale.X > scale.Y)
+                    {
+                        return Matrix.CreateScale(scale.X, scale.X, 1) *
+                               Matrix.CreateTranslation(0, baseRes.Height / 2f * (scale.Y - scale.X), 0);
+                    }
+                    return Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                           Matrix.CreateTranslation(baseRes.Width / 2f * (scale.X - scale.Y), 0, 0);
+                default:
+                    throw new Exception(); // throw an actual exception...
+            }
         }
 
         /// <summary>
@@ -63,183 +135,150 @@ namespace Artemis.Engine.Graphics
         }
 
         /// <summary>
-        /// Render all items on this layer.
+        /// Render all items in this layer.
         /// </summary>
         public void Render()
         {
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
-                // Create a new render target with dimensions matching the current resolution.
+                LayerTarget.Dispose();
                 LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+                _targetTransform = RecalculateTargetTransform();
             }
 
-            ArtemisEngine.RenderPipeline.SetRenderTarget(LayerTarget);
-            ArtemisEngine.RenderPipeline.ClearGraphicsDevice(Color.Transparent);
+            rp.ClearRenderProperties();
+            rp.SetRenderTarget(LayerTarget);
+            rp.ClearGraphicsDevice(Color.Transparent);
+            rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
 
-            // Load these once here instead of each time we call ProcessManipulableRenderable.
-            var resolution = ArtemisEngine.DisplayManager.WindowResolution;
-            var isBaseRes  = ArtemisEngine.DisplayManager.IsBaseResolution;
-            var resScale   = ArtemisEngine.DisplayManager.ResolutionScale;
+            var renderables = GetRenderables();
 
-            var renderables = AllRenderables.RetrieveAll();
-
-            foreach (var renderable in renderables)
+            if (LayerScaleType == GlobalLayerScaleType.Uniform)
             {
-                ProcessRenderable(renderable, resolution, isBaseRes, resScale);
-            }
+                foreach (var renderable in renderables)
+                {
+                    renderable.Render();
+                }
 
-            ArtemisEngine.RenderPipeline.UnsetRenderTarget();
+                rp.UnsetRenderTarget();
+                rp.ClearRenderProperties();
+                rp.SetRenderProperties(
+                    SpriteSortMode.Immediate,
+                    BlendState.AlphaBlend,
+                    m: _targetTransform);
 
-            FinalizeRender();
-        }
+                rp.Render(LayerTarget, Vector2.Zero);
 
-        private void ProcessRenderable( IRenderable renderable
-                                      , Resolution resolution
-                                      , bool isBaseRes
-                                      , Vector2 resScale )
-        {
-            var asManipulable = renderable as IManipulableRenderable;
-            if (asManipulable == null)
-            {
-                renderable.Render();
+                rp.ClearRenderProperties();
             }
             else
             {
-                ProcessManipulableRenderable(asManipulable, resolution, isBaseRes, resScale);
-            }
-        }
+                var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
+                var crntRes = ArtemisEngine.DisplayManager.WindowResolution;
+                var resScale = ArtemisEngine.DisplayManager.ResolutionScale;
 
-        private enum _scaleDirection
-        {
-            Width,
-            Height,
-            Both
-        }
-
-        private void ProcessManipulableRenderable( IManipulableRenderable renderable
-                                                 , Resolution res
-                                                 , bool isBaseRes
-                                                 , Vector2 resScale )
-        {
-            var position = renderable.Position;
-            var components = renderable.Components;
-            var resScaleRules = renderable.ResolutionScaleRules;
-
-            Vector2? scale = null;
-            if (ScaleUniformly)
-            {
-                // If "ScaleUniformly" is true, then the only scaling we have to do is
-                // the default scale value associated with the object. We don't have to
-                // do any resolution relative scaling.
-                scale = components.Scale;
-            }
-            else if (!isBaseRes)
-            {
-                float scaleFactor;
-                _scaleDirection scaleDirection; // 0 - width, 1 - height, 2 - both
-                switch (resScaleRules.ScaleType)
+                foreach (var renderable in renderables)
                 {
-                    case ResolutionScaleType.BY_MIN:
-                        scaleFactor = MathHelper.Min(resScale.X, resScale.Y);
-                        scaleDirection = (_scaleDirection)Convert.ToInt32(scaleFactor == resScale.X);
+                    ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the list of items to draw (dependent on the camera).
+        /// </summary>
+        /// <returns></returns>
+        private List<RenderableObject> GetRenderables()
+        {
+            if (Camera is NullCamera)
+                return AllRenderables.RetrieveAll();
+
+            var renderables = new HashSet<RenderableObject>();
+            var aabb = Camera.ViewAABB;
+            _world.QueryAABB(f =>
+                {
+                    var obj = (RenderableObject)f.Body.UserData;
+                    renderables.Add(obj);
+                    return true;
+                }, ref aabb);
+
+            return renderables.ToList();
+        }
+
+        private void ProcessDynamicallyScaledRenderable(
+            RenderableObject obj, bool isBaseRes, Resolution crntRes, Vector2 resScale)
+        {
+            var maintainAspectRatio = obj.MaintainAspectRatio;
+            var scaleType = obj.ScaleType;
+
+            Vector2 scale;
+            if (!isBaseRes)
+            {
+                switch (scaleType)
+                {
+                    case ResolutionScaleType.Min:
+                        var min = MathHelper.Min(resScale.X, resScale.Y);
+                        if (maintainAspectRatio)
+                            scale = new Vector2(min, min);
+                        else if (min == resScale.X)
+                            scale = new Vector2(min, 1f);
+                        else
+                            scale = new Vector2(1f, min);
                         break;
-                    case ResolutionScaleType.BY_MAX:
-                        scaleFactor = MathHelper.Max(resScale.X, resScale.Y);
-                        scaleDirection = (_scaleDirection)Convert.ToInt32(scaleFactor == resScale.X);
+                    case ResolutionScaleType.Max:
+                        var max = MathHelper.Max(resScale.X, resScale.Y);
+                        if (maintainAspectRatio)
+                            scale = new Vector2(max, max);
+                        else if (max == resScale.X)
+                            scale = new Vector2(max, 1f);
+                        else
+                            scale = new Vector2(1f, max);
                         break;
-                    case ResolutionScaleType.BY_WIDTH:
-                        scaleFactor = resScale.X;
-                        scaleDirection = _scaleDirection.Width;
+                    case ResolutionScaleType.Width:
+                        if (maintainAspectRatio)
+                            scale = new Vector2(resScale.X, resScale.X);
+                        else
+                            scale = new Vector2(resScale.X, 1f);
                         break;
-                    case ResolutionScaleType.BY_HEIGHT:
-                        scaleFactor = resScale.Y;
-                        scaleDirection = _scaleDirection.Height;
+                    case ResolutionScaleType.Height:
+                        if (maintainAspectRatio)
+                            scale = new Vector2(resScale.Y, resScale.Y);
+                        else
+                            scale = new Vector2(1f, resScale.Y);
                         break;
-                    case ResolutionScaleType.WITH_RES:
-                        scaleFactor = 0;
-                        scaleDirection = _scaleDirection.Both;
+                    case ResolutionScaleType.WithRes:
+                        /*
+                        if (maintainAspectRatio && resScale.X != resScale.Y)
+                            // throw an error or log a warning or something...
+                         */
+                        scale = new Vector2(resScale.X, resScale.Y);
                         break;
                     default:
-                        throw new Exception();
-                }
-
-                if (scaleDirection == _scaleDirection.Both)
-                {
-                    if (resScaleRules.MaintainAspectRatio)
-                    {
-                        Console.WriteLine("Something"); // warning or something should be thrown.
-                    }
-                    scale = VectorUtils.ComponentwiseProduct(components.Scale ?? Vector2.One, resScale);
-                }
-                else if (resScaleRules.MaintainAspectRatio)
-                {
-                    scale = (components.Scale ?? Vector2.One) * scaleFactor;
-                }
-                else
-                {
-                    if (components.Scale.HasValue)
-                    {
-                        var c_scale = components.Scale.Value;
-                        if (scaleDirection == _scaleDirection.Width)
-                        {
-                            scale = new Vector2(c_scale.X * scaleFactor, c_scale.Y);
-                        }
-                        else
-                        {
-                            scale = new Vector2(c_scale.X, c_scale.Y * scaleFactor);
-                        }
-                    }
-                    else
-                    {
-                        scale = scaleDirection == _scaleDirection.Width ?
-                                new Vector2(scaleFactor, 1) :
-                                new Vector2(1, scaleFactor);
-                    }
+                        throw new Exception(); // throw actual exception...
                 }
             }
-
-            RelativePosition newPos = position;
-            if (resScaleRules.RelativePositioning)
+            else
             {
-                var oldVec = position.Position;
-                var newVec = new Vector2(oldVec.X * res.Width, oldVec.Y * res.Height);
-                newPos = new RelativePosition(newVec, position.RelativeTo);
+                scale = Vector2.One;
             }
 
-            var newComponents = new RenderComponents(
-                components.SourceRectangle,
-                components.Tint,
-                components.Rotation,
-                scale,
-                components.SpriteEffects);
+            bool hasOriginalScale = false;
+            Vector2 originalScale = Vector2.One;
+            if (obj.RenderComponents.Scale.HasValue)
+            {
+                originalScale = obj.RenderComponents.Scale.Value;
+                hasOriginalScale = true;
+            }
+                
 
-            RenderIManipulable(renderable, newPos, newComponents);
-        }
+            var resultingScale = VectorUtils.ComponentwiseProduct(originalScale, scale);
 
-        private void RenderIManipulable(
-            IManipulableRenderable renderable, RelativePosition newPos, RenderComponents newComponents)
-        {
-            // Swap out the old components for the new components and render.
-            var oldPos = renderable.Position;
-            var oldComps = renderable.Components;
-            
-            renderable.Position = newPos;
-            renderable.Components = newComponents;
+            // Swap out the original scale for the newly calculated scale.
+            obj.RenderComponents.Scale = resultingScale;
 
-            renderable.Render();
+            obj.Render();
 
-            renderable.Position = oldPos;
-            renderable.Components = oldComps;
-        }
-
-        private void FinalizeRender()
-        {
-            ArtemisEngine.RenderPipeline.SetRenderProperties(
-                SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
-            ArtemisEngine.RenderPipeline.Render(LayerTarget, Vector2.Zero);
-
-            ArtemisEngine.RenderPipeline.ClearRenderProperties();
+            obj.RenderComponents.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
         }
     }
 }

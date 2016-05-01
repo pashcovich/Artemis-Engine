@@ -1,7 +1,5 @@
 ﻿#region Using Statements
 
-using Artemis.Engine;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
