@@ -128,9 +128,12 @@ namespace Artemis.Engine.Graphics
             Vector2? scale = null;
             if (ScaleUniformly)
             {
+                // If "ScaleUniformly" is true, then the only scaling we have to do is
+                // the default scale value associated with the object. We don't have to
+                // do any resolution relative scaling.
                 scale = components.Scale;
             }
-            else if (isBaseRes)
+            else if (!isBaseRes)
             {
                 float scaleFactor;
                 _scaleDirection scaleDirection; // 0 - width, 1 - height, 2 - both
@@ -216,9 +219,10 @@ namespace Artemis.Engine.Graphics
         private void RenderIManipulable(
             IManipulableRenderable renderable, RelativePosition newPos, RenderComponents newComponents)
         {
+            // Swap out the old components for the new components and render.
             var oldPos = renderable.Position;
             var oldComps = renderable.Components;
-
+            
             renderable.Position = newPos;
             renderable.Components = newComponents;
 

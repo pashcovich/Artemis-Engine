@@ -107,7 +107,7 @@ namespace FarseerPhysics
         /// <summary>
         /// The maximum number of vertices on a convex polygon.
         /// </summary>
-        public static int MaxPolygonVertices = 8;
+        public static int MaxPolygonVertices = 32;
 
         /// <summary>
         /// Farseer Physics Engine has a different way of filtering fixtures than Box2d.
@@ -187,7 +187,7 @@ namespace FarseerPhysics
         /// A velocity threshold for elastic collisions. Any collision with a relative linear
         /// velocity below this threshold will be treated as inelastic.
         /// </summary>
-        public const float VelocityThreshold = 1.0f;
+        public const float VelocityThreshold = 0.1f;
 
         /// <summary>
         /// The maximum linear position correction used when solving constraints. This helps to
