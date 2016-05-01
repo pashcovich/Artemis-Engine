@@ -255,11 +255,21 @@ namespace Artemis.Engine.Multiforms
         {
             Updating = true;
 
-            foreach (var name in GlobalProcessOrder)
+            if (GlobalProcessOrder != null)
             {
-                if (!ActiveMultiforms.ContainsKey(name))
-                    continue;
-                ActiveMultiforms[name].Update();
+                foreach (var name in GlobalProcessOrder)
+                {
+                    if (!ActiveMultiforms.ContainsKey(name))
+                        continue;
+                    ActiveMultiforms[name].Update();
+                }
+            }
+            else
+            {
+                foreach (var kvp in ActiveMultiforms)
+                {
+                    kvp.Value.Update();
+                }
             }
 
             Updating = false;
@@ -301,11 +311,21 @@ namespace Artemis.Engine.Multiforms
         /// </summary>
         internal void Render()
         {
-            foreach (var name in GlobalProcessOrder.Reverse())
+            if (GlobalProcessOrder != null)
             {
-                if (!ActiveMultiforms.ContainsKey(name))
-                    continue;
-                ActiveMultiforms[name].Render();
+                foreach (var name in GlobalProcessOrder.Reverse())
+                {
+                    if (!ActiveMultiforms.ContainsKey(name))
+                        continue;
+                    ActiveMultiforms[name].Render();
+                }
+            }
+            else
+            {
+                foreach (var kvp in ActiveMultiforms)
+                {
+                    kvp.Value.Render();
+                }
             }
         }
     }

@@ -175,7 +175,7 @@ namespace Artemis.Engine
             graphicsManager.PreferredBackBufferHeight = WindowResolution.Height;
 
             // Center the display based on the native resolution.
-            var form = (Form)Control.FromHandle(window.Handle);
+            var form = (System.Windows.Forms.Form)Control.FromHandle(window.Handle);
             var position = new System.Drawing.Point(
                 (Resolution.Native.Width - WindowResolution.Width) / 2,
                 (Resolution.Native.Height - WindowResolution.Height) / 2

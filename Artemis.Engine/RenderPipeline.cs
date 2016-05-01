@@ -1,8 +1,5 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Graphics;
-using Artemis.Engine.Maths.Geometry;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -179,7 +176,7 @@ namespace Artemis.Engine
         /// Set the current render properties to those specified in the given packet.
         /// </summary>
         /// <param name="packet"></param>
-        public void SetRenderProperties(RenderPropertiesPacket packet)
+        public void SetRenderProperties(SpriteBatchPropertiesPacket packet)
         {
             SetRenderProperties(
                 packet.SpriteSortMode,

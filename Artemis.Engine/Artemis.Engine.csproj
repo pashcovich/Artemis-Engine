@@ -51,6 +51,7 @@
     <Compile Include="Effectors\EffectableObject.cs" />
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
     <Compile Include="Graphics\AnimationMap.cs" />
@@ -64,20 +65,26 @@
     <Compile Include="Graphics\AnimationStepActions\JumpToAnimationStepAction.cs" />
     <Compile Include="Graphics\AnimationStepActions\PlaySoundAnimationStepAction.cs" />
     <Compile Include="Graphics\AnimationStepActions\ReverseAnimationStepAction.cs" />
-    <Compile Include="Graphics\IManipulableRenderable.cs" />
-    <Compile Include="Graphics\IRenderable.cs" />
+    <Compile Include="Graphics\DimensionlessCamera.cs" />
+    <Compile Include="Graphics\CameraException.cs" />
+    <Compile Include="Graphics\GlobalLayerScaleType.cs" />
+    <Compile Include="Graphics\AbstractCamera.cs" />
+    <Compile Include="Graphics\LayerAwareObject.cs" />
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\AnimationStateLoopType.cs" />
+    <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
+    <Compile Include="Graphics\RenderableObject.cs" />
     <Compile Include="Graphics\RenderComponents.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
-    <Compile Include="Graphics\ResolutionScaleRules.cs" />
-    <Compile Include="Graphics\ResolutionScaleType.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="Graphics\SpriteSheet.cs" />
     <Compile Include="Graphics\AnimationStepActions\WaitAnimationStepAction.cs" />
+    <Compile Include="Graphics\TextureOrigins.cs" />
+    <Compile Include="Graphics\UniformLayerScaleType.cs" />
+    <Compile Include="Multiforms\Menu\MenuMultiform.cs" />
     <Compile Include="Multiforms\TransitionConstraintsAttribute.cs" />
     <Compile Include="MultipleUpdateException.cs" />
     <Compile Include="Persistence\AbstractOptionRecord.cs" />
@@ -88,6 +95,10 @@
     <Compile Include="Persistence\OptionValidator.cs" />
     <Compile Include="Persistence\SimpleOptionRecord.cs" />
     <Compile Include="Persistence\UserOptions.cs" />
+    <Compile Include="PhysicalObject.cs" />
+    <Compile Include="ResolutionRelativeObject.cs" />
+    <Compile Include="ResolutionScaleRules.cs" />
+    <Compile Include="ResolutionScaleType.cs" />
     <Compile Include="UpdatableObject.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
@@ -142,7 +153,7 @@
     <Compile Include="RelativePositionType.cs" />
     <Compile Include="RenderPipeline.cs" />
     <Compile Include="RenderPipelineException.cs" />
-    <Compile Include="RenderPropertiesPacket.cs" />
+    <Compile Include="SpriteBatchPropertiesPacket.cs" />
     <Compile Include="Resolution.cs" />
     <Compile Include="Assets\AssetGroup.cs" />
     <Compile Include="Assets\SpriteFontAssetImporter.cs" />
@@ -185,6 +196,7 @@
       <Name>Farseer Physics MonoGame</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
