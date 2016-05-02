@@ -3,10 +3,10 @@
 using Artemis.Engine.Input;
 using Artemis.Engine.Multiforms;
 using Artemis.Engine.Persistence;
-using Artemis.Engine.Utilities.Dynamics;
 using Artemis.Engine.Utilities.Serialize;
 
-using Microsoft.Xna.Framework;
+using FarseerPhysics;
+
 
 using System;
 
@@ -70,24 +70,52 @@ namespace Artemis.Engine
         /// </summary>
         public static KeyboardInput Keyboard { get { return Instance._Keyboard; } }
 
-        public static void Setup(string setupFileName, Action setupAction)
+        /// <summary>
+        /// Setup the engine.
+        /// 
+        /// This loads the game constants from the given constants file and initializes the user options.
+        /// 
+        /// NOTE: This does NOT actually load the user options. That happens after calling Begin.
+        /// </summary>
+        /// <param name="setupFileName"></param>
+        /// <param name="setupAction"></param>
+        public static void Setup(string constantsFileName, Action setupAction)
         {
-            GameConstants.ReadFromFile(setupFileName);
+            GameConstants.ReadFromFile(constantsFileName);
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(GameConstants.PixelsPerSimUnit);
+
             AddOptions();
             setupAction();
 
             SetupCalled = true;
         }
 
-        public static void Setup(string setupFileName, string optionFileName)
+        /// <summary>
+        /// Setup the engine.
+        /// 
+        /// This loads the game constants from the given constants file and initializes the user options.
+        /// 
+        /// NOTE: This does NOT actually load the user options. That happens after calling Begin.
+        /// </summary>
+        /// <param name="constantsFileName"></param>
+        /// <param name="setupAction"></param>
+        /// <param name="optionFileName"></param>
+        public static void Setup(string constantsFileName, string optionFileName, Action setupAction)
         {
-            GameConstants.ReadFromFile(setupFileName);
+            GameConstants.ReadFromFile(constantsFileName);
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(GameConstants.PixelsPerSimUnit);
+
             UserOptions.SetFileName(optionFileName);
             AddOptions();
+            setupAction();
 
             SetupCalled = true;
         }
 
+        /// <summary>
+        /// Begin the game.
+        /// </summary>
+        /// <param name="initializer"></param>
         public static void Begin(Action initializer)
         {
             if (!SetupCalled)
@@ -98,6 +126,7 @@ namespace Artemis.Engine
             {
                 throw new EngineSetupException("Engine.Begin called multiple times.");
             }
+
             Instance = new ArtemisEngine(initializer);
             Instance.Run();
 
