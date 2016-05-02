@@ -50,7 +50,7 @@ namespace Artemis.Engine.Graphics
                           , World world = null )
             : base(UriUtilities.GetLastPart(fullName))
         {
-            rp = ArtemisEngine.RenderPipeline;
+            rp = ArtemisEngine.RenderPipeline; // for convenience
 
             // We have to store the full name until the layer gets added to 
             // a LayerManager.

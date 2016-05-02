@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 #endregion
@@ -45,8 +46,14 @@ namespace Artemis.Engine
         /// </summary>
         public bool IsBaseResolution { get { return WindowResolution == GameConstants.BaseResolution; } }
 
+        /// <summary>
+        /// The ratio of the current resolution to the base resolution.
+        /// </summary>
         public Vector2 ResolutionScale { get { return WindowResolution / GameConstants.BaseResolution; } }
 
+        /// <summary>
+        /// Whether or not the resolution has changed.
+        /// </summary>
         public bool ResolutionChanged { get { return resChangedCounter > 0; } }
         private int resChangedCounter = 0;
 
@@ -135,6 +142,9 @@ namespace Artemis.Engine
         /// </summary>
         private bool dirty;
 
+        private HashSet<ResolutionRelativeObject> registeredResolutionChangeListeners
+            = new HashSet<ResolutionRelativeObject>();
+
         internal DisplayManager( GameKernel game
                                , RenderPipeline renderPipeline
                                , Resolution baseResolution
@@ -153,6 +163,16 @@ namespace Artemis.Engine
             BackgroundColour = bgColor;
 
             ReinitDisplayProperties(true);
+        }
+
+        internal void RegisterResolutionChangeListener(ResolutionRelativeObject obj)
+        {
+            registeredResolutionChangeListeners.Add(obj);
+        }
+
+        internal void RemoveResolutionChangeListener(ResolutionRelativeObject obj)
+        {
+            registeredResolutionChangeListeners.Remove(obj);
         }
 
         /// <summary>
@@ -300,8 +320,15 @@ namespace Artemis.Engine
                     );
             }
 
+            var prev = WindowResolution;
             WindowResolution = resolution;
             dirty = true;
+
+            foreach (var obj in registeredResolutionChangeListeners)
+            {
+                if (obj.OnResolutionChanged != null)
+                    obj.OnResolutionChanged(prev, resolution, ResolutionScale);
+            }
         }
 
         /// <summary>
