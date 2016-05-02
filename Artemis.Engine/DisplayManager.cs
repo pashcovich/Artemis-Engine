@@ -32,11 +32,11 @@ namespace Artemis.Engine
         {
             get
             {
-                return UserOptions.Get<Resolution>("Resolution");
+                return UserOptions.Get<Resolution>(UserOptions.Builtins.Resolution);
             }
             set
             {
-                UserOptions.Set("Resolution", value);
+                UserOptions.Set(UserOptions.Builtins.Resolution, value);
             }
         }
 
@@ -57,11 +57,11 @@ namespace Artemis.Engine
         { 
             get 
             { 
-                return UserOptions.Get<bool>("Fullscreen"); 
+                return UserOptions.Get<bool>(UserOptions.Builtins.Fullscreen); 
             } 
             private set 
             { 
-                UserOptions.Set("Fullscreen", value); 
+                UserOptions.Set(UserOptions.Builtins.Fullscreen, value); 
             } 
         }
 
@@ -72,11 +72,11 @@ namespace Artemis.Engine
         {
             get
             {
-                return UserOptions.Get<bool>("MouseVisible");
+                return UserOptions.Get<bool>(UserOptions.Builtins.MouseVisible);
             }
             private set
             {
-                UserOptions.Set("MouseVisible", value);
+                UserOptions.Set(UserOptions.Builtins.MouseVisible, value);
             }
         }
 
@@ -87,11 +87,11 @@ namespace Artemis.Engine
         {
             get
             {
-                return UserOptions.Get<bool>("Borderless");
+                return UserOptions.Get<bool>(UserOptions.Builtins.Borderless);
             }
             private set
             {
-                UserOptions.Set("Borderless", value);
+                UserOptions.Set(UserOptions.Builtins.Borderless, value);
             }
         }
 
@@ -102,11 +102,11 @@ namespace Artemis.Engine
         {
             get
             {
-                return UserOptions.Get<bool>("VSync");
+                return UserOptions.Get<bool>(UserOptions.Builtins.VSync);
             }
             set
             {
-                UserOptions.Set("VSync", value);
+                UserOptions.Set(UserOptions.Builtins.VSync, value);
             }
         }
 
