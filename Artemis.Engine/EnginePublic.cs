@@ -7,7 +7,6 @@ using Artemis.Engine.Utilities.Serialize;
 
 using FarseerPhysics;
 
-
 using System;
 
 #endregion
