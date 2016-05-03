@@ -20,7 +20,7 @@ namespace Artemis.ApprovalTestTemplates.MultiformTemplate
         [STAThread]
         static void Main()
         {
-            ArtemisEngine.Setup("game.setup", Setup);
+            ArtemisEngine.Setup("game.constants", Setup);
             ArtemisEngine.Begin(Initialize);
         }
 

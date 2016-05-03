@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿#region Using Statements
+
+using System;
 using System.Runtime.Serialization;
+
+#endregion
 
 namespace Artemis.Engine.Graphics
 {
+
+    /// <summary>
+    /// An exception thrown for Camera related issues such as invalid parameters.
+    /// </summary>
     [Serializable]
     public class CameraException : Exception
     {
@@ -14,4 +19,5 @@ namespace Artemis.Engine.Graphics
         public CameraException(string msg, Exception inner) : base(msg, inner) { }
         public CameraException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
+
 }

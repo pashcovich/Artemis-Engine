@@ -20,20 +20,104 @@ namespace Artemis.Engine.Graphics
     {
         private const string TOP_LEVEL = "ALL";
         private RenderPipeline rp;
-        private Matrix _targetTransform;
         private World _world;
+        private AbstractCamera _camera;
+        private bool _requiresTargetTransformRecalc;
+        private GlobalLayerScaleType _layerScaleType;
+        private UniformLayerScaleType _uniformScaleType;
+        private GlobalLayerScaleType? _newLayerScaleType;
+        private UniformLayerScaleType? _newUniformScaleType;
+        private bool midRender;
 
-        internal string tempName { get; private set; }
+        internal Matrix _targetTransform;
+        internal string tempFullName { get; private set; }
 
+        /// <summary>
+        /// The target we're rendering to.
+        /// </summary>
         protected RenderTarget2D LayerTarget { get; private set; }
 
+        /// <summary>
+        /// The top level renderable group.
+        /// </summary>
         protected RenderableGroup AllRenderables { get; private set; }
 
-        public GlobalLayerScaleType LayerScaleType;
+        /// <summary>
+        /// Determines whether or not the layer is scaled "Uniformly" (the entire layer is
+        /// scaled up at once) or "Dynamically" (individual objects are scaled according to
+        /// their individual rules).
+        /// </summary>
+        public GlobalLayerScaleType LayerScaleType
+        {
+            get { return _layerScaleType; }
+            set
+            {
+                if (value == _layerScaleType)
+                    return;
+                _layerScaleType = value;
 
-        public UniformLayerScaleType UniformScaleType;
+                if (midRender)
+                {
+                    _newLayerScaleType = value;
+                    _requiresTargetTransformRecalc = true;
+                }
+                else
+                {
+                    _layerScaleType = value;
+                    RecalculateTargetTransform();
+                }
+            }
+        }
 
-        public AbstractCamera Camera;
+        /// <summary>
+        /// If the LayerScaleType is "Uniform", then this determines how the layer is scaled.
+        /// </summary>
+        public UniformLayerScaleType UniformScaleType
+        {
+            get { return _uniformScaleType; }
+            set
+            {
+                if (value == _uniformScaleType)
+                    return;               
+                if (midRender)
+                {
+                    _newUniformScaleType = value;
+                    _requiresTargetTransformRecalc = true;
+                }
+                else
+                {
+                    _uniformScaleType = value;
+                    RecalculateTargetTransform();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The camera attached to this layer.
+        /// </summary>
+        public AbstractCamera Camera
+        {
+            get { return _camera; }
+            set
+            {
+                if (midRender)
+                    throw new CameraException(
+                        String.Format(
+                            "Cannot set Camera on render layer with name '{0}' " +
+                            "until after the render cycle is complete.", tempFullName
+                            )
+                        );
+                if (value == null)
+                    value = new NullCamera();
+                _camera = value;
+                _camera.Layer = this;
+            }
+        }
+
+        /// <summary>
+        /// Whether or not we are in the middle of rendering this layer.
+        /// </summary>
+        public bool MidRender { get { return midRender; } }
 
         /// <summary>
         /// Whether or not this render layer is managed by a LayerManager or not.
@@ -50,11 +134,11 @@ namespace Artemis.Engine.Graphics
                           , World world = null )
             : base(UriUtilities.GetLastPart(fullName))
         {
-            rp = ArtemisEngine.RenderPipeline;
+            rp = ArtemisEngine.RenderPipeline; // for convenience
 
             // We have to store the full name until the layer gets added to 
             // a LayerManager.
-            tempName = fullName;
+            tempFullName = fullName;
             Managed = false;
 
             AllRenderables = new RenderableGroup(TOP_LEVEL);
@@ -64,10 +148,10 @@ namespace Artemis.Engine.Graphics
 
             LayerScaleType = layerScaleType;
             UniformScaleType = uniformScaleType;
-            _targetTransform = RecalculateTargetTransform();
+            RecalculateTargetTransform();
 
             Camera = camera;
-            camera.TargetToScreenTransform = _targetTransform;
+            camera.Layer = this;
 
             _world = world;
         }
@@ -81,44 +165,56 @@ namespace Artemis.Engine.Graphics
             _world = world;
         }
 
-        private Matrix RecalculateTargetTransform()
+        private void RecalculateTargetTransform()
         {
             if (LayerScaleType == GlobalLayerScaleType.Uniform)
-                return Matrix.Identity;
+            {
+                _targetTransform = Matrix.Identity;
+                return;
+            }
 
             if (ArtemisEngine.DisplayManager.IsBaseResolution)
-                return Matrix.Identity;
+            {
+                _targetTransform = Matrix.Identity;
+                return;
+            }
 
             var baseRes = GameConstants.BaseResolution;
             var scale = ArtemisEngine.DisplayManager.ResolutionScale;
-                
+
+            Matrix transform;
             switch (UniformScaleType)
             {
                 case UniformLayerScaleType.Stretch:
-                    return Matrix.CreateScale(scale.X, scale.Y, 1);
+                    transform = Matrix.CreateScale(scale.X, scale.Y, 1);
+                    break;
                 case UniformLayerScaleType.Fit:
                     if (scale.X == scale.Y)
-                        return Matrix.CreateScale(scale.X, scale.X, 1);
+                        transform = Matrix.CreateScale(scale.X, scale.X, 1);
                     else if (scale.X > scale.Y)
-                    {
-                        return Matrix.CreateScale(scale.Y, scale.Y, 1) *
-                               Matrix.CreateTranslation(baseRes.Width * (1 - scale.X) / 2f, 0, 0);
-                    }
-                    return Matrix.CreateScale(scale.X, scale.X, 1) *
-                           Matrix.CreateTranslation(0, baseRes.Height * (1 - scale.Y) / 2f, 0);
+                        transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                                    Matrix.CreateTranslation(baseRes.Width * (1 - scale.X) / 2f, 0, 0);
+                    transform = Matrix.CreateScale(scale.X, scale.X, 1) *
+                                Matrix.CreateTranslation(0, baseRes.Height * (1 - scale.Y) / 2f, 0);
+                    break;
                 case UniformLayerScaleType.Fill:
                     if (scale.X == scale.Y)
-                        return Matrix.CreateScale(scale.X, scale.X, 1);
+                        transform = Matrix.CreateScale(scale.X, scale.X, 1);
                     else if (scale.X > scale.Y)
-                    {
-                        return Matrix.CreateScale(scale.X, scale.X, 1) *
-                               Matrix.CreateTranslation(0, baseRes.Height / 2f * (scale.Y - scale.X), 0);
-                    }
-                    return Matrix.CreateScale(scale.Y, scale.Y, 1) *
-                           Matrix.CreateTranslation(baseRes.Width / 2f * (scale.X - scale.Y), 0, 0);
+                        transform = Matrix.CreateScale(scale.X, scale.X, 1) *
+                                    Matrix.CreateTranslation(0, baseRes.Height / 2f * (scale.Y - scale.X), 0);
+                    transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                                Matrix.CreateTranslation(baseRes.Width / 2f * (scale.X - scale.Y), 0, 0);
+                    break;
                 default:
-                    throw new Exception(); // throw an actual exception...
+                    throw new RenderLayerException(
+                        String.Format(
+                            "Invalid UniformLayerScaleType value '{0}' supplied.", UniformScaleType
+                            )
+                        );
             }
+
+            _targetTransform = transform;
         }
 
         /// <summary>
@@ -139,17 +235,27 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public void Render()
         {
+            midRender = true;
+
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
                 LayerTarget.Dispose();
-                LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
-                _targetTransform = RecalculateTargetTransform();
+
+                // If we're scaling dynamically then our layer target fills the entire screen.
+                if (LayerScaleType == GlobalLayerScaleType.Dynamic)
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+                else
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateBaseResRenderTarget();
+                RecalculateTargetTransform();
             }
 
             rp.ClearRenderProperties();
+
             rp.SetRenderTarget(LayerTarget);
             rp.ClearGraphicsDevice(Color.Transparent);
+
             rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
+            rp.LockMatrix();
 
             var renderables = GetRenderables();
 
@@ -159,17 +265,6 @@ namespace Artemis.Engine.Graphics
                 {
                     renderable.Render();
                 }
-
-                rp.UnsetRenderTarget();
-                rp.ClearRenderProperties();
-                rp.SetRenderProperties(
-                    SpriteSortMode.Immediate,
-                    BlendState.AlphaBlend,
-                    m: _targetTransform);
-
-                rp.Render(LayerTarget, Vector2.Zero);
-
-                rp.ClearRenderProperties();
             }
             else
             {
@@ -181,6 +276,36 @@ namespace Artemis.Engine.Graphics
                 {
                     ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
                 }
+            }
+
+            rp.UnlockMatrix();
+            rp.UnsetRenderTarget();
+            rp.ClearRenderProperties();
+
+            rp.SetRenderProperties(
+                SpriteSortMode.Immediate,
+                BlendState.AlphaBlend,
+                m: _targetTransform);
+
+            rp.Render(LayerTarget, Vector2.Zero);
+
+            rp.ClearRenderProperties();
+
+            midRender = false;
+
+            if (_requiresTargetTransformRecalc)
+            {
+                if (_newLayerScaleType.HasValue)
+                    _layerScaleType = _newLayerScaleType.Value;
+                if (_newUniformScaleType.HasValue)
+                    _uniformScaleType = _newUniformScaleType.Value;
+
+                _newLayerScaleType = null;
+                _newUniformScaleType = null;
+
+                RecalculateTargetTransform();
+
+                _requiresTargetTransformRecalc = false;
             }
         }
 
@@ -270,7 +395,6 @@ namespace Artemis.Engine.Graphics
                 hasOriginalScale = true;
             }
                 
-
             var resultingScale = VectorUtils.ComponentwiseProduct(originalScale, scale);
 
             // Swap out the original scale for the newly calculated scale.
