@@ -80,6 +80,7 @@
     <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
+    <Compile Include="Graphics\RenderLayerException.cs" />
     <Compile Include="Graphics\SpriteSheet.cs" />
     <Compile Include="Graphics\AnimationStepActions\WaitAnimationStepAction.cs" />
     <Compile Include="Graphics\TextureOrigins.cs" />
