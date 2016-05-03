@@ -23,11 +23,11 @@ namespace Artemis.Engine.Graphics
         private World _world;
         private AbstractCamera _camera;
         private bool _requiresTargetTransformRecalc;
+        private bool midRender;
         private GlobalLayerScaleType _layerScaleType;
         private UniformLayerScaleType _uniformScaleType;
         private GlobalLayerScaleType? _newLayerScaleType;
         private UniformLayerScaleType? _newUniformScaleType;
-        private bool midRender;
 
         internal Matrix _targetTransform;
         internal string tempFullName { get; private set; }
@@ -115,6 +115,14 @@ namespace Artemis.Engine.Graphics
         }
 
         /// <summary>
+        /// The world this layer is attached to.
+        /// </summary>
+        public World World
+        {
+            get { return _world; }
+        }
+
+        /// <summary>
         /// Whether or not we are in the middle of rendering this layer.
         /// </summary>
         public bool MidRender { get { return midRender; } }
@@ -126,6 +134,12 @@ namespace Artemis.Engine.Graphics
 
         public RenderLayer(string fullName)
             : this(fullName, new NullCamera()) { }
+
+        public RenderLayer(string fullName, AbstractCamera camera)
+            : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, null) { }
+
+        public RenderLayer(string fullName, AbstractCamera camera, World world)
+            : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, world) { }
 
         public RenderLayer( string fullName
                           , AbstractCamera camera
@@ -154,6 +168,16 @@ namespace Artemis.Engine.Graphics
             camera.Layer = this;
 
             _world = world;
+        }
+
+        public void AddItem(string name, RenderableGroup item)
+        {
+
+        }
+
+        public void AddItem(string name, Form form)
+        {
+
         }
 
         /// <summary>
