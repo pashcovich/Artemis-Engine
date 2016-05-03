@@ -8,17 +8,23 @@ using Microsoft.Xna.Framework;
 
 namespace Artemis.Engine.Graphics
 {
-    public abstract class AbstractCamera
+
+    public abstract class AbstractCamera : ResolutionRelativeObject
     {
         /// <summary>
-        /// The AABB that contains everything in view of this camera.
+        /// The layer this camera is attached to.
+        /// </summary>
+        public RenderLayer Layer { get; internal set; }
+
+        /// <summary>
+        /// The AABB that contains everything in this camera's FOV.
         /// </summary>
         public abstract AABB ViewAABB { get; }
 
         /// <summary>
         /// The transform matrix that transforms from world coordinates to target coordinates.
         /// 
-        /// This must be implemented for everything else to make sense.
+        /// This must be implemented for every other transform to make sense.
         /// </summary>
         public abstract Matrix WorldToTargetTransform { get; }
 
@@ -34,7 +40,7 @@ namespace Artemis.Engine.Graphics
         /// 
         /// This is set by the RenderLayer this camera is attached to.
         /// </summary>
-        public Matrix TargetToScreenTransform { get; internal set; }
+        public Matrix TargetToScreenTransform { get { return Layer._targetTransform; } }
 
         /// <summary>
         /// The transform matrix that transforms from screen coordinates to target coordinates.
@@ -114,5 +120,7 @@ namespace Artemis.Engine.Graphics
         {
             return Vector2.Transform(screenPosition, ScreenToTargetTransform);
         }
+
+        public AbstractCamera() : base() { }
     }
 }

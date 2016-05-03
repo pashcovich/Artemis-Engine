@@ -21,7 +21,7 @@ namespace Artemis.Engine.Graphics
 
         public void Add(RenderLayer layer)
         {
-            AddObservedNode(layer.tempName, layer);
+            AddObservedNode(layer.tempFullName, layer);
             layer.Managed = true;
         }
 
