@@ -14,23 +14,47 @@ namespace Artemis.Engine.Graphics
 {
     public class SpriteSheet
     {
-
-        public const string GLOBAL_TILE_GROUP_NAME = "GLOBAL";
-
-        public Texture2D Texture { get; private set; }
-
-        private Dictionary<string, Rectangle> GlobalTileGroup;
-
-        private Dictionary<string, Dictionary<string, Rectangle>> TileGroups;
-
-        public SpriteSheet(Texture2D texture, Dictionary<string, Dictionary<string, Rectangle>> tileGroups)
+        public struct Tile
         {
-            Texture = texture;
+            /// <summary>
+            /// The index of the texture associated with this rectangle in the list of
+            /// LoadedTextures (not a property of TextureReference, but of the SpriteSheet
+            /// a TextureReference belongs to).
+            /// </summary>
+            public readonly int TextureID;
+            public readonly Rectangle Rectangle;
+            public Tile(int id, Rectangle rectangle)
+            {
+                TextureID = id;
+                Rectangle = rectangle;
+            }
+        }
+
+        public const string GLOBAL_TILE_GROUP_NAME = "";
+
+        /// <summary>
+        /// The list of loaded textures to draw rectangles from in this sprite sheet.
+        /// </summary>
+        public List<Texture2D> LoadedTextures { get; private set; }
+
+        /// <summary>
+        /// The global group of tiles.
+        /// </summary>
+        private Dictionary<string, Tile> GlobalTileGroup;
+
+        /// <summary>
+        /// The dictionary of non-global tile groups.
+        /// </summary>
+        private Dictionary<string, Dictionary<string, Tile>> TileGroups;
+
+        public SpriteSheet(List<Texture2D> texture, Dictionary<string, Dictionary<string, Tile>> tileGroups)
+        {
+            LoadedTextures = texture;
             GlobalTileGroup = tileGroups[GLOBAL_TILE_GROUP_NAME];
             TileGroups = tileGroups.Where(v => v.Key != GLOBAL_TILE_GROUP_NAME).ToDictionary(v => v.Key, v => v.Value);
         }
 
-        public Rectangle this[string key]
+        public Tile this[string key]
         {
             get
             {
