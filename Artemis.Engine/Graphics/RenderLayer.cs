@@ -170,14 +170,51 @@ namespace Artemis.Engine.Graphics
             _world = world;
         }
 
-        public void AddItem(string name, RenderableGroup item)
+        /// <summary>
+        /// Add an empty group with the given name to the layer.
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddGroup(string name)
         {
-
+            AllRenderables.AddSubnode(name, new RenderableGroup(UriUtilities.GetLastPart(name)));
         }
 
-        public void AddItem(string name, Form form)
+        /// <summary>
+        /// Add the renderable group to the layer.
+        /// </summary>
+        /// <param name="group"></param>
+        public void AddGroup(RenderableGroup group)
         {
+            AllRenderables.AddSubnode(group.Name, group);
+        }
 
+        /// <summary>
+        /// Add the renderable group with the given name to the layer.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="group"></param>
+        public void AddGroup(string name, RenderableGroup group)
+        {
+            AllRenderables.AddSubnode(name, group);
+        }
+
+        /// <summary>
+        /// Add a RenderableObject to this render layer.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="item"></param>
+        public void AddItem(string name, RenderableObject item)
+        {
+            AllRenderables.InsertItem(name, item);
+        }
+
+        /// <summary>
+        /// Add a Form to this render layer.
+        /// </summary>
+        /// <param name="form"></param>
+        public void AddItem(Form form)
+        {
+            AllRenderables.InsertItem(form.Name, form);
         }
 
         /// <summary>
@@ -293,8 +330,8 @@ namespace Artemis.Engine.Graphics
             else
             {
                 var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
-                var crntRes = ArtemisEngine.DisplayManager.WindowResolution;
-                var resScale = ArtemisEngine.DisplayManager.ResolutionScale;
+                var crntRes   = ArtemisEngine.DisplayManager.WindowResolution;
+                var resScale  = ArtemisEngine.DisplayManager.ResolutionScale;
 
                 foreach (var renderable in renderables)
                 {
@@ -403,7 +440,11 @@ namespace Artemis.Engine.Graphics
                         scale = new Vector2(resScale.X, resScale.Y);
                         break;
                     default:
-                        throw new Exception(); // throw actual exception...
+                        throw new RenderLayerException(
+                            String.Format(
+                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj
+                                )
+                            );
                 }
             }
             else

@@ -8,16 +8,18 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderableGroup : UriTreeGroup<RenderableGroup, RenderableObject>
+    public class RenderableGroup : UriTreeMutableGroup<RenderableGroup, RenderableObject>
     {
         public RenderableGroup(string name) : base(name) { }
 
+        /// <summary>
+        /// Recursively retrieve all the RenderableObjects.
+        /// </summary>
+        /// <returns></returns>
         public List<RenderableObject> RetrieveAll()
         {
             var list = new List<RenderableObject>();
-
             RetrieveAll(list);
-
             return list;
         }
 
@@ -27,7 +29,6 @@ namespace Artemis.Engine.Graphics
             {
                 subgroup.RetrieveAll(renderables);
             }
-
             foreach (var item in Items.Values)
             {
                 renderables.Add(item);
