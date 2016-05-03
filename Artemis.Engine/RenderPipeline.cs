@@ -213,6 +213,19 @@ namespace Artemis.Engine
                 var _origin = origin.HasValue ? origin.Value : Vector2.Zero;
                 var _scale  = scale.HasValue  ? scale.Value  : Vector2.One;
 
+                if (!spriteBatchBegun)
+                {
+                    SpriteBatch.Begin(
+                        _spriteSortMode.Value,
+                        _blendState.Value,
+                        _samplerState.Value,
+                        _depthStencilState.Value,
+                        _rasterizerState.Value,
+                        _effect.Value,
+                        _matrix.Value);
+                    spriteBatchBegun = true;
+                }
+
                 SpriteBatch.Draw(
                     texture, position, sourceRectangle, _colour, (float)rotation,
                     _origin, _scale, effects, layerDepth
@@ -619,8 +632,15 @@ namespace Artemis.Engine
             if (spriteBatchBegun)
             {
                 SpriteBatch.End();
+                spriteBatchBegun = false;
             }
-            SpriteBatch.Begin();
+            _spriteSortMode.Value = SpriteSortMode.Deferred;
+            _blendState.Value = null;
+            _samplerState.Value = null;
+            _depthStencilState.Value = null;
+            _rasterizerState.Value = null;
+            _effect.Value = null;
+            _matrix.Value = null;
         }
 
         /// <summary>

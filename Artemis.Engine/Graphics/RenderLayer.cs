@@ -250,9 +250,12 @@ namespace Artemis.Engine.Graphics
             }
 
             rp.ClearRenderProperties();
+
             rp.SetRenderTarget(LayerTarget);
             rp.ClearGraphicsDevice(Color.Transparent);
+
             rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
+            rp.LockMatrix();
 
             var renderables = GetRenderables();
 
@@ -262,17 +265,6 @@ namespace Artemis.Engine.Graphics
                 {
                     renderable.Render();
                 }
-
-                rp.UnsetRenderTarget();
-                rp.ClearRenderProperties();
-                rp.SetRenderProperties(
-                    SpriteSortMode.Immediate,
-                    BlendState.AlphaBlend,
-                    m: _targetTransform);
-
-                rp.Render(LayerTarget, Vector2.Zero);
-
-                rp.ClearRenderProperties();
             }
             else
             {
@@ -285,6 +277,19 @@ namespace Artemis.Engine.Graphics
                     ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
                 }
             }
+
+            rp.UnlockMatrix();
+            rp.UnsetRenderTarget();
+            rp.ClearRenderProperties();
+
+            rp.SetRenderProperties(
+                SpriteSortMode.Immediate,
+                BlendState.AlphaBlend,
+                m: _targetTransform);
+
+            rp.Render(LayerTarget, Vector2.Zero);
+
+            rp.ClearRenderProperties();
 
             midRender = false;
 
