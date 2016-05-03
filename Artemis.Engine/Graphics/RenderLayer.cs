@@ -28,9 +28,17 @@ namespace Artemis.Engine.Graphics
         private UniformLayerScaleType _uniformScaleType;
         private GlobalLayerScaleType? _newLayerScaleType;
         private UniformLayerScaleType? _newUniformScaleType;
+        private List<RenderableToAdd> toAdd = new List<RenderableToAdd>();
 
         internal Matrix _targetTransform;
         internal string tempFullName { get; private set; }
+
+        private struct RenderableToAdd
+        {
+            public RenderableObject Object;
+            public string Name;
+            public bool Anonymous;
+        }
 
         /// <summary>
         /// The target we're rendering to.
@@ -205,7 +213,10 @@ namespace Artemis.Engine.Graphics
         /// <param name="item"></param>
         public void AddItem(string name, RenderableObject item)
         {
-            AllRenderables.InsertItem(name, item);
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = name, Object = item });
+            else
+                AllRenderables.InsertItem(name, item);
         }
 
         /// <summary>
@@ -214,7 +225,51 @@ namespace Artemis.Engine.Graphics
         /// <param name="form"></param>
         public void AddItem(Form form)
         {
-            AllRenderables.InsertItem(form.Name, form);
+            AddItem(form.Name, form);
+        }
+
+        /// <summary>
+        /// Add an anonymous item to this layer.
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddAnonymousItem(RenderableObject item)
+        {
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = null, Object = item, Anonymous = true });
+            else
+                AllRenderables.AddAnonymousItem(item);
+        }
+
+        /// <summary>
+        /// Add an anonymous item to the renderable group with the given name in this layer.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="item"></param>
+        public void AddAnonymousItem(string groupName, RenderableObject item)
+        {
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = groupName, Object = item, Anonymous = true });
+            else
+                AllRenderables.AddAnonymousItem(groupName, item);
+        }
+
+        /// <summary>
+        /// Add an anonymous form to this layer.
+        /// </summary>
+        /// <param name="form"></param>
+        public void AddAnonymousForm(Form form)
+        {
+            AddAnonymousItem(form);
+        }
+
+        /// <summary>
+        /// Add an anonymous form to the renderable group with the given name in this layer.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="form"></param>
+        public void AddAnonymousForm(string groupName, Form form)
+        {
+            AddAnonymousItem(groupName, form);
         }
 
         /// <summary>
@@ -368,6 +423,31 @@ namespace Artemis.Engine.Graphics
 
                 _requiresTargetTransformRecalc = false;
             }
+
+            // Add all the items that were added mid-render.
+            //
+            // Honestly, this is kind of an unnecessary buffer for user clumsiness. They're
+            // rendering code should NOT be adding anything to a layer, that SHOULD be happening
+            // in their update code. This is just in case some theirs some edge case where you
+            // are forced to add an item mid-render, or in case the user isn't astute enough to
+            // realize the error in their ways.
+
+            foreach (var item in toAdd)
+            {
+                if (item.Anonymous)
+                {
+                    if (item.Name != null)
+                        AddAnonymousItem(item.Name, item.Object);
+                    else
+                        AddAnonymousItem(item.Object);
+                }
+                else
+                {
+                    AddItem(item.Name, item.Object);
+                }
+            }
+
+            toAdd.Clear();
         }
 
         /// <summary>
