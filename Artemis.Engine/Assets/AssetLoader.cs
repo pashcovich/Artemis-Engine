@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities.UriTree;
+
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -188,7 +190,17 @@ namespace Artemis.Engine.Assets
             {
                 return AssetFromURI<T>(name);
             }
-            return (T)RegisteredAssetImportersByType[typeof(T)].ImportFrom(name);
+            // This is pretty ghetto...
+            switch (typeof(T).ToString())
+            {
+                case "Texture2D":
+                case "SpriteFont":
+                    if (Content != null) // This is in case the AssetLoader is needed in a partial engine environment.
+                        return Content.Load<T>(name);
+                    return default(T);
+                default:
+                    return (T)RegisteredAssetImportersByType[typeof(T)].ImportFrom(name);
+            }
         }
 
         /// <summary>
