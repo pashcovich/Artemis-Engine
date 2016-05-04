@@ -140,6 +140,18 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public bool Managed { get; internal set; }
 
+        public RenderOrder RenderOrder { get; private set; }
+
+        public List<RenderOrder.IRenderOrderAction> RenderOrderActions
+        {
+            get
+            {
+                if (RenderOrder == null)
+                    return new List<RenderOrder.IRenderOrderAction>();
+                return RenderOrder.Actions;
+            }
+        }
+
         public RenderLayer(string fullName)
             : this(fullName, new NullCamera()) { }
 
@@ -270,6 +282,56 @@ namespace Artemis.Engine.Graphics
         public void AddAnonymousForm(string groupName, Form form)
         {
             AddAnonymousItem(groupName, form);
+        }
+
+        /// <summary>
+        /// Set the layer's RenderOrder to the render the groups/items with the given names.
+        /// </summary>
+        /// <param name="type">The type that each name represents (item or group).</param>
+        /// <param name="names"></param>
+        public void SetRenderOrder(RenderOrder.RenderType type, params string[] names)
+        {
+            var renderOrder = new RenderOrder();
+            switch (type)
+            {
+                case RenderOrder.RenderType.Item:
+                    foreach (var name in names)
+                        renderOrder.RenderItem(name);
+                    break;
+                case RenderOrder.RenderType.Group:
+                    foreach (var name in names)
+                        renderOrder.RenderGroup(name);
+                    break;
+                default:
+                    throw new Exception(); // throw an actual exception
+            }
+            RenderOrder = renderOrder;
+        }
+
+        public void SetRenderOrder(RenderOrder.RenderType[] types, string[] names)
+        {
+            if (types.Length != names.Length)
+                throw new Exception(); // throw an actual exception
+
+            var renderOrder = new RenderOrder();
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (types[i] == RenderOrder.RenderType.Item)
+                    renderOrder.RenderItem(names[i]);
+                else if (types[i] == RenderOrder.RenderType.Group)
+                    renderOrder.RenderGroup(names[i]);
+            }
+            RenderOrder = renderOrder;
+        }
+
+        public void SetRenderOrder(params RenderOrder.IRenderOrderAction[] actions)
+        {
+            RenderOrder = new RenderOrder(actions.ToList());
+        }
+
+        public void SetRenderOrder(RenderOrder order)
+        {
+            RenderOrder = order;
         }
 
         /// <summary>
