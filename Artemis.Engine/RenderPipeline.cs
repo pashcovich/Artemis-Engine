@@ -489,7 +489,7 @@ namespace Artemis.Engine
             if (_matrix.Locked)
                 _matrix.Locked = false;
             if (_matrix.Value != null)
-                _matrix.Value *= matrix;
+                _matrix.Value = matrix * _matrix.Value;
             else
                 _matrix.Value = matrix;
             _matrix.Locked = wasLocked;
@@ -511,7 +511,7 @@ namespace Artemis.Engine
             if (_matrix.Value == matrix)
                 _matrix.Value = null;
             else
-                _matrix.Value *= Microsoft.Xna.Framework.Matrix.Invert(matrix);
+                _matrix.Value = Microsoft.Xna.Framework.Matrix.Invert(matrix) * _matrix.Value;
             _matrix.Locked = wasLocked;
         }
 

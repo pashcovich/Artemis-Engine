@@ -14,12 +14,16 @@ namespace Artemis.Engine.Assets
     /// <typeparam name="T"></typeparam>
     internal class BuiltinAssetImporter<T> : IAssetImporter
     {
-        public object ImportFrom(string filePath)
+        public object ImportFrom(string filePath, bool fullPath = false)
         {
-            var cfName = AssetLoader.ContentFolderName;
-            return AssetLoader.Content.Load<T>(
-                DirectoryUtils.MakeRelativePath(
-                    cfName, Path.Combine(cfName, filePath)));
+            if (AssetLoader.Content != null) // This is in case the AssetLoader is needed in a partial engine environment.
+            {
+                var cfName = AssetLoader.ContentFolderName;
+                return AssetLoader.Content.Load<T>(
+                    DirectoryUtils.MakeRelativePath(
+                        cfName, Path.Combine(cfName, filePath)));
+            }
+            return default(T);
         }
     }
 }

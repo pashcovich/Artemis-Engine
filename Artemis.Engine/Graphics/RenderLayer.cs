@@ -28,9 +28,17 @@ namespace Artemis.Engine.Graphics
         private UniformLayerScaleType _uniformScaleType;
         private GlobalLayerScaleType? _newLayerScaleType;
         private UniformLayerScaleType? _newUniformScaleType;
+        private List<RenderableToAdd> toAdd = new List<RenderableToAdd>();
 
         internal Matrix _targetTransform;
         internal string tempFullName { get; private set; }
+
+        private struct RenderableToAdd
+        {
+            public RenderableObject Object;
+            public string Name;
+            public bool Anonymous;
+        }
 
         /// <summary>
         /// The target we're rendering to.
@@ -132,6 +140,18 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public bool Managed { get; internal set; }
 
+        public RenderOrder RenderOrder { get; private set; }
+
+        public List<RenderOrder.IRenderOrderAction> RenderOrderActions
+        {
+            get
+            {
+                if (RenderOrder == null)
+                    return new List<RenderOrder.IRenderOrderAction>();
+                return RenderOrder.Actions;
+            }
+        }
+
         public RenderLayer(string fullName)
             : this(fullName, new NullCamera()) { }
 
@@ -170,14 +190,148 @@ namespace Artemis.Engine.Graphics
             _world = world;
         }
 
-        public void AddItem(string name, RenderableGroup item)
+        /// <summary>
+        /// Add an empty group with the given name to the layer.
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddGroup(string name)
         {
-
+            AllRenderables.AddSubnode(name, new RenderableGroup(UriUtilities.GetLastPart(name)));
         }
 
-        public void AddItem(string name, Form form)
+        /// <summary>
+        /// Add the renderable group to the layer.
+        /// </summary>
+        /// <param name="group"></param>
+        public void AddGroup(RenderableGroup group)
         {
+            AllRenderables.AddSubnode(group.Name, group);
+        }
 
+        /// <summary>
+        /// Add the renderable group with the given name to the layer.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="group"></param>
+        public void AddGroup(string name, RenderableGroup group)
+        {
+            AllRenderables.AddSubnode(name, group);
+        }
+
+        /// <summary>
+        /// Add a RenderableObject to this render layer.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="item"></param>
+        public void AddItem(string name, RenderableObject item)
+        {
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = name, Object = item });
+            else
+                AllRenderables.InsertItem(name, item);
+        }
+
+        /// <summary>
+        /// Add a Form to this render layer.
+        /// </summary>
+        /// <param name="form"></param>
+        public void AddItem(Form form)
+        {
+            AddItem(form.Name, form);
+        }
+
+        /// <summary>
+        /// Add an anonymous item to this layer.
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddAnonymousItem(RenderableObject item)
+        {
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = null, Object = item, Anonymous = true });
+            else
+                AllRenderables.AddAnonymousItem(item);
+        }
+
+        /// <summary>
+        /// Add an anonymous item to the renderable group with the given name in this layer.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="item"></param>
+        public void AddAnonymousItem(string groupName, RenderableObject item)
+        {
+            if (midRender)
+                toAdd.Add(new RenderableToAdd { Name = groupName, Object = item, Anonymous = true });
+            else
+                AllRenderables.AddAnonymousItem(groupName, item);
+        }
+
+        /// <summary>
+        /// Add an anonymous form to this layer.
+        /// </summary>
+        /// <param name="form"></param>
+        public void AddAnonymousForm(Form form)
+        {
+            AddAnonymousItem(form);
+        }
+
+        /// <summary>
+        /// Add an anonymous form to the renderable group with the given name in this layer.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="form"></param>
+        public void AddAnonymousForm(string groupName, Form form)
+        {
+            AddAnonymousItem(groupName, form);
+        }
+
+        /// <summary>
+        /// Set the layer's RenderOrder to the render the groups/items with the given names.
+        /// </summary>
+        /// <param name="type">The type that each name represents (item or group).</param>
+        /// <param name="names"></param>
+        public void SetRenderOrder(RenderOrder.RenderType type, params string[] names)
+        {
+            var renderOrder = new RenderOrder();
+            switch (type)
+            {
+                case RenderOrder.RenderType.Item:
+                    foreach (var name in names)
+                        renderOrder.RenderItem(name);
+                    break;
+                case RenderOrder.RenderType.Group:
+                    foreach (var name in names)
+                        renderOrder.RenderGroup(name);
+                    break;
+                default:
+                    throw new Exception(); // throw an actual exception
+            }
+            RenderOrder = renderOrder;
+        }
+
+        public void SetRenderOrder(RenderOrder.RenderType[] types, string[] names)
+        {
+            if (types.Length != names.Length)
+                throw new Exception(); // throw an actual exception
+
+            var renderOrder = new RenderOrder();
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (types[i] == RenderOrder.RenderType.Item)
+                    renderOrder.RenderItem(names[i]);
+                else if (types[i] == RenderOrder.RenderType.Group)
+                    renderOrder.RenderGroup(names[i]);
+            }
+            RenderOrder = renderOrder;
+        }
+
+        public void SetRenderOrder(params RenderOrder.IRenderOrderAction[] actions)
+        {
+            RenderOrder = new RenderOrder(actions.ToList());
+        }
+
+        public void SetRenderOrder(RenderOrder order)
+        {
+            RenderOrder = order;
         }
 
         /// <summary>
@@ -293,8 +447,8 @@ namespace Artemis.Engine.Graphics
             else
             {
                 var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
-                var crntRes = ArtemisEngine.DisplayManager.WindowResolution;
-                var resScale = ArtemisEngine.DisplayManager.ResolutionScale;
+                var crntRes   = ArtemisEngine.DisplayManager.WindowResolution;
+                var resScale  = ArtemisEngine.DisplayManager.ResolutionScale;
 
                 foreach (var renderable in renderables)
                 {
@@ -331,6 +485,31 @@ namespace Artemis.Engine.Graphics
 
                 _requiresTargetTransformRecalc = false;
             }
+
+            // Add all the items that were added mid-render.
+            //
+            // Honestly, this is kind of an unnecessary buffer for user clumsiness. They're
+            // rendering code should NOT be adding anything to a layer, that SHOULD be happening
+            // in their update code. This is just in case some theirs some edge case where you
+            // are forced to add an item mid-render, or in case the user isn't astute enough to
+            // realize the error in their ways.
+
+            foreach (var item in toAdd)
+            {
+                if (item.Anonymous)
+                {
+                    if (item.Name != null)
+                        AddAnonymousItem(item.Name, item.Object);
+                    else
+                        AddAnonymousItem(item.Object);
+                }
+                else
+                {
+                    AddItem(item.Name, item.Object);
+                }
+            }
+
+            toAdd.Clear();
         }
 
         /// <summary>
@@ -403,7 +582,11 @@ namespace Artemis.Engine.Graphics
                         scale = new Vector2(resScale.X, resScale.Y);
                         break;
                     default:
-                        throw new Exception(); // throw actual exception...
+                        throw new RenderLayerException(
+                            String.Format(
+                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj
+                                )
+                            );
                 }
             }
             else
