@@ -29,7 +29,8 @@ namespace Artemis.Engine.Graphics.Animation
         public const string STEP_ACTIONS = "StepActions";
 
         // Xml Attributes
-        public const string NAME = "Name";
+        public const string NAME     = "Name";
+        public const string DURATION = "Duration";
         
         // StepAction Inner Tags
         public const string FRAME         = "Frame";
@@ -142,12 +143,14 @@ namespace Artemis.Engine.Graphics.Animation
                         {
                             AssetLoader.LoadUsingExtension(element.InnerText);
                         }
-                        // Not done
-                        break;
+
+                        throw new NotImplementedException();
+
+                        // break;
 
                     case CALL_FUNCTION:
-                        // Not done
-                        break;
+                        throw new NotImplementedException();
+                        // break;
 
                     case REVERSE:
                         StepActions.Add(new ReverseAnimationStepAction());

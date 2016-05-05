@@ -1,20 +1,6 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Assets;
-using Artemis.Engine.Graphics;
-using Artemis.Engine.Graphics.AnimationStepActions;
-using Artemis.Engine.Utilities.UriTree;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 #endregion
@@ -33,20 +19,20 @@ namespace Artemis.Engine.Graphics.Animation
 
         #endregion
 
-        public XmlElement AnimationMap { get; private set; }
+        public XmlElement AnimationMapElement { get; private set; }
         public Dictionary<string, AnimationState> States { get; private set; }
         public string InitState { get; private set; }
 
-        public AnimationMapReader(XmlElement sheet)
+        public AnimationMapReader(XmlElement animationMapElement)
         {
-            AnimationMap = sheet;
+            AnimationMapElement = animationMapElement;
             States = new Dictionary<string, AnimationState>();
         }
 
         public Dictionary<string, AnimationState> Load()
         {
-            ReadElementChildNodes(AnimationMap);
-            ReadElementAttributes(AnimationMap);
+            ReadElementChildNodes(AnimationMapElement);
+            ReadElementAttributes(AnimationMapElement);
 
             return States;
         }
@@ -62,17 +48,12 @@ namespace Artemis.Engine.Graphics.Animation
                     continue;
                 }
 
-                switch (element.Name)
+                if (element.Name.Equals(ANIMATION_STATE))
                 {
-                    case ANIMATION_STATE:
-                        AnimationStateReader stateReader = new AnimationStateReader(element);
-                        stateReader.Read();
-                        AnimationState state = new AnimationState(stateReader.stateName, stateReader.StepActions, AnimationStateLoopType.Cycle);
-                        States.Add(stateReader.stateName, state);
-                        break;
-
-                    default:
-                        break;
+                    AnimationStateReader stateReader = new AnimationStateReader(element);
+                    stateReader.Read();
+                    AnimationState state = new AnimationState(stateReader.stateName, stateReader.StepActions, AnimationStateLoopType.Cycle);
+                    States.Add(stateReader.stateName, state);
                 }
             }
         }
@@ -81,14 +62,9 @@ namespace Artemis.Engine.Graphics.Animation
         {
             foreach (XmlAttribute attrib in element.Attributes)
             {
-                switch (attrib.Name)
+                if (attrib.Name.Equals(INIT_STATE))
                 {
-                    case INIT_STATE:
-                        InitState = attrib.Value;
-                        break;
-
-                    default:
-                        break;
+                    InitState = attrib.Value;
                 }
             }
         }

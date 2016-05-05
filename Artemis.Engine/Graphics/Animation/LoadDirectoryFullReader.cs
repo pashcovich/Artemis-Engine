@@ -40,7 +40,7 @@ namespace Artemis.Engine.Graphics.Animation
         #endregion
 
         public XmlElement LoadImageTag { get; private set; }
-        public Dictionary<string, Rectangle> Tiles { get; private set; }
+        public Dictionary<string, Rectangle> Tiles { get; private set; }  // Make SpriteSheet.Tile instead of rectangle
         public Dictionary<string, Texture2D> Textures { get; private set; }
         public string GroupName { get; private set; }
 
