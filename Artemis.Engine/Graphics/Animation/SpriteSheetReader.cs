@@ -134,7 +134,7 @@ namespace Artemis.Engine.Graphics.Animation
 
                 case LOAD_DIRECTORY_FULL:
                     LoadDirectoryFullReader directoryFullReader = new LoadDirectoryFullReader(element);
-                    directoryFullReader.read();
+                    directoryFullReader.Read();
                     
                     if (!TileGroups.ContainsKey(directoryFullReader.GroupName))
                     {

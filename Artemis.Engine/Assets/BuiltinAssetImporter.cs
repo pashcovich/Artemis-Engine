@@ -14,7 +14,7 @@ namespace Artemis.Engine.Assets
     /// <typeparam name="T"></typeparam>
     internal class BuiltinAssetImporter<T> : IAssetImporter
     {
-        public object ImportFrom(string filePath, bool fullPath = false)
+        public object ImportFrom(string filePath)
         {
             if (AssetLoader.Content != null) // This is in case the AssetLoader is needed in a partial engine environment.
             {
