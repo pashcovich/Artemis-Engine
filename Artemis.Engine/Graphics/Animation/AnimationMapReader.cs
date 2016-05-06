@@ -23,9 +23,9 @@ namespace Artemis.Engine.Graphics.Animation
         public Dictionary<string, AnimationState> States { get; private set; }
         public string InitState { get; private set; }
 
-        public AnimationMapReader(XmlElement animationMapElement)
+        public AnimationMapReader(XmlElement element)
         {
-            AnimationMapElement = animationMapElement;
+            AnimationMapElement = element;
             States = new Dictionary<string, AnimationState>();
         }
 
@@ -48,12 +48,16 @@ namespace Artemis.Engine.Graphics.Animation
                     continue;
                 }
 
-                if (element.Name.Equals(ANIMATION_STATE))
+                if (element.Name == ANIMATION_STATE)
                 {
                     AnimationStateReader stateReader = new AnimationStateReader(element);
                     stateReader.Read();
-                    AnimationState state = new AnimationState(stateReader.stateName, stateReader.StepActions, AnimationStateLoopType.Cycle);
-                    States.Add(stateReader.stateName, state);
+
+                    AnimationState state = new AnimationState(
+                        stateReader.StateName, 
+                        stateReader.StepActions, 
+                        AnimationStateLoopType.Cycle);
+                    States.Add(stateReader.StateName, state);
                 }
             }
         }
@@ -62,10 +66,8 @@ namespace Artemis.Engine.Graphics.Animation
         {
             foreach (XmlAttribute attrib in element.Attributes)
             {
-                if (attrib.Name.Equals(INIT_STATE))
-                {
+                if (attrib.Name == INIT_STATE)
                     InitState = attrib.Value;
-                }
             }
         }
     }

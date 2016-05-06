@@ -39,24 +39,31 @@ namespace Artemis.Engine.Graphics.Animation
 
         #endregion
 
-        public XmlElement LoadImageTag { get; private set; }
-        public Dictionary<string, Rectangle> Tiles { get; private set; }  // Make SpriteSheet.Tile instead of rectangle
+        /// <summary>
+        /// The element we're parsing.
+        /// </summary>
+        public XmlElement LoadImageElement { get; private set; }
+
+        /// <summary>
+        /// The dictionary of tiles.
+        /// </summary>
+        public Dictionary<string, Rectangle> Tiles { get; private set; }
         public Dictionary<string, Texture2D> Textures { get; private set; }
         public string GroupName { get; private set; }
 
         private string selectedImage = "";
 
-        public LoadDirectoryFullReader(XmlElement tag)
+        public LoadDirectoryFullReader(XmlElement element)
         {
-            LoadImageTag = tag;
+            LoadImageElement = element;
             Tiles = new Dictionary<string, Rectangle>();
             GroupName = string.Empty;
             Textures = new Dictionary<string, Texture2D>();
         }
 
-        public void read()
+        public void Read()
         {
-            foreach (var node in LoadImageTag)
+            foreach (var node in LoadImageElement)
             {
                 var element = node as XmlElement;
 

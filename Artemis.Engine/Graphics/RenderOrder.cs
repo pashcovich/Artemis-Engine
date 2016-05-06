@@ -52,12 +52,22 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public class RenderItem : IRenderOrderAction
         {
+            /// <summary>
+            /// The name of the item to render.
+            /// </summary>
             public string Name;
+
+            /// <summary>
+            /// Whether or not to ignore duplicate renders.
+            /// </summary>
+            public bool IgnoreDuplicates;
+
             public RenderType RenderType { get; private set; }
-            public RenderItem(string name)
+            public RenderItem(string name, bool ignoreDuplicates = false)
             {
                 Name = name;
                 RenderType = RenderOrder.RenderType.Item;
+                IgnoreDuplicates = ignoreDuplicates;
             }
         }
 
@@ -66,14 +76,29 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public class RenderGroup : IRenderOrderAction
         {
+            /// <summary>
+            /// The name of the item to render.
+            /// </summary>
             public string Name;
+
+            /// <summary>
+            /// Options regarding which of the items in the group to render.
+            /// </summary>
             public RenderGroupOptions Options;
+
+            /// <summary>
+            /// Whether or not to ignore duplicate renders.
+            /// </summary>
+            public bool IgnoreDuplicates;
+            
             public RenderType RenderType { get; private set; }
-            public RenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre)
+            
+            public RenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool ignoreDuplicates = false)
             {
                 Name = name;
                 Options = options;
                 RenderType = RenderOrder.RenderType.Group;
+                IgnoreDuplicates = ignoreDuplicates;
             }
         }
 
@@ -82,7 +107,15 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public class SetRenderProperties : IRenderOrderAction
         {
+            /// <summary>
+            /// The properties to apply.
+            /// </summary>
             public SpriteBatchPropertiesPacket Packet;
+
+            /// <summary>
+            /// If this is true, and a property in the packet is set to it's default value, then
+            /// it is ignored and is not set. This is useful if you have a property that's locked 
+            /// </summary>
             public bool IgnoreDefaults;
             public bool ApplyMatrix;
             public SetRenderProperties( SpriteBatchPropertiesPacket packet
@@ -124,7 +157,7 @@ namespace Artemis.Engine.Graphics
         /// Set the next render order action to render the item with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void RenderItem(string name)
+        public void AddRenderItem(string name)
         {
             Actions.Add(new RenderItem(name));
         }
@@ -134,7 +167,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         /// <param name="name"></param>
         /// <param name="options"></param>
-        public void RenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre)
+        public void AddRenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre)
         {
             Actions.Add(new RenderGroup(name, options));
         }
@@ -151,7 +184,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="m"></param>
         /// <param name="ignoreDefaults"></param>
         /// <param name="applyMatrix"></param>
-        public void SetRenderProperties( SpriteSortMode ssm    = SpriteSortMode.Deferred
+        public void AddSetRenderProperties( SpriteSortMode ssm    = SpriteSortMode.Deferred
                                        , BlendState bs         = null
                                        , SamplerState ss       = null
                                        , DepthStencilState dss = null
@@ -171,7 +204,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="packet"></param>
         /// <param name="ignoreDefaults"></param>
         /// <param name="applyMatrix"></param>
-        public void SetRenderProperties( SpriteBatchPropertiesPacket packet
+        public void AddSetRenderProperties( SpriteBatchPropertiesPacket packet
                                        , bool ignoreDefaults = true
                                        , bool applyMatrix = false )
         {

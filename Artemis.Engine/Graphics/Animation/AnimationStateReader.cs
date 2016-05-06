@@ -68,7 +68,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         public XmlElement AnimationStateTag { get; private set; }
         public List<AbstractAnimationStepAction> StepActions { get; private set; }
-        public string stateName { get; private set; }
+        public string StateName { get; private set; }
 
         private bool hasFrameTags = false;
 
@@ -80,7 +80,7 @@ namespace Artemis.Engine.Graphics.Animation
         {
             AnimationStateTag = tag;
             StepActions = new List<AbstractAnimationStepAction>();
-            stateName = string.Empty;
+            StateName = string.Empty;
         }
 
         public void Read()
@@ -111,7 +111,7 @@ namespace Artemis.Engine.Graphics.Animation
 
                         foreach (var frame in Regex.Split(element.InnerText, FRAME_SEPARATOR_REGEX))
                         {
-                            StepActions.Add(new FrameAnimationStepAction(stateName + frame));
+                            StepActions.Add(new FrameAnimationStepAction(StateName + frame));
                         }
                         break;
 
@@ -126,15 +126,20 @@ namespace Artemis.Engine.Graphics.Animation
 
                     // Step Action Inner Tags
                     case FRAME:
-                        StepActions.Add(new FrameAnimationStepAction(element.InnerText));
+                        StepActions.Add(
+                            new FrameAnimationStepAction(element.InnerText));
                         break;
 
                     case WAIT:
-                        int waitFrame = Convert.ToInt32(Regex.Match(element.InnerText, INT_REGEX).Groups[1].Value);
+                        int waitFrame = Convert.ToInt32(
+                            Regex.Match(element.InnerText, INT_REGEX).Groups[1].Value);
                         StepActions.Add(new WaitAnimationStepAction(waitFrame));
                         break;
 
                     case SOUND:
+                        throw new NotImplementedException();
+                        // Not done
+                        /*
                         if (element.InnerText.Contains(UriUtilities.URI_SEPARATOR))
                         {
                             AssetLoader.Load<SoundEffect>(element.InnerText);
@@ -143,14 +148,10 @@ namespace Artemis.Engine.Graphics.Animation
                         {
                             AssetLoader.LoadUsingExtension(element.InnerText);
                         }
-
-                        throw new NotImplementedException();
-
-                        // break;
+                        */
 
                     case CALL_FUNCTION:
                         throw new NotImplementedException();
-                        // break;
 
                     case REVERSE:
                         StepActions.Add(new ReverseAnimationStepAction());
@@ -173,7 +174,7 @@ namespace Artemis.Engine.Graphics.Animation
                                 switch (repeatElement.Name)
                                 {
                                     case FRAME:
-                                        StepActions.Add(new FrameAnimationStepAction(stateName + i));
+                                        StepActions.Add(new FrameAnimationStepAction(StateName + i));
                                         break;
 
                                     case WAIT:
@@ -198,7 +199,7 @@ namespace Artemis.Engine.Graphics.Animation
 
                         if (type.Equals("cycle"))
                         {
-                            StepActions.Add(new FrameAnimationStepAction(stateName + "0"));
+                            StepActions.Add(new FrameAnimationStepAction(StateName + "0"));
                         }
                         else if (type.Equals("reverse"))
                         {
@@ -246,7 +247,7 @@ namespace Artemis.Engine.Graphics.Animation
                     case NAME:
                         if (!attrib.Value.Equals(string.Empty))
                         {
-                            stateName = attrib.Value + ".";
+                            StateName = attrib.Value + ".";
                         }
                         break;
 
