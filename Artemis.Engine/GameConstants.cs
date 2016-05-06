@@ -375,7 +375,7 @@ namespace Artemis.Engine
             if (root.Name != XmlElements.ROOT)
             {
                 // Should we throw an error or log something, or just fail silently?
-                // return;
+                return;
             }
             foreach (var child in root.ChildNodes)
             {

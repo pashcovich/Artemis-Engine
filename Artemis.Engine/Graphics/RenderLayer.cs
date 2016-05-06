@@ -18,16 +18,19 @@ namespace Artemis.Engine.Graphics
 {
     public class RenderLayer : UriTreeObserverNode<RenderLayer, RenderableGroup>
     {
-        private const string TOP_LEVEL = "ALL";
-        private RenderPipeline rp;
+        private const string TOP_LEVEL = "ALL"; // The name of the top level of renderable objects.
+        private RenderPipeline rp; // the global render pipeline,
         private World _world;
         private AbstractCamera _camera;
-        private bool _requiresTargetTransformRecalc;
-        private bool midRender;
+        private bool _requiresTargetTransformRecalc; // whether or not we need to recalculate the TargetTransform 
+                                                     // matrix (when target resolution changes for example).
+        private bool midRender; // whether or not we've entered a render cycle.
+
         private GlobalLayerScaleType _layerScaleType;
         private UniformLayerScaleType _uniformScaleType;
         private GlobalLayerScaleType? _newLayerScaleType;
         private UniformLayerScaleType? _newUniformScaleType;
+
         private List<RenderableToAdd> toAdd = new List<RenderableToAdd>();
 
         internal Matrix _targetTransform;
@@ -140,8 +143,14 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public bool Managed { get; internal set; }
 
+        /// <summary>
+        /// The order in which objects get rendered.
+        /// </summary>
         public RenderOrder RenderOrder { get; private set; }
 
+        /// <summary>
+        /// THe list of actions representing the render order.
+        /// </summary>
         public List<RenderOrder.IRenderOrderAction> RenderOrderActions
         {
             get
@@ -296,42 +305,51 @@ namespace Artemis.Engine.Graphics
             {
                 case RenderOrder.RenderType.Item:
                     foreach (var name in names)
-                        renderOrder.RenderItem(name);
+                        renderOrder.AddRenderItem(name);
                     break;
                 case RenderOrder.RenderType.Group:
                     foreach (var name in names)
-                        renderOrder.RenderGroup(name);
+                        renderOrder.AddRenderGroup(name);
                     break;
                 default:
+                    throw new RenderOrderException(
+                        String.Format(
+                            "Can't handle RenderOrder.RenderType '{0}'" +
+                            " for more options see the other overloads of `SetRenderOrder`.", type
+                            )
+                        );
                     throw new Exception(); // throw an actual exception
             }
-            RenderOrder = renderOrder;
+            SetRenderOrder(renderOrder);
         }
 
         public void SetRenderOrder(RenderOrder.RenderType[] types, string[] names)
         {
             if (types.Length != names.Length)
-                throw new Exception(); // throw an actual exception
+                throw new RenderOrderException(
+                    "The length of the given types array must match the length of the given names array.");
 
             var renderOrder = new RenderOrder();
             for (int i = 0; i < types.Length; i++)
             {
                 if (types[i] == RenderOrder.RenderType.Item)
-                    renderOrder.RenderItem(names[i]);
+                    renderOrder.AddRenderItem(names[i]);
                 else if (types[i] == RenderOrder.RenderType.Group)
-                    renderOrder.RenderGroup(names[i]);
+                    renderOrder.AddRenderGroup(names[i]);
             }
-            RenderOrder = renderOrder;
+            SetRenderOrder(renderOrder);
         }
 
         public void SetRenderOrder(params RenderOrder.IRenderOrderAction[] actions)
         {
-            RenderOrder = new RenderOrder(actions.ToList());
+            SetRenderOrder(new RenderOrder(actions.ToList()));
         }
 
         public void SetRenderOrder(RenderOrder order)
         {
             RenderOrder = order;
+
+            // Calculate render order.
         }
 
         /// <summary>
@@ -435,24 +453,50 @@ namespace Artemis.Engine.Graphics
             rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
             rp.LockMatrix();
 
-            var renderables = GetRenderables();
-
-            if (LayerScaleType == GlobalLayerScaleType.Uniform)
+            if (RenderOrder == null)
             {
-                foreach (var renderable in renderables)
+                var renderables = GetRenderables();
+
+                if (LayerScaleType == GlobalLayerScaleType.Uniform)
                 {
-                    renderable.Render();
+                    foreach (var renderable in renderables)
+                    {
+                        renderable.Render();
+                        renderable.Rendered = true;
+                    }
                 }
+                else
+                {
+                    var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
+                    var crntRes = ArtemisEngine.DisplayManager.WindowResolution;
+                    var resScale = ArtemisEngine.DisplayManager.ResolutionScale;
+
+                    foreach (var renderable in renderables)
+                    {
+                        ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
+                        renderable.Rendered = true;
+                    }
+                }
+
+                // Reset their rendered values.
+                foreach (var renderable in renderables)
+                    renderable.Rendered = false;
             }
             else
             {
-                var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
-                var crntRes   = ArtemisEngine.DisplayManager.WindowResolution;
-                var resScale  = ArtemisEngine.DisplayManager.ResolutionScale;
-
-                foreach (var renderable in renderables)
+                if (LayerScaleType == GlobalLayerScaleType.Uniform)
                 {
-                    ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
+                    foreach (var item in RenderOrder.Actions)
+                    {
+                        if (item is RenderOrder.RenderItem)
+                        {
+                            var action = (RenderOrder.RenderItem)item;
+                            var renderable = AllRenderables.GetItem(action.Name);
+                            if (renderable.Rendered)
+                            renderable.Render();
+                            renderable.Rendered = true;
+                        }
+                    }
                 }
             }
 

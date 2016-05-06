@@ -93,8 +93,7 @@
     <Compile Include="DisplayManagerException.cs" />
     <Compile Include="Graphics\RenderLayerException.cs" />
     <Compile Include="Graphics\RenderOrder.cs" />
-    <Compile Include="Graphics\SpriteSheet.cs" />
-    <Compile Include="Graphics\AnimationStepActions\WaitAnimationStepAction.cs" />
+    <Compile Include="Graphics\RenderOrderException.cs" />
     <Compile Include="Graphics\TextureOrigins.cs" />
     <Compile Include="Graphics\UniformLayerScaleType.cs" />
     <Compile Include="Multiforms\Menu\MenuMultiform.cs" />
