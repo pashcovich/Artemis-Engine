@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 #endregion
@@ -25,7 +26,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         public void AddItem(string name, U item, bool disallowDuplicates = true)
         {
-            AddItem(UriUtilities.GetParts(name), item, disallowDuplicates);
+            AddItem(new Queue<string>(UriUtilities.GetParts(name)), item, disallowDuplicates);
         }
 
         /// <summary>
@@ -35,46 +36,45 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="name"></param>
         public void SetItem(string name, U item)
         {
-            AddItem(UriUtilities.GetParts(name), item, false);
+            AddItem(new Queue<string>(UriUtilities.GetParts(name)), item, false);
         }
 
-        private void AddItem(string[] nameParts, U item, bool disallowDuplicates)
+        private void AddItem(Queue<string> nameParts, U item, bool disallowDuplicates)
         {
-            if (nameParts.Length == 1)
+            var first = nameParts.Dequeue();
+            if (nameParts.Count == 0)
             {
-                var name = nameParts[0];
-                if (Items.ContainsKey(name))
+                if (Items.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not add item '{0}' with name '{1}' to group with full name '{2}', " +
-                                "an item with that name already exists.", item, name, FullName
+                                "an item with that name already exists.", item, first, FullName
                                 )
                             );
                     }
-                    Items[name] = item;
+                    Items[first] = item;
                 }
                 else
                 {
-                    Items.Add(name, item);
+                    Items.Add(first, item);
                 }
             }
             else
             {
-                var newParts = nameParts.Skip(1).ToArray();
-                if (!Subnodes.ContainsKey(nameParts[0]))
+                if (!Subnodes.ContainsKey(first))
                 {
                     throw new UriTreeException(
                         String.Format(
                             "Could not add item '{0}' with name '{1}' to group with full name '{2}; " +
                             "missing intermediate node with name '{3}'. Consider using InsertItem instead.",
-                            item, nameParts, FullName, nameParts[0]
+                            item, nameParts, FullName, first
                             )
                         );
                 }
-                Subnodes[nameParts[0]].AddItem(newParts, item, disallowDuplicates);
+                Subnodes[first].AddItem(nameParts, item, disallowDuplicates);
             }
         }
 
@@ -94,29 +94,29 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="item"></param>
         public void AddAnonymousItem(string name, U item)
         {
-            AddAnonymousItem(UriUtilities.GetParts(name), item);
+            AddAnonymousItem(new Queue<string>(UriUtilities.GetParts(name)), item);
         }
 
-        private void AddAnonymousItem(string[] nameParts, U item)
+        private void AddAnonymousItem(Queue<string> nameParts, U item)
         {
-            if (nameParts.Length == 0)
+            if (nameParts.Count == 0)
             {
                 AnonymousItems.Add(item);
             }
             else
             {
-                if (!Subnodes.ContainsKey(nameParts[0]))
+                var first = nameParts.Dequeue();
+                if (!Subnodes.ContainsKey(first))
                 {
                     throw new UriTreeException(
                         String.Format(
                             "Could not add item '{0}' to group with full name '{1}'; " +
                             "missing intermediate node with name '{2}'. Consider using InsertItem instead.",
-                            item, FullName, nameParts[0]
+                            item, FullName, first
                             )
                         );
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[nameParts[0]].AddAnonymousItem(newParts, item);
+                Subnodes[first].AddAnonymousItem(nameParts, item);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         public void InsertItem(string name, U item, bool disallowDuplicates = true)
         {
-            InsertItem<T>(UriUtilities.GetParts(name), item, disallowDuplicates);
+            InsertItem<T>(new Queue<string>(UriUtilities.GetParts(name)), item, disallowDuplicates);
         }
 
         /// <summary>
@@ -151,43 +151,42 @@ namespace Artemis.Engine.Utilities.UriTree
         public void InsertItem<NodeType>(string name, U item, bool disallowDuplicates = true)
             where NodeType : UriTreeMutableGroup<T, U>
         {
-            InsertItem<NodeType>(UriUtilities.GetParts(name), item, disallowDuplicates);
+            InsertItem<NodeType>(new Queue<string>(UriUtilities.GetParts(name)), item, disallowDuplicates);
         }
 
-        private void InsertItem<NodeType>(string[] nameParts, U item, bool disallowDuplicates)
+        private void InsertItem<NodeType>(Queue<string> nameParts, U item, bool disallowDuplicates)
             where NodeType : UriTreeMutableGroup<T, U>
         {
-            var firstPart = nameParts[0];
+            var first = nameParts.Dequeue();
 
-            if (nameParts.Length == 1)
+            if (nameParts.Count == 1)
             {
-                if (Items.ContainsKey(firstPart))
+                if (Items.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Cannot insert item '{0}' with name '{1}' to group with full name '{2}', " +
-                                "an item with that name already exists.", item, firstPart, FullName
+                                "an item with that name already exists.", item, first, FullName
                                 )
                             );
                     }
-                    Items[firstPart] = item;
+                    Items[first] = item;
                 }
                 else
                 {
-                    Items.Add(firstPart, item);
+                    Items.Add(first, item);
                 }
             }
             else
             {
-                if (!Subnodes.ContainsKey(firstPart))
+                if (!Subnodes.ContainsKey(first))
                 {
-                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), firstPart);
+                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), first);
                     newNode.SetParent((T)this); // will add to Subnodes automatically.
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[firstPart].InsertItem<NodeType>(nameParts, item, disallowDuplicates);
+                Subnodes[first].InsertItem<NodeType>(nameParts, item, disallowDuplicates);
             }
         }
 
@@ -220,26 +219,25 @@ namespace Artemis.Engine.Utilities.UriTree
         public void InsertAnonymousItem<NodeType>(string name, U item)
             where NodeType : UriTreeMutableGroup<T, U>
         {
-            InsertAnonymousItem<NodeType>(UriUtilities.GetParts(name), item);
+            InsertAnonymousItem<NodeType>(new Queue<string>(UriUtilities.GetParts(name)), item);
         }
 
-        private void InsertAnonymousItem<NodeType>(string[] nameParts, U item)
+        private void InsertAnonymousItem<NodeType>(Queue<string> nameParts, U item)
             where NodeType : UriTreeMutableGroup<T, U>
         {
-            if (nameParts.Length == 0)
+            if (nameParts.Count == 0)
             {
                 AnonymousItems.Add(item);
             }
             else
             {
-                var firstPart = nameParts[0];
-                if (!Subnodes.ContainsKey(firstPart))
+                var first = nameParts.Dequeue();
+                if (!Subnodes.ContainsKey(first))
                 {
-                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), firstPart);
+                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), first);
                     newNode.SetParent((T)this);
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[firstPart].InsertAnonymousItem<NodeType>(newParts, item);
+                Subnodes[first].InsertAnonymousItem<NodeType>(nameParts, item);
             }
         }
         
@@ -250,15 +248,15 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="failQuiet"></param>
         public void RemoveItem(string name, bool failQuiet = false)
         {
-            RemoveItem(UriUtilities.GetParts(name), failQuiet);
+            RemoveItem(new Queue<string>(UriUtilities.GetParts(name)), failQuiet);
         }
 
-        private void RemoveItem(string[] nameParts, bool failQuiet)
+        private void RemoveItem(Queue<string> nameParts, bool failQuiet)
         {
-            if (nameParts.Length == 1)
+            var first = nameParts.Dequeue();
+            if (nameParts.Count == 0)
             {
-                var name = nameParts[0];
-                if (!Items.ContainsKey(name))
+                if (!Items.ContainsKey(first))
                 {
                     if (failQuiet)
                     {
@@ -266,11 +264,11 @@ namespace Artemis.Engine.Utilities.UriTree
                     }
                     throw CouldNotRemoveItem(nameParts);
                 }
-                Items.Remove(name);
+                Items.Remove(first);
             }
             else
             {
-                if (!Subnodes.ContainsKey(nameParts[0]))
+                if (!Subnodes.ContainsKey(first))
                 {
                     if (failQuiet)
                     {
@@ -278,12 +276,11 @@ namespace Artemis.Engine.Utilities.UriTree
                     }
                     throw CouldNotRemoveItem(nameParts);
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[nameParts[0]].RemoveItem(newParts, failQuiet);
+                Subnodes[first].RemoveItem(nameParts, failQuiet);
             }
         }
 
-        private UriTreeException CouldNotRemoveItem(string[] nameParts)
+        private UriTreeException CouldNotRemoveItem(Queue<string> nameParts)
         {
             var name = String.Join(UriUtilities.URI_SEPARATOR.ToString(), nameParts);
             return new UriTreeException(
@@ -299,9 +296,15 @@ namespace Artemis.Engine.Utilities.UriTree
         /// Remove an anonymous item from this group.
         /// </summary>
         /// <param name="item"></param>
-        public void RemoveAnonymousItem(U item)
+        public bool RemoveAnonymousItem(U item, bool searchRecursive = true)
         {
-            AnonymousItems.Remove(item);
+            if (!AnonymousItems.Remove(item) && searchRecursive)
+            {
+                if (IsLeaf)
+                    return false;
+                return Subnodes.Any(kvp => kvp.Value.RemoveAnonymousItem(item, searchRecursive));
+            }
+            return true;
         }
 
         /// <summary>
@@ -310,35 +313,35 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="name"></param>
         /// <param name="item"></param>
         /// <param name="failQuiet"></param>
-        public void RemoveAnonymousItem(string name, U item, bool failQuiet = true)
+        public bool RemoveAnonymousItem(string name, U item, bool failQuiet = true)
         {
-            RemoveAnonymousItem(UriUtilities.GetParts(name), item, failQuiet);
+            return RemoveAnonymousItem(new Queue<string>(UriUtilities.GetParts(name)), item, failQuiet);
         }
 
-        private void RemoveAnonymousItem(string[] nameParts, U item, bool failQuiet)
+        private bool RemoveAnonymousItem(Queue<string> nameParts, U item, bool failQuiet)
         {
-            if (nameParts.Length == 0)
+            if (nameParts.Count == 0)
             {
-                AnonymousItems.Remove(item);
+                return AnonymousItems.Remove(item);
             }
             else
             {
-                if (!Subnodes.ContainsKey(nameParts[0]))
+                var first = nameParts.Dequeue();
+                if (!Subnodes.ContainsKey(first))
                 {
                     if (failQuiet)
                     {
-                        return;
+                        return false;
                     }
                     throw new UriTreeException(
                         String.Format(
                             "Could not remove item '{0}' from group with full name '{1}'; " +
                             "missing intermediate node with name '{2}'.",
-                            item, FullName, nameParts[0]
+                            item, FullName, first
                             )
                         );
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[nameParts[0]].RemoveAnonymousItem(newParts, item, failQuiet);
+                return Subnodes[first].RemoveAnonymousItem(nameParts, item, failQuiet);
             }
         }
     }
