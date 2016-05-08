@@ -2,8 +2,10 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Diagnostics;
 
 #endregion
 
@@ -69,11 +71,14 @@ namespace Artemis.Engine.Graphics.Animation
             switch (element.Name)
             {
                 case LOAD_IMAGE_AS_TILE:
+                    Console.WriteLine("Load Image As Tile Detected");
+
                     LoadImageAsTileReader imageTileReader = new LoadImageAsTileReader(element);
                     imageTileReader.read();
 
                     if (!TileGroups.ContainsKey(imageTileReader.TileGroup))
                     {
+                        Console.WriteLine("New Key at: " + imageTileReader.TileGroup);
                         TileGroups.Add(imageTileReader.TileGroup, new Dictionary<string, SpriteSheet.Tile>());
                         currentFrame.Add(imageTileReader.TileGroup, 0);
                     }

@@ -76,7 +76,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         private void ReadElementAttributes(XmlElement element)
         {
-            Rectangle tile = new Rectangle();
+            Rectangle tile = new Rectangle(0, 0, 0, 0);
             foreach (XmlAttribute attrib in element.Attributes)
             {
                 switch (attrib.Name)
@@ -85,6 +85,8 @@ namespace Artemis.Engine.Graphics.Animation
                         if (Tiles.ContainsKey(Path.GetFileNameWithoutExtension(attrib.Value)))
                         {
                             selectedImage = Path.GetFileNameWithoutExtension(attrib.Value);
+                            tile.Width = Textures[selectedImage].Width;
+                            tile.Height = Textures[selectedImage].Height;
                         }
                         else
                         {

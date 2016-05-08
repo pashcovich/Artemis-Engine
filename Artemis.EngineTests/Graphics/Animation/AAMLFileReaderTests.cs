@@ -1,23 +1,33 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Artemis.Engine.Graphics.Animation;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Artemis.Engine.Graphics.Animation.Tests
+namespace Artemis.Tests
 {
-    [TestClass()]
+    [TestClass]
     public class AAMLFileReaderTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void AAMLFileReaderTest()
         {
-            Assert.Fail();
-            Console.WriteLine("Testing");
+            Trace.WriteLine("Start...");
+
+            AAMLFileReader fileReader = new AAMLFileReader("../../TestFile.aaml");
+            try
+            {
+                fileReader.Read();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message + "\nAt: " + e.StackTrace);
+            }
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void ReadTest()
         {
             Assert.Fail();

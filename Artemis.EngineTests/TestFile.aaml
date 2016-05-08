@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Animation>
+	<SpriteSheet>
+		<LoadImageAsTile Name="meleeattack/survivor-meleeattack_shotgun_0.png" TileGroup=""/>
+	</SpriteSheet>
+	<AnimationMap InitState="idle">
+	</AnimationMap>
+</Animation>

@@ -68,7 +68,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         private void ReadElementAttributes(XmlElement element)
         {
-            Rectangle tempTile = new Rectangle();
+            Rectangle tempTile = new Rectangle(0, 0, Texture.Width, Texture.Height);
             foreach (XmlAttribute attrib in element.Attributes)
             {
                 switch (attrib.Name)
