@@ -23,7 +23,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         // Xml Attribute Names
         public const string NAME        = "Name";
-        public const string TILE_GROUP = "TileGroup";
+        public const string TILE_GROUP  = "TileGroup";
         public const string TOP_LEFT    = "TopLeft";
         public const string DIMENSIONS  = "Dimensions";
 
@@ -68,7 +68,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         private void ReadElementAttributes(XmlElement element)
         {
-            Rectangle tempTile = new Rectangle(0, 0, Texture.Width, Texture.Height);
+            Rectangle tempTile = new Rectangle(0, 0, Int32.MaxValue, Int32.MaxValue);
             foreach (XmlAttribute attrib in element.Attributes)
             {
                 switch (attrib.Name)
@@ -97,15 +97,11 @@ namespace Artemis.Engine.Graphics.Animation
 
                         tempTile.X = Convert.ToInt32(coords.Groups[1].Value.Trim());
                         tempTile.Y = Convert.ToInt32(coords.Groups[5].Value.Trim());
-                        tempTile.Height = Tile.Height;
-                        tempTile.Width = Tile.Width;
                         break;
 
                     case DIMENSIONS:
                         Match dimensions = Regex.Match(attrib.Value, INT_REGEX + DIMENSIONS_SPECE_REGEX + INT_REGEX);
-
-                        tempTile.X = Tile.X;
-                        tempTile.Y = Tile.Y;
+                        
                         tempTile.Width = Convert.ToInt32(dimensions.Groups[1].Value.Trim());
                         tempTile.Height = Convert.ToInt32(dimensions.Groups[6].Value.Trim());
                         break;

@@ -14,8 +14,6 @@ namespace Artemis.Tests
         [TestMethod]
         public void AAMLFileReaderTest()
         {
-            Trace.WriteLine("Start...");
-
             AAMLFileReader fileReader = new AAMLFileReader("../../TestFile.aaml");
             try
             {
@@ -23,7 +21,7 @@ namespace Artemis.Tests
             }
             catch (Exception e)
             {
-                Assert.Fail(e.Message + "\nAt: " + e.StackTrace);
+                Assert.Fail(e.Message + "\n\nAt:\n" + e.StackTrace);
             }
         }
 

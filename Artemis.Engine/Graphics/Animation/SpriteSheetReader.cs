@@ -46,6 +46,7 @@ namespace Artemis.Engine.Graphics.Animation
         {
             SpriteSheet = sheet;
             TileGroups = new Dictionary<string, Dictionary<string, SpriteSheet.Tile>>();
+            TileGroups.Add("", new Dictionary<string, SpriteSheet.Tile>());
             Textures = new List<Texture2D>();
         }
 
@@ -71,14 +72,11 @@ namespace Artemis.Engine.Graphics.Animation
             switch (element.Name)
             {
                 case LOAD_IMAGE_AS_TILE:
-                    Console.WriteLine("Load Image As Tile Detected");
-
                     LoadImageAsTileReader imageTileReader = new LoadImageAsTileReader(element);
                     imageTileReader.read();
 
                     if (!TileGroups.ContainsKey(imageTileReader.TileGroup))
                     {
-                        Console.WriteLine("New Key at: " + imageTileReader.TileGroup);
                         TileGroups.Add(imageTileReader.TileGroup, new Dictionary<string, SpriteSheet.Tile>());
                         currentFrame.Add(imageTileReader.TileGroup, 0);
                     }
