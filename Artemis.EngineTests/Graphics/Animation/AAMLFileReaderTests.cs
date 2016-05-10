@@ -18,7 +18,7 @@ namespace Artemis.Tests
             try
             {
                 fileReader.Read();
-            }
+            } 
             catch (Exception e)
             {
                 Assert.Fail(e.Message + "\n\nAt:\n" + e.StackTrace);

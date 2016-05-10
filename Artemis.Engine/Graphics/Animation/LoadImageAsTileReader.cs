@@ -86,7 +86,11 @@ namespace Artemis.Engine.Graphics.Animation
 
                     case TILE_GROUP:
                         TileGroup = element.Value;
-                        if (!TileGroup.Equals(string.Empty))
+                        if (String.IsNullOrEmpty(TileGroup))
+                        {
+                            TileGroup = "";
+                        }
+                        else
                         {
                             TileGroup += ".";
                         }
