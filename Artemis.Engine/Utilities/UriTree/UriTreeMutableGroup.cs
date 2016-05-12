@@ -16,6 +16,12 @@ namespace Artemis.Engine.Utilities.UriTree
     /// <typeparam name="U"></typeparam>
     public class UriTreeMutableGroup<T, U> : UriTreeGroup<T, U> where T : UriTreeMutableGroup<T, U>
     {
+
+        public delegate void UriTreeItemDelegate(string itemName, U item);
+
+        public UriTreeItemDelegate OnItemAdded;
+        public UriTreeItemDelegate OnItemRemoved;
+
         protected UriTreeMutableGroup(string name) : base(name) { }
 
         /// <summary>
@@ -61,6 +67,8 @@ namespace Artemis.Engine.Utilities.UriTree
                 {
                     Items.Add(first, item);
                 }
+                if (OnItemAdded != null)
+                    OnItemAdded(first, item);
             }
             else
             {
@@ -102,6 +110,8 @@ namespace Artemis.Engine.Utilities.UriTree
             if (nameParts.Count == 0)
             {
                 AnonymousItems.Add(item);
+                if (OnItemAdded != null)
+                    OnItemAdded(null, item);
             }
             else
             {
@@ -178,6 +188,8 @@ namespace Artemis.Engine.Utilities.UriTree
                 {
                     Items.Add(first, item);
                 }
+                if (OnItemAdded != null)
+                    OnItemAdded(first, item);
             }
             else
             {
@@ -228,6 +240,8 @@ namespace Artemis.Engine.Utilities.UriTree
             if (nameParts.Count == 0)
             {
                 AnonymousItems.Add(item);
+                if (OnItemAdded != null)
+                    OnItemAdded(null, item);
             }
             else
             {
@@ -264,7 +278,10 @@ namespace Artemis.Engine.Utilities.UriTree
                     }
                     throw CouldNotRemoveItem(nameParts);
                 }
+                var item = Items[first];
                 Items.Remove(first);
+                if (OnItemRemoved != null)
+                    OnItemRemoved(first, item);
             }
             else
             {
@@ -304,6 +321,8 @@ namespace Artemis.Engine.Utilities.UriTree
                     return false;
                 return Subnodes.Any(kvp => kvp.Value.RemoveAnonymousItem(item, searchRecursive));
             }
+            if (OnItemRemoved != null)
+                OnItemRemoved(null, item);
             return true;
         }
 
@@ -322,7 +341,10 @@ namespace Artemis.Engine.Utilities.UriTree
         {
             if (nameParts.Count == 0)
             {
-                return AnonymousItems.Remove(item);
+                var removed = AnonymousItems.Remove(item);
+                if (OnItemRemoved != null)
+                    OnItemRemoved(null, item);
+                return removed;
             }
             else
             {

@@ -19,6 +19,9 @@ namespace Artemis.Engine.Utilities.UriTree
     /// <typeparam name="T">This must be the class itself, otherwise recursion won't work.</typeparam>
     public class UriTreeNode<T> : IEnumerable<T> where T : UriTreeNode<T>
     {
+
+        public delegate void UriTreeNodeDelegate(UriTreeNode<T> node);
+
         private string name;
 
         /// <summary>
@@ -74,6 +77,9 @@ namespace Artemis.Engine.Utilities.UriTree
         /// </summary>
         public Dictionary<string, T> Subnodes { get; protected set; }
 
+        public UriTreeNodeDelegate OnNodeAdded;
+        public UriTreeNodeDelegate OnNodeRemoved;
+
         protected UriTreeNode(string name)
         {
             Name = name;
@@ -91,6 +97,9 @@ namespace Artemis.Engine.Utilities.UriTree
             if (!Parent.Subnodes.ContainsKey(name))
             {
                 Parent.Subnodes.Add(name, (T)this);
+
+                if (Parent.OnNodeAdded != null)
+                    Parent.OnNodeAdded(this);
             }
         }
 
@@ -163,13 +172,17 @@ namespace Artemis.Engine.Utilities.UriTree
 
             if (nameParts.Count == 1)
             {
-                var asDisposable = Subnodes[first] as IDisposable;
+                var node = Subnodes[first];
+                var asDisposable = node as IDisposable;
                 if (asDisposable != null)
                 {
                     asDisposable.Dispose();
                 }
 
                 Subnodes.Remove(first);
+
+                if (OnNodeRemoved != null)
+                    OnNodeRemoved(node);
 
                 return;
             }
@@ -368,7 +381,6 @@ namespace Artemis.Engine.Utilities.UriTree
                 {
                     var newNode = (T)Activator.CreateInstance(typeof(NodeType), first);
                     newNode.SetParent((T)this);
-                    Subnodes.Add(first, newNode);
                 }
                 Subnodes[first].InsertSubnode<NodeType>(nameParts, subnode, disallowDuplicates);
             }
