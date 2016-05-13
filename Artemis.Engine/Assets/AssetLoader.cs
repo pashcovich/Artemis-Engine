@@ -289,7 +289,7 @@ namespace Artemis.Engine.Assets
             }
             else
             {
-                return LoadedAssetGroups[parts[0]].GetSubnode(parts.Skip(1).ToArray(), false);
+                return LoadedAssetGroups[parts[0]].GetSubnode(new Queue<string>(parts.Skip(1)), false);
             }
         }
 

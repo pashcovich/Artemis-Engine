@@ -94,7 +94,7 @@ namespace Artemis.Engine
             ResetTime();
 
             // This is probably overkill...
-            //
+            //  
             // We assign a different updater function depending on the partial
             // state of the engine so that we're not making the check for IsPartial
             // every time UpdateTime is called (which is a lot).
