@@ -1,20 +1,6 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Assets;
-using Artemis.Engine.Graphics;
-using Artemis.Engine.Graphics.AnimationStepActions;
-using Artemis.Engine.Utilities.UriTree;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 #endregion

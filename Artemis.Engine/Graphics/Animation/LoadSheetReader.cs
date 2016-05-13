@@ -131,7 +131,7 @@ namespace Artemis.Engine.Graphics.Animation
 
         private void Parse_Tile(XmlElement element, string groupName)
         {
-            Rectangle tile = new Rectangle();
+            Rectangle tile = new Rectangle(0, 0, Texture.Width, Texture.Height);
 
             if (!groupName.Equals(string.Empty))
             {

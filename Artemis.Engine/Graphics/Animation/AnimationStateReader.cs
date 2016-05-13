@@ -29,7 +29,8 @@ namespace Artemis.Engine.Graphics.Animation
         public const string STEP_ACTIONS = "StepActions";
 
         // Xml Attributes
-        public const string NAME = "Name";
+        public const string NAME     = "Name";
+        public const string DURATION = "Duration";
         
         // StepAction Inner Tags
         public const string FRAME         = "Frame";

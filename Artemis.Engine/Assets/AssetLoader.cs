@@ -214,7 +214,18 @@ namespace Artemis.Engine.Assets
             var firstSeparatorPos = name.IndexOf('.');
             var rootGroupName = name.Substring(0, firstSeparatorPos);
             var remainingName = name.Substring(firstSeparatorPos + 1);
-            return LoadedAssetGroups[rootGroupName].GetAsset<T>(remainingName);
+            try
+            {
+                return LoadedAssetGroups[rootGroupName].GetAsset<T>(remainingName);
+            }
+            catch (KeyNotFoundException)
+            {
+                // If Content is null, we're running a partial engine environment, and thus can't actually load any asset
+                // groups.
+                if (Content == null)
+                    return default(T);
+                throw;
+            }
         }
 
         /// <summary>

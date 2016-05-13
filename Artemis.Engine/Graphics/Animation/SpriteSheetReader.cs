@@ -2,8 +2,10 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Diagnostics;
 
 #endregion
 
@@ -44,6 +46,7 @@ namespace Artemis.Engine.Graphics.Animation
         {
             SpriteSheet = sheet;
             TileGroups = new Dictionary<string, Dictionary<string, SpriteSheet.Tile>>();
+            TileGroups.Add("", new Dictionary<string, SpriteSheet.Tile>());
             Textures = new List<Texture2D>();
         }
 
