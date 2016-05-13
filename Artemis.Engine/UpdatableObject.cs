@@ -39,7 +39,7 @@ namespace Artemis.Engine
         /// <summary>
         /// Whether or not "Update" can be called multiple times in a single game tick.
         /// </summary>
-        public bool DisallowMultipleUpdates { get; internal set; }
+        public bool DisallowMultipleUpdates;
 
         /// <summary>
         /// The updater exposed to the user.

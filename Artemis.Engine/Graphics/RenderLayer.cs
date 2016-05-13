@@ -31,7 +31,13 @@ namespace Artemis.Engine.Graphics
         private GlobalLayerScaleType? _newLayerScaleType;
         private UniformLayerScaleType? _newUniformScaleType;
 
-        private List<RenderableToAdd> toAdd = new List<RenderableToAdd>();
+        private readonly List<RenderableToAdd> renderablesToAdd = new List<RenderableToAdd>();
+
+        // the list of the renderables we've seen so far in this render cycle.
+        private readonly HashSet<RenderableObject> seenRenderables = new HashSet<RenderableObject>();
+
+        // the list of renderable groups we've seen so far in this render cycle.
+        private readonly HashSet<RenderableGroup> seenGroups = new HashSet<RenderableGroup>(); 
 
         internal Matrix _targetTransform;
         internal string tempFullName { get; private set; }
@@ -42,6 +48,13 @@ namespace Artemis.Engine.Graphics
             public string Name;
             public bool Anonymous;
         }
+
+        /// <summary>
+        /// A delegate defining what to do upon encountering a renderable
+        /// object in a renderable group.
+        /// </summary>
+        /// <param name="?"></param>
+        public delegate void RenderAction(RenderableObject obj);
 
         /// <summary>
         /// The target we're rendering to.
@@ -104,6 +117,14 @@ namespace Artemis.Engine.Graphics
         }
 
         /// <summary>
+        /// The global RenderGroupOptions, determining whether or not the top level items should be 
+        /// rendered first or the subnodes first. The default value is "RenderOrder.RenderGroupOptions.AllPre".
+        /// 
+        /// Note: If RenderOrder is not null, this value is not used.
+        /// </summary>
+        public RenderOrder.RenderGroupOptions GlobalRenderGroupOptions;
+
+        /// <summary>
         /// The camera attached to this layer.
         /// </summary>
         public AbstractCamera Camera
@@ -151,12 +172,12 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// THe list of actions representing the render order.
         /// </summary>
-        public List<RenderOrder.IRenderOrderAction> RenderOrderActions
+        public List<RenderOrder.AbstractRenderOrderAction> RenderOrderActions
         {
             get
             {
                 if (RenderOrder == null)
-                    return new List<RenderOrder.IRenderOrderAction>();
+                    return new List<RenderOrder.AbstractRenderOrderAction>();
                 return RenderOrder.Actions;
             }
         }
@@ -189,6 +210,7 @@ namespace Artemis.Engine.Graphics
 
             LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
 
+            GlobalRenderGroupOptions = RenderOrder.RenderGroupOptions.AllPre;
             LayerScaleType = layerScaleType;
             UniformScaleType = uniformScaleType;
             RecalculateTargetTransform();
@@ -235,7 +257,7 @@ namespace Artemis.Engine.Graphics
         public void AddItem(string name, RenderableObject item)
         {
             if (midRender)
-                toAdd.Add(new RenderableToAdd { Name = name, Object = item });
+                renderablesToAdd.Add(new RenderableToAdd { Name = name, Object = item });
             else
                 AllRenderables.InsertItem(name, item);
         }
@@ -256,7 +278,7 @@ namespace Artemis.Engine.Graphics
         public void AddAnonymousItem(RenderableObject item)
         {
             if (midRender)
-                toAdd.Add(new RenderableToAdd { Name = null, Object = item, Anonymous = true });
+                renderablesToAdd.Add(new RenderableToAdd { Name = null, Object = item, Anonymous = true });
             else
                 AllRenderables.AddAnonymousItem(item);
         }
@@ -269,7 +291,7 @@ namespace Artemis.Engine.Graphics
         public void AddAnonymousItem(string groupName, RenderableObject item)
         {
             if (midRender)
-                toAdd.Add(new RenderableToAdd { Name = groupName, Object = item, Anonymous = true });
+                renderablesToAdd.Add(new RenderableToAdd { Name = groupName, Object = item, Anonymous = true });
             else
                 AllRenderables.AddAnonymousItem(groupName, item);
         }
@@ -278,9 +300,9 @@ namespace Artemis.Engine.Graphics
         /// Add an anonymous form to this layer.
         /// </summary>
         /// <param name="form"></param>
-        public void AddAnonymousForm(Form form)
+        public void AddAnonymousItem(Form form)
         {
-            AddAnonymousItem(form);
+            AddAnonymousItem((RenderableObject)form);
         }
 
         /// <summary>
@@ -288,9 +310,9 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         /// <param name="groupName"></param>
         /// <param name="form"></param>
-        public void AddAnonymousForm(string groupName, Form form)
+        public void AddAnonymousItem(string groupName, Form form)
         {
-            AddAnonymousItem(groupName, form);
+            AddAnonymousItem(groupName, (RenderableObject)form);
         }
 
         /// <summary>
@@ -318,11 +340,16 @@ namespace Artemis.Engine.Graphics
                             " for more options see the other overloads of `SetRenderOrder`.", type
                             )
                         );
-                    throw new Exception(); // throw an actual exception
             }
             SetRenderOrder(renderOrder);
         }
 
+        /// <summary>
+        /// Set the render order to the render the given list of groups/items with the given
+        /// names and types.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="names"></param>
         public void SetRenderOrder(RenderOrder.RenderType[] types, string[] names)
         {
             if (types.Length != names.Length)
@@ -340,13 +367,25 @@ namespace Artemis.Engine.Graphics
             SetRenderOrder(renderOrder);
         }
 
-        public void SetRenderOrder(params RenderOrder.IRenderOrderAction[] actions)
+        /// <summary>
+        /// Set the render order to the given list of AbstractRenderOrderActions.
+        /// </summary>
+        /// <param name="actions"></param>
+        public void SetRenderOrder(params RenderOrder.AbstractRenderOrderAction[] actions)
         {
             SetRenderOrder(new RenderOrder(actions.ToList()));
         }
 
+        /// <summary>
+        /// Set the render order to the given RenderOrder object.
+        /// </summary>
+        /// <param name="order"></param>
         public void SetRenderOrder(RenderOrder order)
         {
+            if (midRender)
+                throw new RenderOrderException(
+                    String.Format(
+                        "Cannot set render order on layer '{0}' during the render cycle.", FullName));
             RenderOrder = order;
 
             // Calculate render order.
@@ -361,222 +400,65 @@ namespace Artemis.Engine.Graphics
             _world = world;
         }
 
+        /// <summary>
+        /// Recalculate the TargetTransform matrix (required when resolution changes).
+        /// </summary>
         private void RecalculateTargetTransform()
         {
             if (LayerScaleType == GlobalLayerScaleType.Uniform)
             {
                 _targetTransform = Matrix.Identity;
-                return;
             }
-
-            if (ArtemisEngine.DisplayManager.IsBaseResolution)
+            else if (ArtemisEngine.DisplayManager.IsBaseResolution)
             {
                 _targetTransform = Matrix.Identity;
-                return;
-            }
-
-            var baseRes = GameConstants.BaseResolution;
-            var scale = ArtemisEngine.DisplayManager.ResolutionScale;
-
-            Matrix transform;
-            switch (UniformScaleType)
-            {
-                case UniformLayerScaleType.Stretch:
-                    transform = Matrix.CreateScale(scale.X, scale.Y, 1);
-                    break;
-                case UniformLayerScaleType.Fit:
-                    if (scale.X == scale.Y)
-                        transform = Matrix.CreateScale(scale.X, scale.X, 1);
-                    else if (scale.X > scale.Y)
-                        transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
-                                    Matrix.CreateTranslation(baseRes.Width * (1 - scale.X) / 2f, 0, 0);
-                    transform = Matrix.CreateScale(scale.X, scale.X, 1) *
-                                Matrix.CreateTranslation(0, baseRes.Height * (1 - scale.Y) / 2f, 0);
-                    break;
-                case UniformLayerScaleType.Fill:
-                    if (scale.X == scale.Y)
-                        transform = Matrix.CreateScale(scale.X, scale.X, 1);
-                    else if (scale.X > scale.Y)
-                        transform = Matrix.CreateScale(scale.X, scale.X, 1) *
-                                    Matrix.CreateTranslation(0, baseRes.Height / 2f * (scale.Y - scale.X), 0);
-                    transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
-                                Matrix.CreateTranslation(baseRes.Width / 2f * (scale.X - scale.Y), 0, 0);
-                    break;
-                default:
-                    throw new RenderLayerException(
-                        String.Format(
-                            "Invalid UniformLayerScaleType value '{0}' supplied.", UniformScaleType
-                            )
-                        );
-            }
-
-            _targetTransform = transform;
-        }
-
-        /// <summary>
-        /// Render all items and sublayers on this layer.
-        /// </summary>
-        public void RenderAll()
-        {
-            foreach (var layer in Subnodes.Values)
-            {
-                layer.RenderAll();
-            }
-
-            Render();
-        }
-
-        /// <summary>
-        /// Render all items in this layer.
-        /// </summary>
-        public void Render()
-        {
-            midRender = true;
-
-            if (ArtemisEngine.DisplayManager.ResolutionChanged)
-            {
-                LayerTarget.Dispose();
-
-                // If we're scaling dynamically then our layer target fills the entire screen.
-                if (LayerScaleType == GlobalLayerScaleType.Dynamic)
-                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
-                else
-                    LayerTarget = ArtemisEngine.RenderPipeline.CreateBaseResRenderTarget();
-                RecalculateTargetTransform();
-            }
-
-            rp.ClearRenderProperties();
-
-            rp.SetRenderTarget(LayerTarget);
-            rp.ClearGraphicsDevice(Color.Transparent);
-
-            rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
-            rp.LockMatrix();
-
-            if (RenderOrder == null)
-            {
-                var renderables = GetRenderables();
-
-                if (LayerScaleType == GlobalLayerScaleType.Uniform)
-                {
-                    foreach (var renderable in renderables)
-                    {
-                        renderable.Render();
-                        renderable.Rendered = true;
-                    }
-                }
-                else
-                {
-                    var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
-                    var crntRes = ArtemisEngine.DisplayManager.WindowResolution;
-                    var resScale = ArtemisEngine.DisplayManager.ResolutionScale;
-
-                    foreach (var renderable in renderables)
-                    {
-                        ProcessDynamicallyScaledRenderable(renderable, isBaseRes, crntRes, resScale);
-                        renderable.Rendered = true;
-                    }
-                }
-
-                // Reset their rendered values.
-                foreach (var renderable in renderables)
-                    renderable.Rendered = false;
             }
             else
             {
-                if (LayerScaleType == GlobalLayerScaleType.Uniform)
+                var baseRes = GameConstants.BaseResolution;
+                var scale = ArtemisEngine.DisplayManager.ResolutionScale;
+
+                Matrix transform;
+                switch (UniformScaleType)
                 {
-                    foreach (var item in RenderOrder.Actions)
-                    {
-                        if (item is RenderOrder.RenderItem)
-                        {
-                            var action = (RenderOrder.RenderItem)item;
-                            var renderable = AllRenderables.GetItem(action.Name);
-                            if (renderable.Rendered)
-                            renderable.Render();
-                            renderable.Rendered = true;
-                        }
-                    }
+                    case UniformLayerScaleType.Stretch:
+                        transform = Matrix.CreateScale(scale.X, scale.Y, 1);
+                        break;
+                    case UniformLayerScaleType.Fit:
+                        if (scale.X == scale.Y)
+                            transform = Matrix.CreateScale(scale.X, scale.X, 1);
+                        else if (scale.X > scale.Y)
+                            transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                                        Matrix.CreateTranslation(baseRes.Width * (1 - scale.X) / 2f, 0, 0);
+                        transform = Matrix.CreateScale(scale.X, scale.X, 1) *
+                                    Matrix.CreateTranslation(0, baseRes.Height * (1 - scale.Y) / 2f, 0);
+                        break;
+                    case UniformLayerScaleType.Fill:
+                        if (scale.X == scale.Y)
+                            transform = Matrix.CreateScale(scale.X, scale.X, 1);
+                        else if (scale.X > scale.Y)
+                            transform = Matrix.CreateScale(scale.X, scale.X, 1) *
+                                        Matrix.CreateTranslation(0, baseRes.Height / 2f * (scale.Y - scale.X), 0);
+                        transform = Matrix.CreateScale(scale.Y, scale.Y, 1) *
+                                    Matrix.CreateTranslation(baseRes.Width / 2f * (scale.X - scale.Y), 0, 0);
+                        break;
+                    default:
+                        throw new RenderLayerException(
+                            String.Format(
+                                "Invalid UniformLayerScaleType value '{0}' supplied.", UniformScaleType));
                 }
+                _targetTransform = transform;
             }
-
-            rp.UnlockMatrix();
-            rp.UnsetRenderTarget();
-            rp.ClearRenderProperties();
-
-            rp.SetRenderProperties(
-                SpriteSortMode.Immediate,
-                BlendState.AlphaBlend,
-                m: _targetTransform);
-
-            rp.Render(LayerTarget, Vector2.Zero);
-
-            rp.ClearRenderProperties();
-
-            midRender = false;
-
-            if (_requiresTargetTransformRecalc)
-            {
-                if (_newLayerScaleType.HasValue)
-                    _layerScaleType = _newLayerScaleType.Value;
-                if (_newUniformScaleType.HasValue)
-                    _uniformScaleType = _newUniformScaleType.Value;
-
-                _newLayerScaleType = null;
-                _newUniformScaleType = null;
-
-                RecalculateTargetTransform();
-
-                _requiresTargetTransformRecalc = false;
-            }
-
-            // Add all the items that were added mid-render.
-            //
-            // Honestly, this is kind of an unnecessary buffer for user clumsiness. They're
-            // rendering code should NOT be adding anything to a layer, that SHOULD be happening
-            // in their update code. This is just in case some theirs some edge case where you
-            // are forced to add an item mid-render, or in case the user isn't astute enough to
-            // realize the error in their ways.
-
-            foreach (var item in toAdd)
-            {
-                if (item.Anonymous)
-                {
-                    if (item.Name != null)
-                        AddAnonymousItem(item.Name, item.Object);
-                    else
-                        AddAnonymousItem(item.Object);
-                }
-                else
-                {
-                    AddItem(item.Name, item.Object);
-                }
-            }
-
-            toAdd.Clear();
+            _requiresTargetTransformRecalc = false;
         }
 
         /// <summary>
-        /// Get the list of items to draw (dependent on the camera).
+        /// Process a RenderableObject when the GlobalLayerScaleType is set to Dynamic.
         /// </summary>
-        /// <returns></returns>
-        private List<RenderableObject> GetRenderables()
-        {
-            if (Camera is NullCamera)
-                return AllRenderables.RetrieveAll();
-
-            var renderables = new HashSet<RenderableObject>();
-            var aabb = Camera.ViewAABB;
-            _world.QueryAABB(f =>
-                {
-                    var obj = (RenderableObject)f.Body.UserData;
-                    renderables.Add(obj);
-                    return true;
-                }, ref aabb);
-
-            return renderables.ToList();
-        }
-
+        /// <param name="obj"></param>
+        /// <param name="isBaseRes"></param>
+        /// <param name="crntRes"></param>
+        /// <param name="resScale"></param>
         private void ProcessDynamicallyScaledRenderable(
             RenderableObject obj, bool isBaseRes, Resolution crntRes, Vector2 resScale)
         {
@@ -638,22 +520,283 @@ namespace Artemis.Engine.Graphics
                 scale = Vector2.One;
             }
 
-            bool hasOriginalScale = false;
-            Vector2 originalScale = Vector2.One;
-            if (obj.RenderComponents.Scale.HasValue)
-            {
-                originalScale = obj.RenderComponents.Scale.Value;
-                hasOriginalScale = true;
-            }
-                
+            bool hasOriginalScale = obj.RenderComponents.Scale.HasValue;
+            Vector2 originalScale = hasOriginalScale ? obj.RenderComponents.Scale.Value : Vector2.One;
+
             var resultingScale = VectorUtils.ComponentwiseProduct(originalScale, scale);
 
             // Swap out the original scale for the newly calculated scale.
             obj.RenderComponents.Scale = resultingScale;
 
-            obj.Render();
+            obj.InternalRender(seenRenderables);
 
             obj.RenderComponents.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
+        }
+
+        /// <summary>
+        /// Get the RenderAction. The Layer RenderAction determines how it prepares and calls
+        /// each RenderableObject's Render method it encounters.
+        /// 
+        /// For RenderLayer, the render action returned depends on the LayerScaleType.
+        /// </summary>
+        /// <returns></returns>
+        private RenderAction GetRenderAction(Predicate<RenderableObject> isVisibileToCamera)
+        {
+            switch (LayerScaleType)
+            {
+                case GlobalLayerScaleType.Uniform:
+                    if (isVisibileToCamera == null)
+                        return obj => obj.InternalRender(seenRenderables);
+                    else
+                        return obj =>
+                        {
+                            if (isVisibileToCamera(obj))
+                                obj.InternalRender(seenRenderables);
+                        };
+                case GlobalLayerScaleType.Dynamic:
+                    var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
+                    var crntRes   = ArtemisEngine.DisplayManager.WindowResolution;
+                    var resScale  = ArtemisEngine.DisplayManager.ResolutionScale;
+
+                    if (isVisibileToCamera == null)
+                        return obj => ProcessDynamicallyScaledRenderable(obj, isBaseRes, crntRes, resScale);
+                    else
+                        return obj =>
+                        {
+                            if (isVisibileToCamera(obj))
+                                ProcessDynamicallyScaledRenderable(obj, isBaseRes, crntRes, resScale);
+                        };
+                default:
+                    throw new RenderLayerException(
+                        String.Format(
+                            "Unknown GlobalLayerScaleType '{0}' supplied to layer '{1}'.",
+                            LayerScaleType, tempFullName));
+            }
+        }
+
+        /// <summary>
+        /// Get the list of all RenderableObjects visible to the Camera.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<RenderableObject> GetCameraVisibleRenderables()
+        {
+            if (Camera is NullCamera)
+                return AllRenderables.RetrieveAll();
+
+            var renderables = new HashSet<RenderableObject>();
+            var aabb = Camera.ViewAABB;
+            _world.QueryAABB(f =>
+            {
+                var obj = (RenderableObject)f.Body.UserData;
+                renderables.Add(obj); // A renderable object might have multiple fixtures, but
+                // we only want to render the object itself once.
+                return true;
+            }, ref aabb);
+
+            return renderables;
+        }
+
+        /// <summary>
+        /// Render all items and sublayers on this layer.
+        /// </summary>
+        public void RenderAll()
+        {
+            foreach (var layer in Subnodes.Values)
+            {
+                layer.RenderAll();
+            }
+
+            Render();
+        }
+
+        /// <summary>
+        /// Render all items in this layer.
+        /// </summary>
+        public void Render()
+        {
+            midRender = true;
+
+            // Reset the RenderTarget if the resolution has changed.
+            if (ArtemisEngine.DisplayManager.ResolutionChanged)
+            {
+                LayerTarget.Dispose();
+
+                // If we're scaling dynamically then our layer target fills the entire screen.
+                if (LayerScaleType == GlobalLayerScaleType.Dynamic)
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+                else
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateBaseResRenderTarget();
+                RecalculateTargetTransform();
+            }
+
+            // Set the RenderPipeline's target to be this layer's target, clear it,
+            // and lock the matrix property so any user matrix transformations are applied
+            // to the Camera's matrix.
+            rp.ClearRenderProperties();
+
+            rp.SetRenderTarget(LayerTarget);
+            rp.ClearGraphicsDevice(Color.Transparent);
+
+            rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
+            rp.LockMatrix();
+
+            // Get all the renderable objects.
+            var renderables = GetCameraVisibleRenderables();
+
+            // Create the predicate that checks if a given renderable is visible.
+            Predicate<RenderableObject> isVisibleToCamera = null; // if null, then every renderable is visible.
+            if (!(Camera is NullCamera))
+            {
+                var hashSet = (HashSet<RenderableObject>)renderables;
+                isVisibleToCamera = obj => hashSet.Contains(obj);
+            }
+
+            // Get the render action for each encountered RenderableObject.
+            RenderAction renderAction = GetRenderAction(isVisibleToCamera);
+
+            seenRenderables.Clear();
+            seenGroups.Clear();
+
+            // If no RenderOrder was set, just render everything.
+            if (RenderOrder == null)
+            {
+                AllRenderables.Render(
+                    GlobalRenderGroupOptions, renderAction, seenRenderables, seenGroups);
+            }
+            // Otherwise, render in the order specified by the RenderOrder.
+            else
+            {
+                /* TODO: Make this faster (somehow).
+                 * 
+                 * The problem with this is that we're iterating through EVERY RenderableObject and checking
+                 * if the camera can see it, then rendering it. Ideally what we should be doing instead is
+                 * iterating through every RenderableObject returned by the QueryAABB and somehow rendering
+                 * only THOSE in order.
+                 * 
+                 * For large worlds, the number of renderables visible to the camera can be MUCH less than the
+                 * total number of RenderableObjects, which is a problem.
+                 * 
+                 * Most likely what will be done is upon setting the layer's RenderOrder, some sort of mapping
+                 * is created which assigns each RenderableObject a number indicating it's position in the sorted
+                 * list of objects to render.
+                 */
+                foreach (var item in RenderOrder.Actions)
+                {
+                    switch (item.ActionType)
+                    {
+                        case RenderOrder.RenderOrderActionType.RenderItem:
+                            HandleRenderOrderAction_RenderItem((RenderOrder.RenderItem)item, renderAction);
+                            break;
+                        case RenderOrder.RenderOrderActionType.RenderGroup:
+                            HandleRenderOrderAction_RenderGroup((RenderOrder.RenderGroup)item, renderAction);
+                            break;
+                        case RenderOrder.RenderOrderActionType.SetRenderProperties:
+                            HandleRenderOrderAction_SetRenderProperties((RenderOrder.SetRenderProperties)item);
+                            break;
+                        default:
+                            HandleUnknownRenderOrderAction(item, renderAction, isVisibleToCamera);
+                            break;
+                    }
+                }
+            }
+
+            rp.UnlockMatrix();
+            rp.UnsetRenderTarget();
+            rp.ClearRenderProperties();
+
+            rp.SetRenderProperties(
+                SpriteSortMode.Immediate,
+                BlendState.AlphaBlend,
+                m: _targetTransform);
+
+            rp.Render(LayerTarget, Vector2.Zero);
+
+            rp.ClearRenderProperties();
+
+            midRender = false;
+
+            if (_requiresTargetTransformRecalc)
+            {
+                if (_newLayerScaleType.HasValue)
+                    _layerScaleType = _newLayerScaleType.Value;
+                if (_newUniformScaleType.HasValue)
+                    _uniformScaleType = _newUniformScaleType.Value;
+
+                _newLayerScaleType = null;
+                _newUniformScaleType = null;
+
+                RecalculateTargetTransform();
+            }
+
+            // Add all the items that were added mid-render.
+            //
+            // Honestly, this is kind of an unnecessary buffer for user clumsiness. Their
+            // rendering code should NOT be adding anything to a layer, that SHOULD be happening
+            // in their update code. This is just in case there's some edge case where you're
+            // forced to add an item mid-render, or in case the user isn't astute enough to
+            // realize the error in their ways.
+
+            foreach (var item in renderablesToAdd)
+            {
+                if (item.Anonymous)
+                {
+                    if (item.Name != null)
+                        AddAnonymousItem(item.Name, item.Object);
+                    else
+                        AddAnonymousItem(item.Object);
+                }
+                else
+                {
+                    AddItem(item.Name, item.Object);
+                }
+            }
+
+            renderablesToAdd.Clear();
+        }
+
+        /// <summary>
+        /// Handle a RenderItem action in the RenderOrder.
+        /// </summary>
+        /// <param name="action"></param>
+        private void HandleRenderOrderAction_RenderItem(
+            RenderOrder.RenderItem action, RenderAction renderAction)
+        {
+            var renderable = AllRenderables.GetItem(action.Name);
+            if (!(action.SkipDuplicates && seenRenderables.Contains(renderable)))
+                renderAction(renderable);
+        }
+        
+        /// <summary>
+        /// Handle a RenderGroup action in the RenderOrder.
+        /// </summary>
+        /// <param name="action"></param>
+        private void HandleRenderOrderAction_RenderGroup(
+            RenderOrder.RenderGroup action, RenderAction renderAction)
+        {
+            var group = AllRenderables.GetSubnode(action.Name);
+            group.Render(action.Options, renderAction, seenRenderables, seenGroups, action.SkipDuplicates);
+        }
+
+        /// <summary>
+        /// Handle a SetRenderProperties action in the RenderOrder.
+        /// </summary>
+        /// <param name="action"></param>
+        private void HandleRenderOrderAction_SetRenderProperties(RenderOrder.SetRenderProperties action)
+        {
+            ArtemisEngine.RenderPipeline.SetRenderProperties(
+                action.Packet, action.IgnoreDefaults, action.ApplyMatrix);
+        }
+
+        /// <summary>
+        /// Handle a RenderOrderAction that the RenderLayer couldn't identify what to do with.
+        /// Implement this if you have RenderOrderActions that aren't one of the builtin types.
+        /// </summary>
+        /// <param name="action"></param>
+        protected virtual void HandleUnknownRenderOrderAction(
+            RenderOrder.AbstractRenderOrderAction action, RenderAction renderAction, Predicate<RenderableObject> isVisibleToCamera)
+        {
+            throw new RenderOrderException(
+                String.Format("Unknown render order action '{0}'.", action));
         }
     }
 }
