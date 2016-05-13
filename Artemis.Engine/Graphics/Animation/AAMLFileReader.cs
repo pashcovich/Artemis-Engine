@@ -71,13 +71,11 @@ namespace Artemis.Engine.Graphics.Animation
                 throw new AAMLSyntaxException(
                     String.Format("No root node in AAML file '{0}'.", AAMLFileName));
 
-            XmlElement spriteSheet, animationMap;
-            
-
             var rootChildrenElementsOnly = new List<XmlElement>(
                 from child in root.ChildNodes.Cast<XmlNode>()
                 where child is XmlElement
-                select (XmlElement)child);
+                select (XmlElement)child );
+
             if (rootChildrenElementsOnly.Count < 2)
             {
                 throw new AAMLSyntaxException(
@@ -86,6 +84,8 @@ namespace Artemis.Engine.Graphics.Animation
             }
             var first = rootChildrenElementsOnly[0];
             var second = rootChildrenElementsOnly[1];
+
+            XmlElement spriteSheet, animationMap;
 
             if (first.Name == SPRITE_SHEET && second.Name == ANIMATION_MAP)
             {
@@ -104,8 +104,9 @@ namespace Artemis.Engine.Graphics.Animation
                                   "element and an AnimationMap element.", AAMLFileName));
             }
 
-            SpriteSheetReader sheetReader = new SpriteSheetReader(spriteSheet);
-            AnimationMapReader mapReader = new AnimationMapReader(animationMap);
+            var sheetReader = new SpriteSheetReader(spriteSheet);
+            var mapReader   = new AnimationMapReader(animationMap);
+
             sheetReader.Load();
             mapReader.Load();
 

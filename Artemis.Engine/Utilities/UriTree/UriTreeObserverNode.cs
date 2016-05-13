@@ -29,6 +29,8 @@ namespace Artemis.Engine.Utilities.UriTree
 
         private UriTreeObserverMixin<U> observerMixin = new UriTreeObserverMixin<U>();
 
+        public UriTreeNode<U>.UriTreeNodeDelegate OnObservedNodeAdded;
+
         public UriTreeObserverNode(string name) : base(name) { }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         protected void AddObservedNode(string name, U node, bool disallowDuplicates = true)
         {
-            observerMixin.AddObservedNode(ObservedNodes, name, node, disallowDuplicates);
+            observerMixin.AddObservedNode(ObservedNodes, name, node, OnObservedNodeAdded, disallowDuplicates);
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         protected void InsertObservedNode(string name, U node, bool disallowDuplicates = true)
         {
-            observerMixin.InsertObservedNode(ObservedNodes, name, node, disallowDuplicates);
+            observerMixin.InsertObservedNode(ObservedNodes, name, node, OnObservedNodeAdded, disallowDuplicates);
         }
 
         /// <summary>
