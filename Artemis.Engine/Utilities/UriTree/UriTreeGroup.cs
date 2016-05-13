@@ -55,7 +55,7 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <returns></returns>
         public U GetItem(string fullName, U defaultVal, bool useDefault = true)
         {
-            return GetItem(UriUtilities.GetParts(fullName), useDefault, defaultVal);
+            return GetItem(new Queue<string>(UriUtilities.GetParts(fullName)), useDefault, defaultVal);
         }
 
         /// <summary>
@@ -65,33 +65,33 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <returns></returns>
         public U GetItem(string fullName, bool useDefault = false)
         {
-            return GetItem(UriUtilities.GetParts(fullName), useDefault, default(U));
+            return GetItem(new Queue<string>(UriUtilities.GetParts(fullName)), useDefault, default(U));
         }
 
-        internal U GetItem(string[] nameParts, bool useDefault, U defaultVal)
+        internal U GetItem(Queue<string> nameParts, bool useDefault, U defaultVal)
         {
-            if (nameParts.Length > 1 && !Subnodes.ContainsKey(nameParts[0]))
+            var first = nameParts.Dequeue();
+            if (nameParts.Count > 0 && !Subnodes.ContainsKey(first))
             {
                 if (useDefault)
                 {
                     return defaultVal;
                 }
-                throw CouldNotRetrieveItem(nameParts[0]);
+                throw CouldNotRetrieveItem(first);
             }
-            else if (nameParts.Length == 1)
+            else if (nameParts.Count == 0)
             {
-                if (!Items.ContainsKey(nameParts[0]))
+                if (!Items.ContainsKey(first))
                 {
                     if (useDefault)
                     {
                         return defaultVal;
                     }
-                    throw CouldNotRetrieveItem(nameParts[0]);
+                    throw CouldNotRetrieveItem(first);
                 }
-                return Items[nameParts[0]];
+                return Items[first];
             }
-            var newParts = nameParts.Skip(1).ToArray();
-            return Subnodes[nameParts[0]].GetItem(newParts, useDefault, defaultVal);
+            return Subnodes[first].GetItem(nameParts, useDefault, defaultVal);
         }
 
         /// <summary>
@@ -107,6 +107,33 @@ namespace Artemis.Engine.Utilities.UriTree
                         "from group with full name '{1}'", name, FullName
                         )
                     );
+        }
+
+        public bool ContainsItem(string name)
+        {
+            return ContainsItem(new Queue<string>(UriUtilities.GetParts(name)));
+        }
+
+        internal bool ContainsItem(Queue<string> nameParts)
+        {
+            var first = nameParts.Dequeue();
+            if (nameParts.Count == 0)
+            {
+                return Items.ContainsKey(first);
+            }
+            return Subnodes[first].ContainsItem(nameParts);
+        }
+
+        /// <summary>
+        /// Check if this group contains the given item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool ContainsItem(U item, bool searchRecursive = true)
+        {
+            return Items.ContainsValue(item) || (
+                        searchRecursive ? Subnodes.Any(kvp => kvp.Value.ContainsItem(item)) : false
+                        );
         }
 
         /// <summary>

@@ -26,6 +26,13 @@ namespace Artemis.Engine.Graphics
             Group
         }
 
+        internal enum RenderOrderActionType
+        {
+            RenderItem,
+            RenderGroup,
+            SetRenderProperties
+        }
+
         /// <summary>
         /// Options indicating how to render a group.
         /// </summary>
@@ -45,36 +52,43 @@ namespace Artemis.Engine.Graphics
             Top
         }
 
-        public interface IRenderOrderAction { }
+        public abstract class AbstractRenderOrderAction
+        {
+            internal RenderOrderActionType ActionType;
+        }
 
         /// <summary>
         /// A RenderOrderAction indicating to render the item with the given name.
         /// </summary>
-        public class RenderItem : IRenderOrderAction
+        public class RenderItem : AbstractRenderOrderAction
         {
+
             /// <summary>
             /// The name of the item to render.
             /// </summary>
             public string Name;
 
             /// <summary>
-            /// Whether or not to ignore duplicate renders.
+            /// Whether or not to skip duplicate renders.
             /// </summary>
-            public bool IgnoreDuplicates;
+            public bool SkipDuplicates;
 
             public RenderType RenderType { get; private set; }
-            public RenderItem(string name, bool ignoreDuplicates = false)
+
+            public RenderItem(string name, bool skipDuplicates = true)
             {
                 Name = name;
                 RenderType = RenderOrder.RenderType.Item;
-                IgnoreDuplicates = ignoreDuplicates;
+                SkipDuplicates = skipDuplicates;
+
+                ActionType = RenderOrderActionType.RenderItem;
             }
         }
 
         /// <summary>
         /// A RenderOrderAction indicating to render the group with the given name.
         /// </summary>
-        public class RenderGroup : IRenderOrderAction
+        public class RenderGroup : AbstractRenderOrderAction
         {
             /// <summary>
             /// The name of the item to render.
@@ -87,25 +101,28 @@ namespace Artemis.Engine.Graphics
             public RenderGroupOptions Options;
 
             /// <summary>
-            /// Whether or not to ignore duplicate renders.
+            /// Whether or not to skip duplicate renders.
             /// </summary>
-            public bool IgnoreDuplicates;
+            public bool SkipDuplicates;
             
             public RenderType RenderType { get; private set; }
             
-            public RenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool ignoreDuplicates = false)
+            public RenderGroup(
+                string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool skipDuplicates = true)
             {
                 Name = name;
                 Options = options;
                 RenderType = RenderOrder.RenderType.Group;
-                IgnoreDuplicates = ignoreDuplicates;
+                SkipDuplicates = skipDuplicates;
+
+                ActionType = RenderOrderActionType.RenderGroup;
             }
         }
 
         /// <summary>
         /// A RenderOrderAction indicating to set the render properties to the given values.
         /// </summary>
-        public class SetRenderProperties : IRenderOrderAction
+        public class SetRenderProperties : AbstractRenderOrderAction
         {
             /// <summary>
             /// The properties to apply.
@@ -125,6 +142,8 @@ namespace Artemis.Engine.Graphics
                 Packet = packet;
                 IgnoreDefaults = ignoreDefaults;
                 ApplyMatrix = applyMatrix;
+
+                ActionType = RenderOrderActionType.SetRenderProperties;
             }
             public SetRenderProperties( SpriteSortMode ssm    = SpriteSortMode.Deferred
                                       , BlendState bs         = null
@@ -141,14 +160,14 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// The list of actions.
         /// </summary>
-        public List<IRenderOrderAction> Actions { get; private set; }
+        public List<AbstractRenderOrderAction> Actions { get; private set; }
 
         public RenderOrder() 
         {
-            Actions = new List<IRenderOrderAction>();
+            Actions = new List<AbstractRenderOrderAction>();
         }
 
-        public RenderOrder(List<IRenderOrderAction> actions)
+        public RenderOrder(List<AbstractRenderOrderAction> actions)
         {
             Actions = actions;
         }
@@ -157,9 +176,9 @@ namespace Artemis.Engine.Graphics
         /// Set the next render order action to render the item with the given name.
         /// </summary>
         /// <param name="name"></param>
-        public void AddRenderItem(string name)
+        public void AddRenderItem(string name, bool skipDuplicates = true)
         {
-            Actions.Add(new RenderItem(name));
+            Actions.Add(new RenderItem(name, skipDuplicates));
         }
 
         /// <summary>
@@ -167,9 +186,10 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         /// <param name="name"></param>
         /// <param name="options"></param>
-        public void AddRenderGroup(string name, RenderGroupOptions options = RenderGroupOptions.AllPre)
+        public void AddRenderGroup(
+            string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool skipDuplicates = true)
         {
-            Actions.Add(new RenderGroup(name, options));
+            Actions.Add(new RenderGroup(name, options, skipDuplicates));
         }
 
         /// <summary>
@@ -215,7 +235,7 @@ namespace Artemis.Engine.Graphics
         /// Set the next render order action to the given IRenderOrderAction.
         /// </summary>
         /// <param name="action"></param>
-        public void SetNextAction(IRenderOrderAction action)
+        public void SetNextAction(AbstractRenderOrderAction action)
         {
             Actions.Add(action);
         }

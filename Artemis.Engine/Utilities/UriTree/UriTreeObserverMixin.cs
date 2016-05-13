@@ -18,87 +18,101 @@ namespace Artemis.Engine.Utilities.UriTree
     {
 
         public void AddObservedNode(
-            Dictionary<string, U> observedNodes, string name, U node, bool disallowDuplicates = true)
+            Dictionary<string, U> observedNodes, string name, U node, 
+            UriTreeNode<U>.UriTreeNodeDelegate onNodeAdded, bool disallowDuplicates = true)
         {
-            if (name.Contains(UriUtilities.URI_SEPARATOR))
-            {
-                var firstPart = UriUtilities.GetFirstPart(name);
-                var allButFirst = UriUtilities.AllButFirstPart(name);
+            AddObservedNode(
+                observedNodes, new Queue<string>(UriUtilities.GetParts(name)), 
+                node, onNodeAdded, disallowDuplicates);
+        }
 
-                if (!observedNodes.ContainsKey(firstPart))
+        public void AddObservedNode(
+            Dictionary<string, U> observedNodes, Queue<string> nameParts, U node, 
+            UriTreeNode<U>.UriTreeNodeDelegate onNodeAdded, bool disallowDuplicates = true)
+        {
+            var first = nameParts.Dequeue();
+            if (nameParts.Count > 0)
+            {
+                if (!observedNodes.ContainsKey(first))
                 {
                     throw new UriTreeException(
                         String.Format(
                             "Could not add node with unqualified name '{0}' to UriTreeObserver. " +
                             "Missing intermediate node with name '{1}'. Consider using InsertObservedNode instead.",
-                            name, firstPart
+                            String.Join(UriUtilities.URI_SEPARATOR.ToString(), nameParts), first
                             )
                         );
                 }
-                observedNodes[firstPart].AddSubnode(allButFirst, node, disallowDuplicates);
+                observedNodes[first].AddSubnode(nameParts, node, disallowDuplicates);
             }
             else
             {
-                if (observedNodes.ContainsKey(name))
+                if (observedNodes.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not add node with full name '{0}' to UriTreeObserver. " +
-                                "A node with that name already exists.", name
+                                "A node with that name already exists.", first
                                 )
                            );
                     }
-                    observedNodes[name] = node;
+                    observedNodes[first] = node;
                 }
                 else
                 {
-                    observedNodes.Add(name, node);
+                    observedNodes.Add(first, node);
                 }
+                if (onNodeAdded != null)
+                    onNodeAdded(node);
             }
         }
 
         public void InsertObservedNode(
-            Dictionary<string, U> observedNodes, string name, U node, bool disallowDuplicates = true)
+            Dictionary<string, U> observedNodes, string name, U node, 
+            UriTreeNode<U>.UriTreeNodeDelegate onNodeAdded, bool disallowDuplicates = true)
         {
-            InsertObservedNode<U>(observedNodes, name, node, disallowDuplicates);
+            InsertObservedNode<U>(
+                observedNodes, new Queue<string>(UriUtilities.GetParts(name)), 
+                node, onNodeAdded, disallowDuplicates);
         }
 
         public void InsertObservedNode<NodeType>(
-            Dictionary<string, U> observedNodes, string name, U node, bool disallowDuplicates = true)
+            Dictionary<string, U> observedNodes, Queue<string> nameParts, U node,
+            UriTreeNode<U>.UriTreeNodeDelegate onNodeAdded, bool disallowDuplicates = true)
             where NodeType : U
         {
-            if (name.Contains(UriUtilities.URI_SEPARATOR))
+            var first = nameParts.Dequeue();
+            if (nameParts.Count > 0)
             {
-                var firstPart = UriUtilities.GetFirstPart(name);
-                var allButFirst = UriUtilities.AllButFirstPart(name);
-
-                if (!observedNodes.ContainsKey(firstPart))
+                if (!observedNodes.ContainsKey(first))
                 {
-                    observedNodes.Add(firstPart, (U)Activator.CreateInstance(typeof(NodeType), firstPart));
+                    observedNodes.Add(first, (U)Activator.CreateInstance(typeof(NodeType), first));
                 }
-                observedNodes[firstPart].InsertSubnode<NodeType>(allButFirst, node, disallowDuplicates);
+                observedNodes[first].InsertSubnode<NodeType>(nameParts, node, disallowDuplicates);
             }
             else
             {
-                if (observedNodes.ContainsKey(name))
+                if (observedNodes.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not insert node with full name '{0}' to UriTreeObserver. " +
-                                "A node with that name already exists.", name
+                                "A node with that name already exists.", first
                                 )
                            );
                     }
-                    observedNodes[name] = node;
+                    observedNodes[first] = node;
                 }
                 else
                 {
-                    observedNodes.Add(name, node);
+                    observedNodes.Add(first, node);
                 }
+                if (onNodeAdded != null)
+                    onNodeAdded(node);
             }
         }
 
@@ -113,6 +127,5 @@ namespace Artemis.Engine.Utilities.UriTree
             }
             return observedNodes[name];
         }
-
     }
 }

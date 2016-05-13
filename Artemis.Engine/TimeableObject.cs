@@ -4,6 +4,8 @@ using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.Partial;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -18,6 +20,38 @@ namespace Artemis.Engine
     /// </summary>
     public class TimeableObject : UpdatableObject
     {
+        private struct TimedInvocation
+        {
+            /// <summary>
+            /// Whether or not this invocation is based on elapsed frames or elapsed time.
+            /// </summary>
+            public bool UsingFrames;
+
+            /// <summary>
+            /// The amount of frames to pass before invocation.
+            /// </summary>
+            public int Frames;
+
+            /// <summary>
+            /// The frame this invocation was created.
+            /// </summary>
+            public int StartFrame;
+
+            /// <summary>
+            /// The amount of time to pass before invocation.
+            /// </summary>
+            public double Milliseconds;
+
+            /// <summary>
+            /// The start time of this invocation.
+            /// </summary>
+            public double StartTime;
+
+            /// <summary>
+            /// The action to invoke.
+            /// </summary>
+            public Action Action;
+        }
 
         /// <summary>
         /// The default value of ArtemisEngine.GameTimer.DeltaTime, used when running in
@@ -40,6 +74,19 @@ namespace Artemis.Engine
         /// </summary>
         public int ElapsedFrames { get; private set; }
 
+        private HashSet<TimedInvocation> timedInvocations;
+
+        // TODO: Use SkipLists here for O(1) retrieval of first element (SortedDictionaries are O(log(n)).
+        // Don't want to use SortedList because they have average-case O(n) insertion.
+        private SortedDictionary<int, TimedInvocation> _fastTimedInvocations_frames;
+        private SortedDictionary<double, TimedInvocation> _fastTimedInvocations_milliseconds;
+
+        /// <summary>
+        /// Whether or not this object can handle heavy loads of timed invocations. Set this to true
+        /// if your object uses a very large number of timed invocations.
+        /// </summary>
+        public bool UseHeavyInvocationLoadHandling;
+
         private Action UpdateTime { get; set; }
 
         public TimeableObject() : base()
@@ -59,6 +106,10 @@ namespace Artemis.Engine
             {
                 UpdateTime = updateTime_Partial;
             }
+
+            timedInvocations = new HashSet<TimedInvocation>();
+            // _fastTimedInvocations_frames = new SortedDictionary<int, TimedInvocation>();
+            // _fastTimedInvocations_milliseconds = new SortedDictionary<double, TimedInvocation>();
         }
 
         private void updateTime()
@@ -80,13 +131,75 @@ namespace Artemis.Engine
             base.AutomaticUpdate();
 
             UpdateTime();
+
+            if (UseHeavyInvocationLoadHandling)
+            {
+                throw new NotImplementedException(
+                    "Support for heavy invocation load handling is not yet implemented.");
+            }
+            else
+            {
+                var toRemove = new List<TimedInvocation>();
+                foreach (var invocation in timedInvocations)
+                {
+                    if ((invocation.UsingFrames && ElapsedFrames - invocation.StartFrame >= invocation.Frames) ||
+                        (ElapsedTime - invocation.StartTime >= invocation.Milliseconds))
+                    {
+                        invocation.Action();
+                        toRemove.Add(invocation);
+                    }
+                }
+
+                foreach (var invocation in toRemove)
+                {
+                    timedInvocations.Remove(invocation);
+                }
+            }
         }
 
-        public void ResetTime()
+        public void ResetTime(bool clearInvocations = false)
         {
             ElapsedFrames   = 0;
             ElapsedTime     = 0;
             PrevElapsedTime = 0;
+
+            if (clearInvocations)
+                timedInvocations.Clear();
+        }
+
+        /// <summary>
+        /// Invoke a given action after the given number of frames have passed.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="frames"></param>
+        public void InvokeAfter(Action action, int frames)
+        {
+            if (frames < 0)
+                return;
+            timedInvocations.Add(new TimedInvocation
+            {
+                Action = action,
+                Frames = (int)frames,
+                StartFrame = ElapsedFrames,
+                UsingFrames = true
+            });
+        }
+
+        /// <summary>
+        /// Invoke a given action after the given number of milliseconds have passed.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="time"></param>
+        public void InvokeAfter(Action action, double time)
+        {
+            if (time < 0)
+                return;
+            timedInvocations.Add(new TimedInvocation
+            {
+                Action = action,
+                Milliseconds = time,
+                StartTime = ElapsedTime
+            });
         }
 
         /// <summary>

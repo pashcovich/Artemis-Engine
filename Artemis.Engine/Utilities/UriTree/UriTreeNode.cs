@@ -19,6 +19,9 @@ namespace Artemis.Engine.Utilities.UriTree
     /// <typeparam name="T">This must be the class itself, otherwise recursion won't work.</typeparam>
     public class UriTreeNode<T> : IEnumerable<T> where T : UriTreeNode<T>
     {
+
+        public delegate void UriTreeNodeDelegate(UriTreeNode<T> node);
+
         private string name;
 
         /// <summary>
@@ -74,6 +77,9 @@ namespace Artemis.Engine.Utilities.UriTree
         /// </summary>
         public Dictionary<string, T> Subnodes { get; protected set; }
 
+        public UriTreeNodeDelegate OnNodeAdded;
+        public UriTreeNodeDelegate OnNodeRemoved;
+
         protected UriTreeNode(string name)
         {
             Name = name;
@@ -91,6 +97,9 @@ namespace Artemis.Engine.Utilities.UriTree
             if (!Parent.Subnodes.ContainsKey(name))
             {
                 Parent.Subnodes.Add(name, (T)this);
+
+                if (Parent.OnNodeAdded != null)
+                    Parent.OnNodeAdded(this);
             }
         }
 
@@ -105,12 +114,13 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <returns></returns>
         public T GetSubnode(string fullName, bool failQuiet = false)
         {
-            return GetSubnode(UriUtilities.GetParts(fullName), failQuiet);
+            return GetSubnode(new Queue<string>(UriUtilities.GetParts(fullName)), failQuiet);
         }
 
-        internal T GetSubnode(string[] subnodeNameParts, bool failQuiet)
+        internal T GetSubnode(Queue<string> subnodeNameParts, bool failQuiet)
         {
-            if (!Subnodes.ContainsKey(subnodeNameParts[0]))
+            var first = subnodeNameParts.Dequeue();
+            if (!Subnodes.ContainsKey(first))
             {
                 if (failQuiet)
                 {
@@ -120,16 +130,15 @@ namespace Artemis.Engine.Utilities.UriTree
                     String.Format(
                         "Could not retrieve subnode with unqualified name '{0}' " +
                         "from node with full name '{1}'. No node exists with the given name.", 
-                        subnodeNameParts[0], FullName
+                        first, FullName
                         )
                     );
             }
-            if (subnodeNameParts.Length == 1)
+            if (subnodeNameParts.Count == 0)
             {
-                return Subnodes[subnodeNameParts[0]];
+                return Subnodes[first];
             }
-            var newParts = subnodeNameParts.Skip(1).ToArray();
-            return Subnodes[subnodeNameParts[0]].GetSubnode(newParts, failQuiet);
+            return Subnodes[first].GetSubnode(subnodeNameParts, failQuiet);
         }
 
         /// <summary>
@@ -139,42 +148,45 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="fullName"></param>
         public void RemoveSubnode(string fullName, bool failQuiet = true)
         {
-            RemoveSubnode(UriUtilities.GetParts(fullName), failQuiet);
+            RemoveSubnode(new Queue<string>(UriUtilities.GetParts(fullName)), failQuiet);
         }
 
-        internal void RemoveSubnode(string[] nameParts, bool failQuiet)
+        internal void RemoveSubnode(Queue<string> nameParts, bool failQuiet)
         {
-            if (!Subnodes.ContainsKey(nameParts[0]))
+            var first = nameParts.Dequeue();
+            if (!Subnodes.ContainsKey(first))
             {
                 if (failQuiet)
                 {
                     return;
                 }
+                var last = nameParts.Count > 0 ? nameParts.Last() : first;
                 throw new UriTreeException(
                     String.Format(
                         "Could not remove node with unqualified name '{0}' from " +
                         "node with full name '{1}'. No node exists with the given name.",
-                        nameParts.Last(), FullName
+                        last, FullName
                         )
                     );
             }
 
-            if (nameParts.Length == 1)
+            if (nameParts.Count == 1)
             {
-                var name = nameParts[0];
-
-                var asDisposable = Subnodes[name] as IDisposable;
+                var node = Subnodes[first];
+                var asDisposable = node as IDisposable;
                 if (asDisposable != null)
                 {
                     asDisposable.Dispose();
                 }
 
-                Subnodes.Remove(name);
+                Subnodes.Remove(first);
+
+                if (OnNodeRemoved != null)
+                    OnNodeRemoved(node);
 
                 return;
             }
-            var newParts = nameParts.Skip(1).ToArray();
-            Subnodes[nameParts[0]].RemoveSubnode(newParts, failQuiet);
+            Subnodes[first].RemoveSubnode(nameParts, failQuiet);
         }
 
         /// <summary>
@@ -185,46 +197,46 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <param name="disallowDuplicates"></param>
         public void AddSubnode(string fullName, T subnode, bool disallowDuplicates = true)
         {
-            AddSubnode(UriUtilities.GetParts(fullName), subnode, disallowDuplicates);
+            AddSubnode(new Queue<string>(UriUtilities.GetParts(fullName)), subnode, disallowDuplicates);
         }
 
-        internal void AddSubnode(string[] nameParts, T subnode, bool disallowDuplicates)
+        internal void AddSubnode(Queue<string> nameParts, T subnode, bool disallowDuplicates)
         {
-            if (nameParts.Length == 1)
+            var first = nameParts.Dequeue();
+            if (nameParts.Count == 0)
             {
-                if (Subnodes.ContainsKey(nameParts[0]))
+                if (Subnodes.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not add subgroup; a group with unqualified name '{0}' " +
-                                "already exists in group with full name '{1}'.", nameParts[0], FullName
+                                "already exists in group with full name '{1}'.", first, FullName
                                 )
                             );
                     }
-                    Subnodes[nameParts[0]] = subnode;
+                    Subnodes[first] = subnode;
                 }
                 else
                 {
-                    Subnodes.Add(nameParts[0], subnode);
+                    Subnodes.Add(first, subnode);
                 }
                 subnode.SetParent((T)this);
             }
             else
             {
-                var newParts = nameParts.Skip(1).ToArray();
-                if (!Subnodes.ContainsKey(nameParts[0]))
+                if (!Subnodes.ContainsKey(first))
                 {
                     throw new UriTreeException(
                         String.Format(
                             "Could not add subgroup with full name '{0}' to group with full name '{1}'; " +
                             "intermediate groups missing. Consider using InsertSubnode instead.",
-                            nameParts[0], FullName
+                            first, FullName
                             )
                         );
                 }
-                Subnodes[nameParts[0]].AddSubnode(newParts, subnode, disallowDuplicates);
+                Subnodes[first].AddSubnode(nameParts, subnode, disallowDuplicates);
             }
         }
 
@@ -267,45 +279,44 @@ namespace Artemis.Engine.Utilities.UriTree
         public void AddInsertSubnode<NodeType>(string fullName, bool disallowDuplicates = true)
             where NodeType : UriTreeNode<T>
         {
-            AddInsertSubnode<NodeType>(UriUtilities.GetParts(fullName), disallowDuplicates);
+            AddInsertSubnode<NodeType>(new Queue<string>(UriUtilities.GetParts(fullName)), disallowDuplicates);
         }
 
-        internal void AddInsertSubnode<NodeType>(string[] nameParts, bool disallowDuplicates)
+        internal void AddInsertSubnode<NodeType>(Queue<string> nameParts, bool disallowDuplicates)
             where NodeType : UriTreeNode<T>
         {
-            var firstPart = nameParts[0];
+            var first = nameParts.Dequeue();
 
-            if (nameParts.Length == 1)
+            if (nameParts.Count == 0)
             {
-                var currentNode = (T)Activator.CreateInstance(typeof(NodeType), firstPart);
-                if (Subnodes.ContainsKey(firstPart))
+                var currentNode = (T)Activator.CreateInstance(typeof(NodeType), first);
+                if (Subnodes.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not insert subnode, a node with full name '{0}' " +
-                                "already exists.", Subnodes[firstPart].FullName
+                                "already exists.", Subnodes[first].FullName
                                 )
                             );
                     }
-                    Subnodes[firstPart] = currentNode;
+                    Subnodes[first] = currentNode;
                 }
                 else
                 {
-                    Subnodes.Add(firstPart, currentNode);
+                    Subnodes.Add(first, currentNode);
                 }
                 currentNode.SetParent((T)this);
             }
             else
             {
-                if (!Subnodes.ContainsKey(firstPart))
+                if (!Subnodes.ContainsKey(first))
                 {
-                    var currentNode = (T)Activator.CreateInstance(typeof(NodeType), firstPart);
+                    var currentNode = (T)Activator.CreateInstance(typeof(NodeType), first);
                     currentNode.SetParent((T)this); // will add to Subnodes automatically.
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[firstPart].AddInsertSubnode<NodeType>(newParts, disallowDuplicates);
+                Subnodes[first].AddInsertSubnode<NodeType>(nameParts, disallowDuplicates);
             }            
         }
 
@@ -335,46 +346,77 @@ namespace Artemis.Engine.Utilities.UriTree
         public void InsertSubnode<NodeType>(string fullName, T subnode, bool disallowDuplicates = true)
             where NodeType : UriTreeNode<T>
         {
-            InsertSubnode<NodeType>(UriUtilities.GetParts(fullName), subnode, disallowDuplicates);
+            InsertSubnode<NodeType>(new Queue<string>(UriUtilities.GetParts(fullName)), subnode, disallowDuplicates);
         }
 
-        internal void InsertSubnode<NodeType>(string[] nameParts, T subnode, bool disallowDuplicates)
+        internal void InsertSubnode<NodeType>(Queue<string> nameParts, T subnode, bool disallowDuplicates)
             where NodeType : UriTreeNode<T>
         {
-            var firstPart = nameParts[0];
+            var first = nameParts.Dequeue();
 
-            if (nameParts.Length == 1)
+            if (nameParts.Count == 0)
             {
-                if (Subnodes.ContainsKey(firstPart))
+                if (Subnodes.ContainsKey(first))
                 {
                     if (disallowDuplicates)
                     {
                         throw new UriTreeException(
                             String.Format(
                                 "Could not insert subgroup, a group with full name '{0}' " +
-                                "already exists.", Subnodes[firstPart].FullName
+                                "already exists.", Subnodes[first].FullName
                                 )
                             );
                     }
-                    Subnodes[firstPart] = subnode;
+                    Subnodes[first] = subnode;
                 }
                 else
                 {
-                    Subnodes.Add(firstPart, subnode);
+                    Subnodes.Add(first, subnode);
                 }
                 subnode.SetParent((T)this);
             }
             else
             {
-                if (!Subnodes.ContainsKey(firstPart))
+                if (!Subnodes.ContainsKey(first))
                 {
-                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), firstPart);
+                    var newNode = (T)Activator.CreateInstance(typeof(NodeType), first);
                     newNode.SetParent((T)this);
-                    Subnodes.Add(firstPart, newNode);
                 }
-                var newParts = nameParts.Skip(1).ToArray();
-                Subnodes[firstPart].InsertSubnode<NodeType>(newParts, subnode, disallowDuplicates);
+                Subnodes[first].InsertSubnode<NodeType>(nameParts, subnode, disallowDuplicates);
             }
+        }
+
+        /// <summary>
+        /// Check if this node is the parent of a given node.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ContainsSubnode(string name)
+        {
+            return ContainsSubnode(new Queue<string>(UriUtilities.GetParts(name)));
+        }
+
+        internal bool ContainsSubnode(Queue<string> nameParts)
+        {
+            if (nameParts.Count == 0)
+                return true;
+            var first = nameParts.Dequeue();
+            if (!Subnodes.ContainsKey(first))
+                return false;
+            return Subnodes[first].ContainsSubnode(nameParts);
+        }
+
+        /// <summary>
+        /// Check if this node contains the given subnode.
+        /// </summary>
+        /// <param name="subnode"></param>
+        /// <param name="searchRecursive"></param>
+        /// <returns></returns>
+        public bool ContainsSubnode(T subnode)
+        {
+            var fullName = FullName;
+            var relativeName = new String(subnode.FullName.SkipWhile((c, i) => c == fullName[i]).ToArray());
+            return ContainsSubnode(relativeName);
         }
 
         public IEnumerator<string> IterateNodeNames()
