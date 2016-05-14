@@ -16,7 +16,8 @@ namespace Artemis.Engine.Utilities
         /// <param name="instance"></param>
         public delegate void AttributeHandler(T instance);
 
-        private List<Type> registeredAttributes;
+        private HashSet<Type> registeredAttributes;
+        private HashSet<Type> registeredInheritableAttributes;
 
         // Maps a type to a set of the attribute types that are applied to it.
         private Dictionary<Type, List<AttributeHandler>> memoizedSubclasses;
@@ -26,7 +27,9 @@ namespace Artemis.Engine.Utilities
 
         public AttributeMemoService() 
         {
-            registeredAttributes = new List<Type>();
+            registeredAttributes = new HashSet<Type>();
+            registeredInheritableAttributes = new HashSet<Type>();
+
             memoizedSubclasses = new Dictionary<Type, List<AttributeHandler>>();
             attributePresentHandlers = new Dictionary<Type, AttributeHandler>();
             attributeMissingHandlers = new Dictionary<Type, AttributeHandler>();
@@ -39,17 +42,36 @@ namespace Artemis.Engine.Utilities
         /// <param name="attributeType"></param>
         /// <param name="presentHandler"></param>
         /// <param name="missingHandler"></param>
-        public void RegisterHandler(
-            Type attributeType, AttributeHandler presentHandler, AttributeHandler missingHandler)
+        public void RegisterHandler(Type attributeType
+                                   , AttributeHandler presentHandler
+                                   , AttributeHandler missingHandler
+                                   , bool inheritable = false)
         {
-            if (presentHandler != null)
+            if (registeredAttributes.Contains(attributeType))
             {
-                attributePresentHandlers.Add(attributeType, presentHandler);
+                if (presentHandler != null)
+                {
+                    attributePresentHandlers[attributeType] += presentHandler;
+                }
+                if (missingHandler != null)
+                {
+                    attributeMissingHandlers[attributeType] += missingHandler;
+                }
             }
-            if (missingHandler != null)
+            else
             {
-                attributeMissingHandlers.Add(attributeType, missingHandler);
+                if (presentHandler != null)
+                {
+                    attributePresentHandlers.Add(attributeType, presentHandler);
+                }
+                if (missingHandler != null)
+                {
+                    attributeMissingHandlers.Add(attributeType, missingHandler);
+                }
+                registeredAttributes.Add(attributeType);
             }
+            if (inheritable)
+                registeredInheritableAttributes.Add(attributeType);
         }
 
         /// <summary>
@@ -59,7 +81,9 @@ namespace Artemis.Engine.Utilities
         /// <typeparam name="U"></typeparam>
         /// <param name="presentHandler"></param>
         /// <param name="missingHandler"></param>
-        public void RegisterHandler<U>(AttributeHandler presentHandler, AttributeHandler missingHandler)
+        public void RegisterHandler<U>(AttributeHandler presentHandler
+                                      , AttributeHandler missingHandler
+                                      , bool inheritable = false)
             where U : Attribute
         {
             RegisterHandler(typeof(U), presentHandler, missingHandler);
@@ -71,10 +95,10 @@ namespace Artemis.Engine.Utilities
         /// </summary>
         /// <typeparam name="U"></typeparam>
         /// <param name="presentHandler"></param>
-        public void RegisterHandler<U>(AttributeHandler presentHandler)
+        public void RegisterHandler<U>(AttributeHandler presentHandler, bool inheritable = false)
             where U : Attribute
         {
-            RegisterHandler(typeof(U), presentHandler, null);
+            RegisterHandler(typeof(U), presentHandler, null, inheritable);
         }
 
         /// <summary>
@@ -92,18 +116,20 @@ namespace Artemis.Engine.Utilities
 
                 foreach (var attribute in registeredAttributes)
                 {
-                    if (Reflection.HasAttribute(type, attribute))
+                    if (Reflection.HasAttribute(type, attribute)
+                        || (registeredInheritableAttributes.Contains(attribute)
+                            && Reflection.HasInheritedAttribute(type, attribute)))
                     {
-                        if (attributePresentHandlers.ContainsKey(type))
+                        if (attributePresentHandlers.ContainsKey(attribute))
                         {
-                            handlers.Add(attributePresentHandlers[type]);
+                            handlers.Add(attributePresentHandlers[attribute]);
                         }
                     }
                     else
                     {
-                        if (attributeMissingHandlers.ContainsKey(type))
+                        if (attributeMissingHandlers.ContainsKey(attribute))
                         {
-                            handlers.Add(attributeMissingHandlers[type]);
+                            handlers.Add(attributeMissingHandlers[attribute]);
                         }
                     }
                 }
@@ -115,6 +141,5 @@ namespace Artemis.Engine.Utilities
                 handler(instance);
             }
         }
-
     }
 }

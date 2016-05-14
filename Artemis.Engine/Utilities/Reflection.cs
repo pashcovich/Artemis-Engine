@@ -365,6 +365,29 @@ namespace Artemis.Engine.Utilities
             return obj.IsDefined(typeof(T), false);
         }
 
+        /// <summary>
+        /// Check if the given type, or any of it's base types, has a given attribute.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        public static bool HasInheritedAttribute(Type type, Type attribute)
+        {
+            return type.IsDefined(attribute, true);
+        }
+
+        /// <summary>
+        /// Check if the given type, or any of it's base types, has a given attribute.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool HasInheritedAttribute<T>(Type type)
+            where T : Attribute
+        {
+            return type.IsDefined(typeof(T), true);
+        }
+
         #endregion
 
         /// <summary>

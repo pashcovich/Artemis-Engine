@@ -9,8 +9,8 @@ namespace Artemis.Engine.Utilities.Dynamics
     /// <summary>
     /// An attribute representing whether or not a class has DynamicProperties.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class HasDynamicPropertiesAttribute : Attribute 
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class HasDynamicPropertiesAttribute : Attribute
     {
 
         /// <summary>
@@ -19,13 +19,20 @@ namespace Artemis.Engine.Utilities.Dynamics
         public string[] DynamicPropertyNames { get; private set; }
 
         /// <summary>
-        /// Whether or not an array of DynamicProperties has been supplied.
+        /// Whether or not the supplied list of dynamic properties is complete (i.e.
+        /// accounts for all dynamic properties in base classes as well).
         /// </summary>
-        public bool HasDynamicPropertyList { get { return DynamicPropertyNames.Length > 0; } }
+        public bool Complete { get; private set; }
 
-        public HasDynamicPropertiesAttribute(params string[] propNames)
+        public HasDynamicPropertiesAttribute(string[] propNames, bool complete = false)
         {
+            if (propNames.Length == 0)
+            {
+                throw new DynamicPropertyException(
+                    "HasDynamicProperties attribute must be supplied more than 0 property names.");
+            }
             DynamicPropertyNames = propNames;
+            Complete = complete;
         }
     }
 }
