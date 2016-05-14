@@ -54,6 +54,7 @@
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
+    <Compile Include="Graphics\AbstractRenderLayer.cs" />
     <Compile Include="Graphics\Animation\AAMLException.cs" />
     <Compile Include="Graphics\Animation\AAMLFileReader.cs" />
     <Compile Include="Graphics\Animation\AnimationMap.cs" />
@@ -116,7 +117,6 @@
     <Compile Include="UpdatableObject.cs" />
     <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
-    <Compile Include="Utilities\Dynamics\DynamicPropertyAttribute.cs" />
     <Compile Include="Effectors\Effector.cs" />
     <Compile Include="Effectors\EffectorException.cs" />
     <Compile Include="Effectors\EffectorOperator.cs" />

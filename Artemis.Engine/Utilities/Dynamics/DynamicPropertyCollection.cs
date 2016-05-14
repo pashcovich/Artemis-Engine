@@ -26,7 +26,7 @@ namespace Artemis.Engine.Utilities.Dynamics
         {
             var handler = new AttributeMemoService<DynamicPropertyCollection>
                              .AttributeHandler(t => t.SetupDynamicProperties());
-            attrMemoService.RegisterHandler<HasDynamicPropertiesAttribute>(handler);
+            attrMemoService.RegisterHandler<HasDynamicPropertiesAttribute>(handler, true);
         }
 
         /// <summary>
@@ -35,50 +35,30 @@ namespace Artemis.Engine.Utilities.Dynamics
         private void SetupDynamicProperties()
         {
             var type = GetType();
-            var attribute = (HasDynamicPropertiesAttribute)Attribute.GetCustomAttribute(
+            var finalParent = typeof(DynamicPropertyCollection);
+            var properties = new HashSet<PropertyInfo>();
+
+            while (type != finalParent)
+            {
+                var attribute = (HasDynamicPropertiesAttribute)Attribute.GetCustomAttribute(
                     type, typeof(HasDynamicPropertiesAttribute));
 
-            if (attribute.HasDynamicPropertyList)
-            {
-                var properties = from name in attribute.DynamicPropertyNames
-                                 select type.GetProperty(name);
-                AddDynamicProperties(properties.ToArray(), exclusive: true);
-            }
-            else
-            {
-                AddDynamicProperties(type.GetProperties());
-            }
-        }
+                if (attribute != null)
+                {
+                    foreach (var name in attribute.DynamicPropertyNames)
+                    {
+                        properties.Add(type.GetProperty(name));
+                    }
 
-        /// <summary>
-        /// Add all the dynamic properties attached to this object to this
-        /// DynamicPropertyCollection.
-        /// </summary>
-        /// <param name="properties"></param>
-        private void AddDynamicProperties(PropertyInfo[] properties, bool exclusive = false)
-        {
-            // If exclusive is true then it is expected that the properties suppled in the `properties`
-            // array are exclusively those marked with a DynamicPropertyAttribute. 
-            //
-            // This allows us to throw an error if the user specifies an attribute as a DynamicProperty 
-            // (in the DynamicPropertyList attribute of the HasDynamicProperties attribute) that isn't 
-            // actually marked as a DynamicProperty.
+                    if (attribute.Complete)
+                        break;
+                }
+                type = type.BaseType;
+            }
 
             foreach (var property in properties)
             {
-                if (exclusive || Reflection.HasAttribute<DynamicPropertyAttribute>(property))
-                {
-                    AddDynamicProperty(property);
-                }
-                else
-                {
-                    throw new DynamicPropertyException(
-                        String.Format(
-                            "The property with name '{0}' is not marked " +
-                            "with a DynamicPropertyAttribute.", property.Name
-                            )
-                        );
-                }
+                AddDynamicProperty(property);
             }
         }
 

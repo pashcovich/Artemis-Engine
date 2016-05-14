@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace Artemis.Engine
 {
-    [HasDynamicProperties]
+    [HasDynamicProperties(new string[] {"WorldPosition", "TargetPosition", "ScreenPosition"}, true)]
     public class PhysicalObject : LayerAwareObject
     {
         public Body Body;
@@ -22,10 +22,8 @@ namespace Artemis.Engine
         /// If this value is set, it is expected that the given value is in simulation units
         /// and not display units. Use ConvertUnits.ToSimUnits if not.
         /// </summary>
-        [DynamicProperty]
         public Vector2 WorldPosition { get { return Body.Position; } set { Body.Position = value; } }
 
-        [DynamicProperty]
         public Vector2 TargetPosition
         {
             get
@@ -40,7 +38,6 @@ namespace Artemis.Engine
             }
         }
 
-        [DynamicProperty]
         public Vector2 ScreenPosition
         {
             get
