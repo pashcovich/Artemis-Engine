@@ -9,17 +9,6 @@ namespace Artemis.Engine.Graphics
         public BasicRenderLayer(string fullName)
             : base(fullName) { }
 
-        protected override void PreRender()
-        {
-            // Reset the RenderTarget if the resolution has changed.
-            if (ArtemisEngine.DisplayManager.ResolutionChanged)
-            {
-                LayerTarget.Dispose();
-
-                LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
-            }
-        }
-
         protected override RenderableHandler GetRenderableHandler()
         {
             return obj => obj.InternalRender(SeenRenderables);

@@ -35,12 +35,12 @@ namespace Artemis.Engine.Graphics
         public RenderOrder RenderOrder { get; private set; }
 
         /// <summary>
-        /// The global RenderGroupOptions, determining whether or not the top level items should be 
-        /// rendered first or the subnodes first. The default value is "RenderOrder.RenderGroupOptions.AllPre".
+        /// The global RenderTraversalOptions, determining whether or not the top level items should be 
+        /// rendered first or the subnodes first. The default value is "RenderOrder.RenderTraversalOptions.AllPre".
         /// 
         /// Note: If RenderOrder is not null, this value is not used.
         /// </summary>
-        public RenderOrder.RenderGroupOptions GlobalRenderGroupOptions;
+        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
 
         /// <summary>
         /// The list of actions representing the render order.
@@ -58,7 +58,7 @@ namespace Artemis.Engine.Graphics
         public AbstractOrderableRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
-            GlobalRenderGroupOptions = RenderOrder.RenderGroupOptions.AllPre;
+            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Artemis.Engine.Graphics
             if (RenderOrder == null)
             {
                 AllRenderables.Render(
-                    GlobalRenderGroupOptions, renderableHandler, SeenRenderables, SeenGroups);
+                    GlobalTraversalOptions, renderableHandler, SeenRenderables, SeenGroups);
             }
             // Otherwise, render in the order specified by the RenderOrder.
             else
@@ -190,6 +190,12 @@ namespace Artemis.Engine.Graphics
                         case RenderOrder.RenderOrderActionType.SetRenderProperties:
                             HandleRenderOrderAction_SetRenderProperties((RenderOrder.SetRenderProperties)item);
                             break;
+                        case RenderOrder.RenderOrderActionType.RenderLayer:
+                            throw new RenderOrderException(
+                                String.Format(
+                                    "The RenderOrderAction `RenderLayer` cannot be used in the " +
+                                    "RenderOrder for layer '{0}'. This RenderOrderAction can only " +
+                                    "be used in a LayerManager's render order.", FullName));
                         default:
                             HandleUnknownRenderOrderAction(item, renderableHandler);
                             break;

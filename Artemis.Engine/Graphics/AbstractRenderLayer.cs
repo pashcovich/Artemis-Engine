@@ -46,6 +46,14 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public RenderTarget2D LayerTarget { get; protected set; }
 
+        /// <summary>
+        /// The fill colour of the target. The default value is Color.Transparent.
+        /// 
+        /// NOTE: If the colour you supply has no alpha value, it will be opaque, meaning
+        /// when this layer is rendered it will erase any layers underneath.
+        /// </summary>
+        public Color TargetFill;
+
         public AbstractRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
@@ -56,6 +64,7 @@ namespace Artemis.Engine.Graphics
             AddObservedNode(TOP_LEVEL, AllRenderables);
 
             LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+            TargetFill = Color.Transparent;
         }
 
         /// <summary>
@@ -155,21 +164,26 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// Render all items and sublayers on this layer.
         /// </summary>
-        public void Render(RenderOrder.RenderGroupOptions order = RenderOrder.RenderGroupOptions.AllPre)
+        public void Render( HashSet<AbstractRenderLayer> seenLayers
+                          , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre
+                          , bool skipDuplicates = true )
         {
             MidRender = true;
             switch (order)
             {
-                case RenderOrder.RenderGroupOptions.AllPre:
-                    RenderSublayers(order);
-                    RenderTop();
+                case RenderOrder.RenderTraversalOptions.AllPre:
+                    RenderSublayers(seenLayers, order, skipDuplicates);
+                    if (!(skipDuplicates && seenLayers.Contains(this)))
+                        RenderTop();
                     break;
-                case RenderOrder.RenderGroupOptions.AllPost:
-                    RenderTop();
-                    RenderSublayers(order);
+                case RenderOrder.RenderTraversalOptions.AllPost:
+                    if (!(skipDuplicates && seenLayers.Contains(this)))
+                        RenderTop();
+                    RenderSublayers(seenLayers, order, skipDuplicates);
                     break;
-                case RenderOrder.RenderGroupOptions.Top:
-                    RenderTop();
+                case RenderOrder.RenderTraversalOptions.Top:
+                    if (!(skipDuplicates && seenLayers.Contains(this)))
+                        RenderTop();
                     break;
                 default:
                     throw new RenderOrderException(
@@ -178,6 +192,8 @@ namespace Artemis.Engine.Graphics
                             "layer '{1}'.", order, FullName));
             }
             MidRender = false;
+
+            seenLayers.Add(this);
 
             // Add all the items that were added mid-render.
             //
@@ -209,18 +225,24 @@ namespace Artemis.Engine.Graphics
         /// Render only the sublayers of this layer.
         /// </summary>
         /// <param name="order"></param>
-        public virtual void RenderSublayers(RenderOrder.RenderGroupOptions order = RenderOrder.RenderGroupOptions.AllPre)
+        public virtual void RenderSublayers( HashSet<AbstractRenderLayer> seenLayers
+                                           , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre  
+                                           , bool skipDuplicates = true )
         {
             foreach (var layer in Subnodes.Values)
             {
-                layer.Render(order);
+                layer.Render(seenLayers, order, skipDuplicates);
             }
         }
+
+        // (Michael, 5/15/2016) NOTE: RenderTop is private because if the user wants to only 
+        // render the items in this layer and none of the sublayers, they can just call Render 
+        // with their `order` parameter set to `RenderOrder.RenderTraversalOptions.AllPre`.
 
         /// <summary>
         /// Render only the items in this layer (none of the sublayers).
         /// </summary>
-        public void RenderTop()
+        private void RenderTop()
         {
             // Setup anything before rendering.
             PreRender();
@@ -244,7 +266,15 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// Called before anything is rendered.
         /// </summary>
-        protected virtual void PreRender() { }
+        protected virtual void PreRender() 
+        {
+            // Reset the RenderTarget if the resolution has changed.
+            if (ArtemisEngine.DisplayManager.ResolutionChanged)
+            {
+                LayerTarget.Dispose();
+                LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+            }
+        }
 
         /// <summary>
         /// Set up the layer's target.
@@ -254,7 +284,7 @@ namespace Artemis.Engine.Graphics
             ArtemisEngine.RenderPipeline.ClearRenderProperties();
 
             ArtemisEngine.RenderPipeline.SetRenderTarget(LayerTarget);
-            ArtemisEngine.RenderPipeline.ClearGraphicsDevice(Color.Transparent);
+            ArtemisEngine.RenderPipeline.ClearGraphicsDevice(TargetFill);
         }
 
         /// <summary>

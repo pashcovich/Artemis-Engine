@@ -79,6 +79,7 @@
     <Compile Include="Graphics\Animation\LoadSheetReader.cs" />
     <Compile Include="Graphics\Animation\SpriteSheet.cs" />
     <Compile Include="Graphics\Animation\SpriteSheetReader.cs" />
+    <Compile Include="Graphics\BasicRenderLayer.cs" />
     <Compile Include="Graphics\DimensionlessCamera.cs" />
     <Compile Include="Graphics\CameraException.cs" />
     <Compile Include="Graphics\GlobalLayerScaleType.cs" />
