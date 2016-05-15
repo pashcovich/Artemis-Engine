@@ -6,10 +6,16 @@ using Artemis.Engine.Graphics;
 
 namespace Artemis.Engine
 {
-    public abstract class Form : RenderableObject
+    public abstract class Form : PhysicalObject
     {
+        /// <summary>
+        /// The name of this form.
+        /// </summary>
         public string Name { get; private set; }
 
+        /// <summary>
+        /// Whether or not this form has a name.
+        /// </summary>
         public bool Anonymous { get { return Name != null; } }
     }
 }

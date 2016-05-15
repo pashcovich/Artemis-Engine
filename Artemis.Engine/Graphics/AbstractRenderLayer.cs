@@ -15,7 +15,6 @@ namespace Artemis.Engine.Graphics
     public abstract class AbstractRenderLayer : UriTreeObserverNode<AbstractRenderLayer, RenderableGroup>
     {
         private const string TOP_LEVEL = "ALL"; // The name of the top level of renderable objects.
-
         private readonly List<RenderableToAdd> renderablesToAdd = new List<RenderableToAdd>();
         protected struct RenderableToAdd
         {
@@ -79,6 +78,11 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public bool TargetIsMipMap;
 
+        /// <summary>
+        /// The boundaries of the target.
+        /// </summary>
+        public Rectangle TargetBounds { get { return LayerTarget.Bounds; } }
+
         public AbstractRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
@@ -138,6 +142,7 @@ namespace Artemis.Engine.Graphics
                 renderablesToAdd.Add(new RenderableToAdd { Name = name, Object = item });
             else
                 AllRenderables.InsertItem(name, item);
+            item.Layer = this;
         }
 
         /// <summary>
@@ -159,6 +164,7 @@ namespace Artemis.Engine.Graphics
                 renderablesToAdd.Add(new RenderableToAdd { Name = null, Object = item, Anonymous = true });
             else
                 AllRenderables.AddAnonymousItem(item);
+            item.Layer = this;
         }
 
         /// <summary>
@@ -172,6 +178,7 @@ namespace Artemis.Engine.Graphics
                 renderablesToAdd.Add(new RenderableToAdd { Name = groupName, Object = item, Anonymous = true });
             else
                 AllRenderables.AddAnonymousItem(groupName, item);
+            item.Layer = this;
         }
 
         /// <summary>

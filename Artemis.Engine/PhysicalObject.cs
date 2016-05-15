@@ -12,9 +12,13 @@ using Microsoft.Xna.Framework;
 namespace Artemis.Engine
 {
     [HasDynamicProperties(new string[] {"WorldPosition", "TargetPosition", "ScreenPosition"}, true)]
-    public class PhysicalObject : LayerAwareObject
+    public abstract class PhysicalObject : RenderableObject
     {
         private Body _body;
+
+        /// <summary>
+        /// The body attached to this physical object.
+        /// </summary>
         public Body Body
         {
             get { return _body; }
@@ -25,6 +29,33 @@ namespace Artemis.Engine
                                        // Artemis Engine PhysicalObject instance it belongs to. This is used
                                        // specifically in RenderLayer to retrieve the RenderableObjects from
                                        // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
+            }
+        }
+
+        private AbstractCamera _nullCamera = new NullCamera();
+        private bool _useNullCamera;
+
+        /// <summary>
+        /// The Camera this physical object is being viewed by.
+        /// </summary>
+        public AbstractCamera Camera
+        {
+            get
+            {
+                if (!_useNullCamera)
+                {
+                    var layer = Layer as RenderLayer;
+                    if (layer == null)
+                    {
+                        _useNullCamera = true;
+                        return _nullCamera;
+                    }
+                    return layer.Camera;
+                }
+                else
+                {
+                    return _nullCamera;
+                }
             }
         }
 

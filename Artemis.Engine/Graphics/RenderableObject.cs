@@ -7,8 +7,12 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
-    public abstract class RenderableObject : PhysicalObject
+    public abstract class RenderableObject : ResolutionRelativeObject
     {
+        /// <summary>
+        /// The Layer this object belongs to.
+        /// </summary>
+        public AbstractRenderLayer Layer { get; internal set; }
 
         /// <summary>
         /// Whether or not this object is visible.

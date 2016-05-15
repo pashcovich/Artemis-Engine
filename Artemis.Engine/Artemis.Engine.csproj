@@ -84,11 +84,10 @@
     <Compile Include="Graphics\CameraException.cs" />
     <Compile Include="Graphics\GlobalLayerScaleType.cs" />
     <Compile Include="Graphics\AbstractCamera.cs" />
-    <Compile Include="Graphics\LayerAwareObject.cs" />
+    <Compile Include="Graphics\RenderableObject.cs" />
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
-    <Compile Include="Graphics\RenderableObject.cs" />
     <Compile Include="Graphics\RenderComponents.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
