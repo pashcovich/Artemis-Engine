@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Microsoft.Xna.Framework.Graphics;
+
 using System;
 using System.Collections.Generic;
 
@@ -7,6 +9,14 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
+
+    /// <summary>
+    /// A delegate fired when the LayerTarget of a Layer changes.
+    /// </summary>
+    /// <param name="previousTarget"></param>
+    /// <param name="currentTarget"></param>
+    public delegate void LayerTargetChangedDelegate(RenderTarget2D previousTarget, RenderTarget2D currentTarget);
+
     public abstract class RenderableObject : ResolutionRelativeObject
     {
         /// <summary>
@@ -34,6 +44,11 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public abstract void Render();
 
+        /// <summary>
+        /// The event fired when the target of the layer is changed.
+        /// </summary>
+        public LayerTargetChangedDelegate OnLayerTargetChanged;
+
         internal void InternalRender(HashSet<RenderableObject> seenObjects)
         {
             if (Visible)
@@ -48,6 +63,15 @@ namespace Artemis.Engine.Graphics
                 Render();
                 seenObjects.Add(this);
             }
+        }
+
+        public RenderableObject() : base() { }
+
+        public override void Kill()
+        {
+            base.Kill();
+
+            Layer.targetChangeListeners.Remove(this);
         }
     }
 }

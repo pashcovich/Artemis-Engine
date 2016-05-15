@@ -60,6 +60,8 @@ namespace Artemis.Engine.Graphics
 
         /// <summary>
         /// If the LayerScaleType is "Uniform", then this determines how the layer is scaled.
+        /// 
+        /// Note: This value is only used if LayerScaleType is set to GlobalLayerScaleType.Uniform.
         /// </summary>
         public UniformLayerScaleType UniformScaleType
         {
@@ -349,7 +351,7 @@ namespace Artemis.Engine.Graphics
             // Reset the RenderTarget if the resolution has changed.
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
-                LayerTarget.Dispose();
+                var previousTarget = LayerTarget;
 
                 // If we're scaling dynamically then our layer target fills the entire screen.
                 if (LayerScaleType == GlobalLayerScaleType.Dynamic)
@@ -368,6 +370,16 @@ namespace Artemis.Engine.Graphics
                         TargetUsage, 
                         TargetFill, 
                         TargetIsMipMap);
+
+                foreach (var item in targetChangeListeners)
+                {
+                    if (item.OnLayerTargetChanged != null)
+                    {
+                        item.OnLayerTargetChanged(previousTarget, LayerTarget);
+                    }
+                }
+
+                previousTarget.Dispose();
 
                 RecalculateTargetTransform();
             }

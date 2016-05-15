@@ -28,17 +28,10 @@ namespace Artemis.Engine
         public bool ListeningToResolutionChanges { get; private set; }
 
         /// <summary>
-        /// Whether or not the position of this object is a Screen coordinate, as opposed to a
+        /// Whether or not the position of this object is a Target coordinate, as opposed to a
         /// World coordinate.
-        /// 
-        /// NOTE: Though this is called "UseScreenRelativePosition", it actually indicates that the object's
-        /// coordinates are TARGET space coordinates. The Target of a layer is "like" the screen, but positioned
-        /// and scaled according to the GlobalLayerScaleRules. When the game's resolution aspect ratio is not the
-        /// base aspect ratio, the Target space changes. What the user "thinks of" as the screen space is *actually*
-        /// the target space. There's slightly more subtlety to it than what's explained here, but that's the gist
-        /// of it.
         /// </summary>
-        public bool UseScreenRelativePositioning { get; set; } // CURRENTLY NOT IN USE
+        public bool UseTargetRelativePositioning { get; set; } // CURRENTLY NOT IN USE
 
         /// <summary>
         /// Whether or not to maintain the aspect ratio of this object upon dynamically
@@ -60,14 +53,14 @@ namespace Artemis.Engine
             get
             {
                 var rules = new ResolutionScaleRules();
-                rules.UseScreenRelativePositioning = UseScreenRelativePositioning;
+                rules.UseTargetRelativePositioning = UseTargetRelativePositioning;
                 rules.MaintainAspectRatio = MaintainAspectRatio;
                 rules.ScaleType = ScaleType;
                 return rules;
             }
             set
             {
-                UseScreenRelativePositioning = value.UseScreenRelativePositioning;
+                UseTargetRelativePositioning = value.UseTargetRelativePositioning;
                 MaintainAspectRatio = value.MaintainAspectRatio;
                 ScaleType = value.ScaleType;
              
@@ -79,8 +72,6 @@ namespace Artemis.Engine
         /// is decorated with a `ResolutionChangedListener` attribute).
         /// </summary>
         public ResolutionChangedDelegate OnResolutionChanged;
-
-
 
         public ResolutionRelativeObject() : base() { }
 

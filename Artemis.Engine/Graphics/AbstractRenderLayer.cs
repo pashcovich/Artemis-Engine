@@ -15,6 +15,9 @@ namespace Artemis.Engine.Graphics
     public abstract class AbstractRenderLayer : UriTreeObserverNode<AbstractRenderLayer, RenderableGroup>
     {
         private const string TOP_LEVEL = "ALL"; // The name of the top level of renderable objects.
+
+        internal HashSet<RenderableObject> targetChangeListeners = new HashSet<RenderableObject>();
+
         private readonly List<RenderableToAdd> renderablesToAdd = new List<RenderableToAdd>();
         protected struct RenderableToAdd
         {
@@ -143,6 +146,7 @@ namespace Artemis.Engine.Graphics
             else
                 AllRenderables.InsertItem(name, item);
             item.Layer = this;
+            targetChangeListeners.Add(item);
         }
 
         /// <summary>
@@ -179,6 +183,7 @@ namespace Artemis.Engine.Graphics
             else
                 AllRenderables.AddAnonymousItem(groupName, item);
             item.Layer = this;
+            targetChangeListeners.Add(item);
         }
 
         /// <summary>
@@ -310,9 +315,20 @@ namespace Artemis.Engine.Graphics
             // Reset the RenderTarget if the resolution has changed.
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
-                LayerTarget.Dispose();
+                var previousTarget = LayerTarget;
+                
                 LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
                     TargetFormat, TargetDepthFormat, PreferredMultiSampleCount, TargetUsage, TargetFill, TargetIsMipMap);
+
+                foreach (var item in targetChangeListeners)
+                {
+                    if (item.OnLayerTargetChanged != null)
+                    {
+                        item.OnLayerTargetChanged(previousTarget, LayerTarget);
+                    }
+                }
+
+                previousTarget.Dispose();
             }
         }
 
