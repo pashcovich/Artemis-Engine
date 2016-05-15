@@ -16,14 +16,14 @@ using System.Linq;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderLayer : AbstractRenderLayer<RenderLayer>
+    public class RenderLayer : AbstractOrderableRenderLayer
     {
         private RenderPipeline rp; // the global render pipeline,
         private World _world;
         private AbstractCamera _camera;
         private bool _requiresTargetTransformRecalc; // whether or not we need to recalculate the TargetTransform 
                                                      // matrix (when target resolution changes for example).
-        private Matrix _targetTransform;
+        internal Matrix _targetTransform;
         private Predicate<RenderableObject> isVisibleToCameraPredicate;
 
         private GlobalLayerScaleType _layerScaleType;
@@ -288,7 +288,7 @@ namespace Artemis.Engine.Graphics
         /// For RenderLayer, the render action returned depends on the LayerScaleType.
         /// </summary>
         /// <returns></returns>
-        protected override RenderableHandler GetRenderAction()
+        protected override RenderableHandler GetRenderableHandler()
         {
             switch (LayerScaleType)
             {
@@ -370,7 +370,10 @@ namespace Artemis.Engine.Graphics
                 isVisibleToCameraPredicate = obj => hashSet.Contains(obj);
             }
         }
-    
+
+        /// <summary>
+        /// Called directly after "SetupLayerTarget" and directly before any rendering.
+        /// </summary>
         protected override void PostSetupLayerTarget()
         {
             rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
@@ -397,6 +400,9 @@ namespace Artemis.Engine.Graphics
             rp.ClearRenderProperties();
         }
 
+        /// <summary>
+        /// Called after everything is rendered (also after RenderLayerTarget is called).
+        /// </summary>
         protected override void PostRender()
         {
             if (_requiresTargetTransformRecalc)

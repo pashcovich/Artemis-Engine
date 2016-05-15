@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Artemis.Engine.Graphics
 {
-    public class LayerManager : UriTreeObserver<RenderLayer>
+    public class LayerManager : UriTreeObserver<AbstractRenderLayer>
     {
 
         public List<string> RenderOrder;
