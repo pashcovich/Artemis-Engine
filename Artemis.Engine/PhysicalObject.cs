@@ -12,7 +12,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Artemis.Engine
 {
-    [HasDynamicProperties(new string[] {"WorldPosition", "TargetPosition", "ScreenPosition"}, true)]
+    [HasDynamicProperties(new string[] {
+        "WorldPosition", 
+        "TargetPosition", 
+        "RelativeTargetPosition", 
+        "ScreenPosition" 
+    }, true)]
     public abstract class PhysicalObject : RenderableObject
     {
         private Body _body;
@@ -27,7 +32,7 @@ namespace Artemis.Engine
             {
                 _body = value;
                 _body.UserData = this; // We use the UserData of a body to give a forward reference to the
-                                       // Artemis Engine PhysicalObject instance it belongs to. This is used
+                                       // Artemis.Engine.PhysicalObject instance it belongs to. This is used
                                        // specifically in RenderLayer to retrieve the RenderableObjects from
                                        // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
             }
