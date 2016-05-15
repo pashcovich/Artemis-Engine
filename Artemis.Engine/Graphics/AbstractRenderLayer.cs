@@ -54,6 +54,31 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public Color TargetFill;
 
+        /// <summary>
+        /// The surface format for the LayerTarget.
+        /// </summary>
+        public SurfaceFormat TargetFormat;
+
+        /// <summary>
+        /// The depth format for the LayerTarget.
+        /// </summary>
+        public DepthFormat TargetDepthFormat;
+
+        /// <summary>
+        /// The preferred multisample count for the LayerTarget.
+        /// </summary>
+        public int PreferredMultiSampleCount;
+
+        /// <summary>
+        /// The usage of the LayerTarget.
+        /// </summary>
+        public RenderTargetUsage TargetUsage;
+
+        /// <summary>
+        /// Whether or not the LayerTarget is a mipmap.
+        /// </summary>
+        public bool TargetIsMipMap;
+
         public AbstractRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
@@ -64,7 +89,14 @@ namespace Artemis.Engine.Graphics
             AddObservedNode(TOP_LEVEL, AllRenderables);
 
             LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
-            TargetFill = Color.Transparent;
+            
+            // LayerTarget properties
+            TargetFill                = Color.Transparent;
+            TargetFormat              = SurfaceFormat.Color;
+            TargetDepthFormat         = DepthFormat.None;
+            PreferredMultiSampleCount = 0;
+            TargetUsage               = RenderTargetUsage.DiscardContents;
+            TargetIsMipMap            = false;
         }
 
         /// <summary>
@@ -272,7 +304,8 @@ namespace Artemis.Engine.Graphics
             if (ArtemisEngine.DisplayManager.ResolutionChanged)
             {
                 LayerTarget.Dispose();
-                LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+                LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
+                    TargetFormat, TargetDepthFormat, PreferredMultiSampleCount, TargetUsage, TargetFill, TargetIsMipMap);
             }
         }
 

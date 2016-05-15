@@ -353,9 +353,22 @@ namespace Artemis.Engine.Graphics
 
                 // If we're scaling dynamically then our layer target fills the entire screen.
                 if (LayerScaleType == GlobalLayerScaleType.Dynamic)
-                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget();
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
+                        TargetFormat, 
+                        TargetDepthFormat, 
+                        PreferredMultiSampleCount, 
+                        TargetUsage, 
+                        TargetFill, 
+                        TargetIsMipMap);
                 else
-                    LayerTarget = ArtemisEngine.RenderPipeline.CreateBaseResRenderTarget();
+                    LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
+                        TargetFormat, 
+                        TargetDepthFormat, 
+                        PreferredMultiSampleCount, 
+                        TargetUsage, 
+                        TargetFill, 
+                        TargetIsMipMap);
+
                 RecalculateTargetTransform();
             }
 

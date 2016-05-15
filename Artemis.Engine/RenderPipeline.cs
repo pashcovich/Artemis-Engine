@@ -752,6 +752,33 @@ namespace Artemis.Engine
         }
 
         /// <summary>
+        /// Create a RenderTarget2D with dimensions equal to the current window resolution.
+        /// </summary>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateRenderTarget( SurfaceFormat preferredFormat
+                                                , DepthFormat preferredDepthFormat
+                                                , int preferredMultiSampleCount
+                                                , RenderTargetUsage usage
+                                                , Color? fill = null
+                                                , bool mipMap = false )
+        {
+            return CreateRenderTarget(
+                ArtemisEngine.DisplayManager.WindowResolution, 
+                preferredFormat, 
+                preferredDepthFormat, 
+                preferredMultiSampleCount, 
+                usage, 
+                fill, 
+                mipMap);
+        }
+
+        /// <summary>
         /// Create a RenderTarget2D with dimensions equal to the given resolution.
         /// </summary>
         /// <param name="resolution"></param>
@@ -760,6 +787,44 @@ namespace Artemis.Engine
         public RenderTarget2D CreateRenderTarget(Resolution resolution, Color? fill = null)
         {
             return CreateRenderTarget(resolution.Width, resolution.Height, fill);
+        }
+        
+        /// <summary>
+        /// Create a RenderTarget2D.
+        /// </summary>
+        /// <param name="resolution"></param>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateRenderTarget( Resolution resolution
+                                                , SurfaceFormat preferredFormat
+                                                , DepthFormat preferredDepthFormat
+                                                , int preferredMultiSampleCount
+                                                , RenderTargetUsage usage
+                                                , Color? fill = null
+                                                , bool mipMap = false )
+        {
+            Color _fill = fill.HasValue ? fill.Value : Color.Transparent;
+
+            var target = new RenderTarget2D(
+                GraphicsDevice, 
+                resolution.Width, 
+                resolution.Height, 
+                mipMap, 
+                preferredFormat, 
+                preferredDepthFormat, 
+                preferredMultiSampleCount, 
+                usage);
+
+            GraphicsDevice.SetRenderTarget(target);
+            GraphicsDevice.Clear(_fill);
+            GraphicsDevice.SetRenderTarget(null);
+
+            return target;
         }
 
         /// <summary>
@@ -771,6 +836,33 @@ namespace Artemis.Engine
         {
             var res = GameConstants.BaseResolution;
             return CreateRenderTarget(res.Width, res.Height, fill);
+        }
+
+        /// <summary>
+        /// Create a RenderTarget2D with dimensions equal to the game's base resolution.
+        /// </summary>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateBaseResRenderTarget( SurfaceFormat preferredFormat
+                                                       , DepthFormat preferredDepthFormat
+                                                       , int preferredMultiSampleCount
+                                                       , RenderTargetUsage usage
+                                                       , Color? fill = null
+                                                       , bool mipMap = false )
+        {
+            return CreateRenderTarget(
+                GameConstants.BaseResolution,
+                preferredFormat,
+                preferredDepthFormat,
+                preferredMultiSampleCount,
+                usage,
+                fill,
+                mipMap);
         }
     }
 }
