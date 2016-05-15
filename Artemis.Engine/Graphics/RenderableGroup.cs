@@ -55,8 +55,9 @@ namespace Artemis.Engine.Graphics
         /// <param name="renderAction">The layer's RenderAction, which determines how each RenderableObject encountered is handled and rendered.</param>
         /// <param name="seenRenderables">The list of RenderableObjects already seen by the layer in this render cycle.</param>
         /// <param name="skipDuplicates">Whether or not to skip duplicate items (if they're present in the seenRenderables list).</param>
-        public virtual void RenderTop(
-            RenderLayer.RenderAction renderAction, HashSet<RenderableObject> seenRenderables, bool skipDuplicates = true)
+        public virtual void RenderTop( RenderableHandler renderAction
+                                     , HashSet<RenderableObject> seenRenderables
+                                     , bool skipDuplicates = true)
         {
             foreach (var item in Items.Values)
             {
@@ -75,7 +76,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="seenGroups">The list of RenderableGroups already seen by the layer in this render cycle.</param>
         /// <param name="skipDuplicates">Whether or not to skip duplicate items/subgroups (if they're present in the seenRenderables/seenGroups lists).</param>
         public virtual void Render( RenderOrder.RenderGroupOptions options
-                                  , RenderLayer.RenderAction renderAction
+                                  , RenderableHandler renderAction
                                   , HashSet<RenderableObject> seenRenderables
                                   , HashSet<RenderableGroup> seenGroups
                                   , bool skipDuplicates = true )

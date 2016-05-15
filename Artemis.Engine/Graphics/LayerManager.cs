@@ -34,7 +34,7 @@ namespace Artemis.Engine.Graphics
         {
             foreach (var layerName in RenderOrder)
             {
-                GetObservedNode(layerName).Render();
+                GetObservedNode(layerName).RenderTop();
             }
         }
     }
