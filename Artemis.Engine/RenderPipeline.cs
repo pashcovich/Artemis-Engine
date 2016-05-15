@@ -205,13 +205,28 @@ namespace Artemis.Engine
                           , Vector2? origin            = null
                           , Vector2? scale             = null
                           , SpriteEffects effects      = SpriteEffects.None
-                          , float layerDepth           = 0 )
+                          , float layerDepth           = 0
+                          , bool originIsRelative      = false)
         {
             if (BegunRenderCycle)
             {
                 var _colour = colour.HasValue ? colour.Value : Color.White;
                 var _origin = origin.HasValue ? origin.Value : Vector2.Zero;
                 var _scale  = scale.HasValue  ? scale.Value  : Vector2.One;
+
+                if (originIsRelative)
+                {
+                    Rectangle rect;
+                    if (sourceRectangle.HasValue)
+                    {
+                        rect = (Rectangle)sourceRectangle;
+                    }
+                    else
+                    {
+                        rect = texture.Bounds;
+                    }
+                    _origin = new Vector2(rect.Width * _origin.X, rect.Height * _origin.Y);
+                }
 
                 if (!spriteBatchBegun)
                 {
@@ -236,49 +251,6 @@ namespace Artemis.Engine
                 throw new RenderPipelineException(
                     "Rendering must occur in the render cycle.");
             }
-        }
-
-        /// <summary>
-        /// Directly render a texture to the screen with the given parameters.
-        /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="position"></param>
-        /// <param name="sourceRectangle"></param>
-        /// <param name="colour"></param>
-        /// <param name="rotation"></param>
-        /// <param name="scale"></param>
-        /// <param name="effects"></param>
-        /// <param name="layerDepth"></param>
-        public void Render(Texture2D texture
-                          , RelativePosition position
-                          , Rectangle? sourceRectangle = null
-                          , Color? colour              = null
-                          , double rotation            = 0
-                          , Vector2? scale             = null
-                          , SpriteEffects effects      = SpriteEffects.None
-                          , float layerDepth           = 0 )
-        {
-            Rectangle rect;
-            if (sourceRectangle.HasValue)
-            {
-                rect = (Rectangle)sourceRectangle;
-            }
-            else
-            {
-                rect = texture.Bounds;
-            }
-            var rel = position.RelativeTo;
-            var origin = new Vector2(rect.Width * rel.xOffset, rect.Height * rel.yOffset);
-
-            Render( texture
-                  , position.Position
-                  , sourceRectangle
-                  , colour
-                  , rotation
-                  , origin
-                  , scale
-                  , effects
-                  , layerDepth );
         }
 
         /// <summary>
@@ -752,6 +724,33 @@ namespace Artemis.Engine
         }
 
         /// <summary>
+        /// Create a RenderTarget2D with dimensions equal to the current window resolution.
+        /// </summary>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateRenderTarget( SurfaceFormat preferredFormat
+                                                , DepthFormat preferredDepthFormat
+                                                , int preferredMultiSampleCount
+                                                , RenderTargetUsage usage
+                                                , Color? fill = null
+                                                , bool mipMap = false )
+        {
+            return CreateRenderTarget(
+                ArtemisEngine.DisplayManager.WindowResolution, 
+                preferredFormat, 
+                preferredDepthFormat, 
+                preferredMultiSampleCount, 
+                usage, 
+                fill, 
+                mipMap);
+        }
+
+        /// <summary>
         /// Create a RenderTarget2D with dimensions equal to the given resolution.
         /// </summary>
         /// <param name="resolution"></param>
@@ -760,6 +759,44 @@ namespace Artemis.Engine
         public RenderTarget2D CreateRenderTarget(Resolution resolution, Color? fill = null)
         {
             return CreateRenderTarget(resolution.Width, resolution.Height, fill);
+        }
+        
+        /// <summary>
+        /// Create a RenderTarget2D.
+        /// </summary>
+        /// <param name="resolution"></param>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateRenderTarget( Resolution resolution
+                                                , SurfaceFormat preferredFormat
+                                                , DepthFormat preferredDepthFormat
+                                                , int preferredMultiSampleCount
+                                                , RenderTargetUsage usage
+                                                , Color? fill = null
+                                                , bool mipMap = false )
+        {
+            Color _fill = fill.HasValue ? fill.Value : Color.Transparent;
+
+            var target = new RenderTarget2D(
+                GraphicsDevice, 
+                resolution.Width, 
+                resolution.Height, 
+                mipMap, 
+                preferredFormat, 
+                preferredDepthFormat, 
+                preferredMultiSampleCount, 
+                usage);
+
+            GraphicsDevice.SetRenderTarget(target);
+            GraphicsDevice.Clear(_fill);
+            GraphicsDevice.SetRenderTarget(null);
+
+            return target;
         }
 
         /// <summary>
@@ -771,6 +808,33 @@ namespace Artemis.Engine
         {
             var res = GameConstants.BaseResolution;
             return CreateRenderTarget(res.Width, res.Height, fill);
+        }
+
+        /// <summary>
+        /// Create a RenderTarget2D with dimensions equal to the game's base resolution.
+        /// </summary>
+        /// <param name="preferredFormat"></param>
+        /// <param name="preferredDepthFormat"></param>
+        /// <param name="preferredMultiSampleCount"></param>
+        /// <param name="usage"></param>
+        /// <param name="fill"></param>
+        /// <param name="mipMap"></param>
+        /// <returns></returns>
+        public RenderTarget2D CreateBaseResRenderTarget( SurfaceFormat preferredFormat
+                                                       , DepthFormat preferredDepthFormat
+                                                       , int preferredMultiSampleCount
+                                                       , RenderTargetUsage usage
+                                                       , Color? fill = null
+                                                       , bool mipMap = false )
+        {
+            return CreateRenderTarget(
+                GameConstants.BaseResolution,
+                preferredFormat,
+                preferredDepthFormat,
+                preferredMultiSampleCount,
+                usage,
+                fill,
+                mipMap);
         }
     }
 }

@@ -21,9 +21,17 @@ namespace Artemis.Engine
                 });
         }
 
+        /// <summary>
+        /// Whether or not this object is the listening to changes in the game's resolution
+        /// (which will trigger the OnResolutionChanged event).
+        /// </summary>
         public bool ListeningToResolutionChanges { get; private set; }
 
-        public bool UseScreenRelativePositioning { get; set; } // CURRENTLY NOT IN USE
+        /// <summary>
+        /// Whether or not the position of this object is a Target coordinate, as opposed to a
+        /// World coordinate.
+        /// </summary>
+        public bool UseTargetRelativePositioning { get; set; } // CURRENTLY NOT IN USE
 
         /// <summary>
         /// Whether or not to maintain the aspect ratio of this object upon dynamically
@@ -45,14 +53,14 @@ namespace Artemis.Engine
             get
             {
                 var rules = new ResolutionScaleRules();
-                rules.UseScreenRelativePositioning = UseScreenRelativePositioning;
+                rules.UseTargetRelativePositioning = UseTargetRelativePositioning;
                 rules.MaintainAspectRatio = MaintainAspectRatio;
                 rules.ScaleType = ScaleType;
                 return rules;
             }
             set
             {
-                UseScreenRelativePositioning = value.UseScreenRelativePositioning;
+                UseTargetRelativePositioning = value.UseTargetRelativePositioning;
                 MaintainAspectRatio = value.MaintainAspectRatio;
                 ScaleType = value.ScaleType;
              

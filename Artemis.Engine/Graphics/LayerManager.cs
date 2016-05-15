@@ -2,6 +2,7 @@
 
 using Artemis.Engine.Utilities.UriTree;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,33 +10,147 @@ using System.Linq;
 
 namespace Artemis.Engine.Graphics
 {
-    public class LayerManager : UriTreeObserver<RenderLayer>
+    public class LayerManager : UriTreeObserver<AbstractRenderLayer>
     {
 
-        public List<string> RenderOrder;
+        /// <summary>
+        /// The order in which the layers are rendered.
+        /// </summary>
+        public RenderOrder RenderOrder { get; private set; }
 
-        public LayerManager()
+        /// <summary>
+        /// The global RenderTraversalOptions, determining whether or not the top level items of each layer should be 
+        /// rendered first or the sublayers first. The default value is "RenderOrder.RenderTraversalOptions.AllPre".
+        /// 
+        /// Note: If RenderOrder is not null, this value is not used.
+        /// </summary>
+        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
+
+        public LayerManager() 
         {
-            RenderOrder = new List<string>();
+            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
         }
 
-        public void Add(RenderLayer layer)
+        /// <summary>
+        /// Add a given layer.
+        /// </summary>
+        /// <param name="layer"></param>
+        public void Add(AbstractRenderLayer layer)
         {
             AddObservedNode(layer.tempFullName, layer);
             layer.Managed = true;
         }
 
+        /// <summary>
+        /// Set the render order to render the given layers (with "AllPre" traversal).
+        /// </summary>
+        /// <param name="order"></param>
         public void SetRenderOrder(params string[] order)
         {
-            RenderOrder = order.ToList();
+            SetRenderOrder(order);
         }
 
+        /// <summary>
+        /// Set the render order to render the given layers with the given traversal option.
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="traversal"></param>
+        public void SetRenderOrder( string[] order
+                                  , RenderOrder.RenderTraversalOptions traversal = RenderOrder.RenderTraversalOptions.AllPre)
+        {
+            var actions = from name in order
+                          select (RenderOrder.AbstractRenderOrderAction)
+                                new RenderOrder.RenderLayer(name, traversal);
+            SetRenderOrder(new RenderOrder(actions.ToList()));
+        }
+
+        /// <summary>
+        /// Set the render order to render the given layers with the given traversal options.
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="traversalOptions"></param>
+        public void SetRenderOrder( string[] order 
+                                  , RenderOrder.RenderTraversalOptions[] traversalOptions )
+        {
+            if (order.Length != traversalOptions.Length)
+            {
+                throw new RenderOrderException();
+            }
+            var actions = new List<RenderOrder.AbstractRenderOrderAction>();
+            for (int i = 0; i < order.Length; i++)
+            {
+                actions.Add(new RenderOrder.RenderLayer(order[i], traversalOptions[i]));
+            }
+            SetRenderOrder(new RenderOrder(actions.ToList()));
+        }
+
+        /// <summary>
+        /// Set the render order to perform the given AbstractRenderOrderActions.
+        /// </summary>
+        /// <param name="actions"></param>
+        public void SetRenderOrder(params RenderOrder.AbstractRenderOrderAction[] actions)
+        {
+            SetRenderOrder(new RenderOrder(actions.ToList()));
+        }
+
+        /// <summary>
+        /// Set the RenderOrder to the given RenderOrder object.
+        /// </summary>
+        /// <param name="order"></param>
+        public void SetRenderOrder(RenderOrder order)
+        {
+            RenderOrder = order;
+        }
+
+        /// <summary>
+        /// Render every layer.
+        /// </summary>
         public void Render()
         {
-            foreach (var layerName in RenderOrder)
+            var seenLayers = new HashSet<AbstractRenderLayer>();
+            if (RenderOrder == null)
             {
-                GetObservedNode(layerName).Render();
+                foreach (var layer in ObservedNodes.Values)
+                {
+                    layer.Render(seenLayers);
+                }
             }
+            else
+            {
+                foreach (var action in RenderOrder.Actions)
+                {
+                    switch (action.ActionType)
+                    {
+                        case RenderOrder.RenderOrderActionType.RenderLayer:
+                            HandleRenderOrderAction_RenderLayer((RenderOrder.RenderLayer)action, seenLayers);
+                            break;
+                        default:
+                            HandleUnknownRenderOrderAction(action);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void HandleRenderOrderAction_RenderLayer(
+            RenderOrder.RenderLayer action, HashSet<AbstractRenderLayer> seenLayers)
+        {
+            var layer = GetObservedNode(action.Name);
+            layer.Render(seenLayers, action.Options, action.SkipDuplicates);
+        }
+
+        /// <summary>
+        /// Handle a RenderOrderAction that the LayerManager couldn't identify what to do with.
+        /// Implement this if you have RenderOrderActions that aren't one of the builtin types.
+        /// </summary>
+        /// <param name="action"></param>
+        protected virtual void HandleUnknownRenderOrderAction(RenderOrder.AbstractRenderOrderAction action)
+        {
+            var name = Enum.GetName(typeof(RenderOrder.RenderOrderActionType), action.ActionType);
+            throw new RenderOrderException(
+                string.Format(
+                    "The RenderOrderAction '{0}' cannot be used in the RenderOrder for a LayerManager.",
+                    name == null ? action.ActionType : (object)name, action.ActionType));
         }
     }
 }

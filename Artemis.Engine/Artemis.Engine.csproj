@@ -54,6 +54,7 @@
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
+    <Compile Include="Graphics\AbstractOrderableRenderLayer.cs" />
     <Compile Include="Graphics\AbstractRenderLayer.cs" />
     <Compile Include="Graphics\Animation\AAMLException.cs" />
     <Compile Include="Graphics\Animation\AAMLFileReader.cs" />
@@ -78,15 +79,15 @@
     <Compile Include="Graphics\Animation\LoadSheetReader.cs" />
     <Compile Include="Graphics\Animation\SpriteSheet.cs" />
     <Compile Include="Graphics\Animation\SpriteSheetReader.cs" />
+    <Compile Include="Graphics\BasicRenderLayer.cs" />
     <Compile Include="Graphics\DimensionlessCamera.cs" />
     <Compile Include="Graphics\CameraException.cs" />
     <Compile Include="Graphics\GlobalLayerScaleType.cs" />
     <Compile Include="Graphics\AbstractCamera.cs" />
-    <Compile Include="Graphics\LayerAwareObject.cs" />
+    <Compile Include="Graphics\RenderableObject.cs" />
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
-    <Compile Include="Graphics\RenderableObject.cs" />
     <Compile Include="Graphics\RenderComponents.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
@@ -163,8 +164,6 @@
     <Compile Include="Multiforms\NamedMultiformAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Multiforms\ReconstructMultiformAttribute.cs" />
-    <Compile Include="RelativePosition.cs" />
-    <Compile Include="RelativePositionType.cs" />
     <Compile Include="RenderPipeline.cs" />
     <Compile Include="RenderPipelineException.cs" />
     <Compile Include="SpriteBatchPropertiesPacket.cs" />
