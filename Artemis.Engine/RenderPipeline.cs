@@ -205,13 +205,28 @@ namespace Artemis.Engine
                           , Vector2? origin            = null
                           , Vector2? scale             = null
                           , SpriteEffects effects      = SpriteEffects.None
-                          , float layerDepth           = 0 )
+                          , float layerDepth           = 0
+                          , bool originIsRelative      = false)
         {
             if (BegunRenderCycle)
             {
                 var _colour = colour.HasValue ? colour.Value : Color.White;
                 var _origin = origin.HasValue ? origin.Value : Vector2.Zero;
                 var _scale  = scale.HasValue  ? scale.Value  : Vector2.One;
+
+                if (originIsRelative)
+                {
+                    Rectangle rect;
+                    if (sourceRectangle.HasValue)
+                    {
+                        rect = (Rectangle)sourceRectangle;
+                    }
+                    else
+                    {
+                        rect = texture.Bounds;
+                    }
+                    _origin = new Vector2(rect.Width * _origin.X, rect.Height * _origin.Y);
+                }
 
                 if (!spriteBatchBegun)
                 {
@@ -236,49 +251,6 @@ namespace Artemis.Engine
                 throw new RenderPipelineException(
                     "Rendering must occur in the render cycle.");
             }
-        }
-
-        /// <summary>
-        /// Directly render a texture to the screen with the given parameters.
-        /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="position"></param>
-        /// <param name="sourceRectangle"></param>
-        /// <param name="colour"></param>
-        /// <param name="rotation"></param>
-        /// <param name="scale"></param>
-        /// <param name="effects"></param>
-        /// <param name="layerDepth"></param>
-        public void Render(Texture2D texture
-                          , RelativePosition position
-                          , Rectangle? sourceRectangle = null
-                          , Color? colour              = null
-                          , double rotation            = 0
-                          , Vector2? scale             = null
-                          , SpriteEffects effects      = SpriteEffects.None
-                          , float layerDepth           = 0 )
-        {
-            Rectangle rect;
-            if (sourceRectangle.HasValue)
-            {
-                rect = (Rectangle)sourceRectangle;
-            }
-            else
-            {
-                rect = texture.Bounds;
-            }
-            var rel = position.RelativeTo;
-            var origin = new Vector2(rect.Width * rel.xOffset, rect.Height * rel.yOffset);
-
-            Render( texture
-                  , position.Position
-                  , sourceRectangle
-                  , colour
-                  , rotation
-                  , origin
-                  , scale
-                  , effects
-                  , layerDepth );
         }
 
         /// <summary>

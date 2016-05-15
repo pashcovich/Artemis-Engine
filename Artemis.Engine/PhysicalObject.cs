@@ -14,7 +14,19 @@ namespace Artemis.Engine
     [HasDynamicProperties(new string[] {"WorldPosition", "TargetPosition", "ScreenPosition"}, true)]
     public class PhysicalObject : LayerAwareObject
     {
-        public Body Body;
+        private Body _body;
+        public Body Body
+        {
+            get { return _body; }
+            set
+            {
+                _body = value;
+                _body.UserData = this; // We use the UserData of a body to give a forward reference to the
+                                       // Artemis Engine PhysicalObject instance it belongs to. This is used
+                                       // specifically in RenderLayer to retrieve the RenderableObjects from
+                                       // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
+            }
+        }
 
         /// <summary>
         /// The position of the object in the world.
@@ -24,6 +36,9 @@ namespace Artemis.Engine
         /// </summary>
         public Vector2 WorldPosition { get { return Body.Position; } set { Body.Position = value; } }
 
+        /// <summary>
+        /// The position on the LayerTarget.
+        /// </summary>
         public Vector2 TargetPosition
         {
             get
@@ -38,6 +53,9 @@ namespace Artemis.Engine
             }
         }
 
+        /// <summary>
+        /// The position on the screen.
+        /// </summary>
         public Vector2 ScreenPosition
         {
             get

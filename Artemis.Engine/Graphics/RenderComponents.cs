@@ -9,16 +9,40 @@ namespace Artemis.Engine.Graphics
 {
     public class RenderComponents
     {
-        public Rectangle? SourceRectangle { get; set; }
+        /// <summary>
+        /// A rectangle that specifies (in texels) the source texels from 
+        /// a texture. Use null to draw the entire texture.
+        /// </summary>
+        public Rectangle? SourceRectangle;
 
-        public Color? Tint { get; set; }
+        /// <summary>
+        /// The color to tint a sprite. Use Color.White for full color with no tinting.
+        /// </summary>
+        public Color? Tint;
 
-        public double Rotation { get; set; }
+        /// <summary>
+        /// Specifies the angle (in radians) to rotate the sprite about its center.
+        /// </summary>
+        public double Rotation;
 
-        public Vector2? Scale { get; set; }
+        /// <summary>
+        /// Scale factor.
+        /// </summary>
+        public Vector2? Scale;
 
-        public Vector2 Origin { get; set; }
+        /// <summary>
+        /// The sprite origin; the default is (0,0) which represents the upper-left corner.
+        /// </summary>
+        public Vector2 Origin;
 
+        /// <summary>
+        /// Whether or not the `Origin` value is a relative or absolute value.
+        /// </summary>
+        public bool OriginIsRelative;
+
+        /// <summary>
+        /// Effects to apply.
+        /// </summary>
         public SpriteEffects SpriteEffects { get; set; }
 
         public RenderComponents( Rectangle? sourceRectangle = null
@@ -26,7 +50,8 @@ namespace Artemis.Engine.Graphics
                                , double rotation            = 0
                                , Vector2? scale             = null
                                , Vector2? origin            = null
-                               , SpriteEffects effects      = SpriteEffects.None )
+                               , SpriteEffects effects      = SpriteEffects.None 
+                               , bool originIsRelative      = false )
         {
             SourceRectangle = sourceRectangle;
             Tint = colour;
@@ -34,6 +59,7 @@ namespace Artemis.Engine.Graphics
             Scale = scale;
             Origin = origin.HasValue ? origin.Value : TextureOrigins.TopLeft;
             SpriteEffects = effects;
+            OriginIsRelative = originIsRelative;
         }
     }
 }

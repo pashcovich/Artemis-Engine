@@ -165,8 +165,6 @@
     <Compile Include="Multiforms\NamedMultiformAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Multiforms\ReconstructMultiformAttribute.cs" />
-    <Compile Include="RelativePosition.cs" />
-    <Compile Include="RelativePositionType.cs" />
     <Compile Include="RenderPipeline.cs" />
     <Compile Include="RenderPipelineException.cs" />
     <Compile Include="SpriteBatchPropertiesPacket.cs" />

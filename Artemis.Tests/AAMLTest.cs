@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿/*
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Artemis.Engine.Graphics.Animation;
 using System;
 using System.Diagnostics;
@@ -32,3 +33,4 @@ namespace Artemis.Tests
         }
     }
 }
+*/
