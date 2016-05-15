@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Artemis.Tests
+namespace Artemis.Tests.Animation
 {
     [TestClass]
     public class AAMLFileReaderTests
     {
         [TestMethod]
-        public void AAMLFileReaderTest()
+        public void AAMLLoadTileTest()
         {
-            AAMLFileReader fileReader = new AAMLFileReader("../../TestFile.aaml");
+            AAMLFileReader fileReader = new AAMLFileReader("LoadTileAAMLTestFile.aaml");
             try
             {
                 fileReader.Read();
@@ -23,12 +23,6 @@ namespace Artemis.Tests
             {
                 Assert.Fail(e.Message + "\n\nAt:\n" + e.StackTrace);
             }
-        }
-
-        [TestMethod]
-        public void ReadTest()
-        {
-            Assert.Fail();
         }
     }
 }

@@ -7,6 +7,7 @@
 			</Adjustments>
 		</LoadImageAsTile>
 	</SpriteSheet>
+  
 	<AnimationMap InitState="idle">
 	</AnimationMap>
 </Animation>

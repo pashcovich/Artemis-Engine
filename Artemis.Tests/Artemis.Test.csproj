@@ -50,7 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AAMLTest.cs" />
+    <Compile Include="Animation\AAMLTest.cs" />
     <Compile Include="DynamicFieldContainerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,7 +61,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TestFile.aaml" />
+    <None Include="Animation\LoadTileAAMLTestFile.aaml" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -54,7 +54,6 @@
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
-    <Compile Include="Graphics\AbstractRenderLayer.cs" />
     <Compile Include="Graphics\Animation\AAMLException.cs" />
     <Compile Include="Graphics\Animation\AAMLFileReader.cs" />
     <Compile Include="Graphics\Animation\AnimationMap.cs" />
