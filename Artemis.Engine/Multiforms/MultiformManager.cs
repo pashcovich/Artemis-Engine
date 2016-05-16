@@ -34,7 +34,7 @@ namespace Artemis.Engine.Multiforms
                 Dictionary<string, Multiform> active)
             {
                 var multiform = registered[name];
-                multiform.DelegateConstruction(args);
+                multiform.InternalConstruct(args);
                 active.Add(name, multiform);
             }
         }

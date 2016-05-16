@@ -116,7 +116,6 @@
     <Compile Include="ResolutionScaleRules.cs" />
     <Compile Include="ResolutionScaleType.cs" />
     <Compile Include="UpdatableObject.cs" />
-    <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
     <Compile Include="Effectors\Effector.cs" />
     <Compile Include="Effectors\EffectorException.cs" />

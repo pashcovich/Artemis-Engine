@@ -7,6 +7,10 @@ using Artemis.Engine.Utilities.Partial;
 
 namespace Artemis.Engine
 {
+    public delegate void Updater();
+
+    public delegate void Renderer();
+
     public class UpdatableObject : PartialEngineAdapter
     {
 
