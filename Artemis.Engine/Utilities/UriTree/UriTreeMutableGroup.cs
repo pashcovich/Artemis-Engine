@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 #endregion
 
@@ -364,6 +365,122 @@ namespace Artemis.Engine.Utilities.UriTree
                         );
                 }
                 return Subnodes[first].RemoveAnonymousItem(nameParts, item, failQuiet);
+            }
+        }
+
+        /// <summary>
+        /// Clear all the items (named or anonymous).
+        /// </summary>
+        /// <param name="recursive"></param>
+        public void ClearItems(bool recursive = false)
+        {
+            if (OnItemRemoved != null)
+            {
+                foreach (var kvp in Items)
+                    OnItemRemoved(kvp.Key, kvp.Value);
+                foreach (var item in AnonymousItems)
+                    OnItemRemoved(null, item);
+
+                Items.Clear();
+                AnonymousItems.Clear();
+            }
+            else
+            {
+                Items.Clear();
+                AnonymousItems.Clear();
+            }
+
+            if (recursive)
+            {
+                foreach (var subnode in Subnodes.Values)
+                    subnode.ClearItems(recursive);
+            }
+        }
+
+        /// <summary>
+        /// Clear all the named items.
+        /// </summary>
+        /// <param name="recursive"></param>
+        public void ClearNamedItems(bool recursive = false)
+        {
+            if (OnItemRemoved != null)
+            {
+                foreach (var kvp in Items)
+                    OnItemRemoved(kvp.Key, kvp.Value);
+                Items.Clear();
+            }
+            else
+            {
+                Items.Clear();
+            }
+
+            if (recursive)
+            {
+                foreach (var subnode in Subnodes.Values)
+                    subnode.ClearNamedItems(recursive);
+            }
+        }
+
+        /// <summary>
+        /// Clear all named items whose name matches the given regex.
+        /// </summary>
+        /// <param name="regex"></param>
+        /// <param name="recursive"></param>
+        public void ClearNamedItems(string regex, bool recursive = false)
+        {
+            var toRemove = new List<string>();
+            if (OnItemRemoved != null)
+            {
+                foreach (var kvp in Items)
+                {
+                    if (Regex.IsMatch(kvp.Key, regex))
+                    {
+                        toRemove.Add(kvp.Key);
+                        OnItemRemoved(kvp.Key, kvp.Value);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var kvp in Items)
+                {
+                    if (Regex.IsMatch(kvp.Key, regex))
+                        toRemove.Add(kvp.Key);
+                }
+            }
+            foreach (var name in toRemove)
+                Items.Remove(name);
+
+            if (recursive)
+            {
+                foreach (var subnode in Subnodes.Values)
+                    subnode.ClearNamedItems(regex, recursive);
+            }
+        }
+
+        /// <summary>
+        /// Clear all anonymous items.
+        /// </summary>
+        /// <param name="recursive"></param>
+        public void ClearAnonymousItems(bool recursive = false)
+        {
+            if (OnItemRemoved != null)
+            {
+                foreach (var item in AnonymousItems)
+                    OnItemRemoved(null, item);
+                AnonymousItems.Clear();
+            }
+            else
+            {
+                AnonymousItems.Clear();
+            }
+
+            if (recursive)
+            {
+                foreach (var subnode in Subnodes.Values)
+                {
+                    subnode.ClearAnonymousItems(recursive);
+                }
             }
         }
     }
