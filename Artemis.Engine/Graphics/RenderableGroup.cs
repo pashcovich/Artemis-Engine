@@ -12,7 +12,16 @@ namespace Artemis.Engine.Graphics
     public class RenderableGroup : UriTreeMutableGroup<RenderableGroup, RenderableObject>
     {
 
-        public RenderableGroup(string name) : base(name) { }
+        public RenderableGroup(string name) : base(name) 
+        {
+            OnItemAdded += OnRenderableAdded;
+        }
+
+        private void OnRenderableAdded(string name, RenderableObject obj)
+        {
+            obj._group = this;
+            obj._name = name;
+        }
 
         /// <summary>
         /// Return all top level renderable objects in this group (i.e. no objects that

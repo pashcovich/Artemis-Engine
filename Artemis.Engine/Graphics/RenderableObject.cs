@@ -49,6 +49,10 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public LayerTargetChangedDelegate OnLayerTargetChanged;
 
+        // Info for killing the object.
+        internal RenderableGroup _group;
+        internal string _name;
+
         internal void InternalRender(HashSet<RenderableObject> seenObjects)
         {
             if (Visible)
@@ -72,6 +76,7 @@ namespace Artemis.Engine.Graphics
             base.Kill();
 
             Layer.targetChangeListeners.Remove(this);
+            _group.RemoveItem(_name);
         }
     }
 }
