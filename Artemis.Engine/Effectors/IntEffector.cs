@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine.Effectors.Special
+namespace Artemis.Engine.Effectors
 {
     /// <summary>
     /// An effector that acts on integers.

@@ -124,11 +124,11 @@
     <Compile Include="Effectors\EffectorOperatorType.cs" />
     <Compile Include="Effectors\EffectorValueType.cs" />
     <Compile Include="Effectors\PresetFunctions.cs" />
-    <Compile Include="Effectors\Special\DoubleEffector.cs" />
-    <Compile Include="Effectors\Special\IntEffector.cs" />
-    <Compile Include="Effectors\Special\VectorEffector.cs" />
-    <Compile Include="Effectors\Special\XCoordEffector.cs" />
-    <Compile Include="Effectors\Special\YCoordEffector.cs" />
+    <Compile Include="Effectors\DoubleEffector.cs" />
+    <Compile Include="Effectors\IntEffector.cs" />
+    <Compile Include="Effectors\VectorEffector.cs" />
+    <Compile Include="Effectors\XCoordEffector.cs" />
+    <Compile Include="Effectors\YCoordEffector.cs" />
     <Compile Include="ManualUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
@@ -208,7 +208,10 @@
       <Name>Farseer Physics MonoGame</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Effectors\Paths\" />
+    <Folder Include="Forms\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
