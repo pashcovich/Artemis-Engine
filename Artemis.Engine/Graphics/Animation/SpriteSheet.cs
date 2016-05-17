@@ -50,7 +50,7 @@ namespace Artemis.Engine.Graphics
         public SpriteSheet(List<Texture2D> texture, Dictionary<string, Dictionary<string, Tile>> tileGroups)
         {
             LoadedTextures = texture;
-            if (TileGroups.ContainsKey(GLOBAL_TILE_GROUP_NAME))
+            if (tileGroups.ContainsKey(GLOBAL_TILE_GROUP_NAME))
             {
                 GlobalTileGroup = tileGroups[GLOBAL_TILE_GROUP_NAME];
             }
