@@ -38,12 +38,12 @@ namespace Artemis.Engine.Graphics.Animation
         public Rectangle Tile { get; private set; }
         public Texture2D Texture { get; private set; }
         public string TileGroup { get; private set; }
-
+        
         public LoadImageAsTileReader(XmlElement tag)
         {
             LoadImageTag = tag;
             Tile = new Rectangle();
-            TileGroup = string.Empty;
+            TileGroup = "";
         }
 
         public void read()

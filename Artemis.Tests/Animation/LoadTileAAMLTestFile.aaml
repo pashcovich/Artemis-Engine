@@ -3,10 +3,11 @@
 	<SpriteSheet>
 		<LoadImageAsTile>
 			<Adjustments>
-				<CropTile Name="meleeattack/survivor-meleeattack_shotgun_0.png" TileGroup=""/>
+				<CropTile Name="Gordon Freeman/shotgun/idle/freeman-idle_shotgun_0.png" TileGroup=""/>
 			</Adjustments>
 		</LoadImageAsTile>
 	</SpriteSheet>
+  
 	<AnimationMap InitState="idle">
 	</AnimationMap>
 </Animation>

@@ -36,9 +36,9 @@ namespace Artemis.Engine.Graphics.Animation
         public XmlElement SpriteSheet { get; private set; }
         public SpriteSheet Sheet { get; private set; }
         public Dictionary<string, Dictionary<string, SpriteSheet.Tile>> TileGroups { get; private set; }  // <GroupName, Tile<Name, Tile (struct)>>
+        public Dictionary<string, int> CurrentFrame { get; private set; }
         public List<Texture2D> Textures { get; private set; }
 
-        private Dictionary<string, int> currentFrame = new Dictionary<string, int>();
         private int currentTileID = 0;
         private SpriteSheet.Tile addTile;
 
@@ -47,6 +47,7 @@ namespace Artemis.Engine.Graphics.Animation
             SpriteSheet = sheet;
             TileGroups = new Dictionary<string, Dictionary<string, SpriteSheet.Tile>>();
             TileGroups.Add("", new Dictionary<string, SpriteSheet.Tile>());
+            CurrentFrame = new Dictionary<string, int>();
             Textures = new List<Texture2D>();
         }
 
@@ -75,18 +76,22 @@ namespace Artemis.Engine.Graphics.Animation
                     LoadImageAsTileReader imageTileReader = new LoadImageAsTileReader(element);
                     imageTileReader.read();
 
+                    addTile = new SpriteSheet.Tile(currentTileID, imageTileReader.Tile);
+                    
                     if (!TileGroups.ContainsKey(imageTileReader.TileGroup))
                     {
                         TileGroups.Add(imageTileReader.TileGroup, new Dictionary<string, SpriteSheet.Tile>());
-                        currentFrame.Add(imageTileReader.TileGroup, 0);
                     }
 
-                    addTile = new SpriteSheet.Tile(currentTileID, imageTileReader.Tile);
+                    if (!CurrentFrame.ContainsKey(imageTileReader.TileGroup))
+                    {
+                        CurrentFrame.Add(imageTileReader.TileGroup, 0);
+                    }
 
-                    TileGroups[imageTileReader.TileGroup].Add(imageTileReader.TileGroup + currentFrame[imageTileReader.TileGroup], addTile);
+                    TileGroups[imageTileReader.TileGroup].Add(imageTileReader.TileGroup + CurrentFrame[imageTileReader.TileGroup], addTile);
                     Textures.Add(imageTileReader.Texture);
 
-                    currentFrame[imageTileReader.TileGroup]++;
+                    CurrentFrame[imageTileReader.TileGroup]++;
                     currentTileID++;
                     break;
 
@@ -99,13 +104,13 @@ namespace Artemis.Engine.Graphics.Animation
                         if (!TileGroups.ContainsKey(group.Key))
                         {
                             TileGroups.Add(group.Key, new Dictionary<string, SpriteSheet.Tile>());
-                            currentFrame.Add(group.Key, 0);
+                            CurrentFrame.Add(group.Key, 0);
                         }
                         foreach (Rectangle tile in group.Value)
                         {
                             addTile = new SpriteSheet.Tile(currentTileID, tile);
-                            TileGroups[group.Key].Add(group.Key + currentFrame[group.Key], addTile);
-                            currentFrame[group.Key]++;
+                            TileGroups[group.Key].Add(group.Key + CurrentFrame[group.Key], addTile);
+                            CurrentFrame[group.Key]++;
                         }
                     }
 
@@ -120,17 +125,17 @@ namespace Artemis.Engine.Graphics.Animation
                     if (!TileGroups.ContainsKey(directoryReader.GroupName))
                     {
                         TileGroups.Add(directoryReader.GroupName, new Dictionary<string, SpriteSheet.Tile>());
-                        currentFrame.Add(directoryReader.GroupName, 0);
+                        CurrentFrame.Add(directoryReader.GroupName, 0);
                     }
 
                     foreach (var key in directoryReader.Tiles.Keys)
                     {
                         addTile = new SpriteSheet.Tile(currentTileID, directoryReader.Tiles[key]);
 
-                        TileGroups[directoryReader.GroupName].Add(directoryReader.GroupName + currentFrame[directoryReader.GroupName], addTile);
+                        TileGroups[directoryReader.GroupName].Add(directoryReader.GroupName + CurrentFrame[directoryReader.GroupName], addTile);
                         Textures.Add(directoryReader.Textures[key]);
 
-                        currentFrame[directoryReader.GroupName]++;
+                        CurrentFrame[directoryReader.GroupName]++;
                         currentTileID++;
                     }
                     break;
@@ -142,17 +147,17 @@ namespace Artemis.Engine.Graphics.Animation
                     if (!TileGroups.ContainsKey(directoryFullReader.GroupName))
                     {
                         TileGroups.Add(directoryFullReader.GroupName, new Dictionary<string, SpriteSheet.Tile>());
-                        currentFrame.Add(directoryFullReader.GroupName, 0);
+                        CurrentFrame.Add(directoryFullReader.GroupName, 0);
                     }
 
                     foreach (var key in directoryFullReader.Tiles.Keys)
                     {
                         addTile = new SpriteSheet.Tile(currentTileID, directoryFullReader.Tiles[key]);
 
-                        TileGroups[directoryFullReader.GroupName].Add(directoryFullReader.GroupName + currentFrame[directoryFullReader.GroupName], addTile);
+                        TileGroups[directoryFullReader.GroupName].Add(directoryFullReader.GroupName + CurrentFrame[directoryFullReader.GroupName], addTile);
                         Textures.Add(directoryFullReader.Textures[key]);
 
-                        currentFrame[directoryFullReader.GroupName]++;
+                        CurrentFrame[directoryFullReader.GroupName]++;
                         currentTileID++;
                     }
                     break;
