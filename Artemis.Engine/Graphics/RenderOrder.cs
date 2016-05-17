@@ -11,8 +11,16 @@ namespace Artemis.Engine.Graphics
 {
     public class RenderOrder
     {
+        internal enum RenderOrderActionType
+        {
+            RenderItem,
+            RenderGroup,
+            RenderLayer,
+            SetRenderProperties
+        }
+
         /// <summary>
-        /// Determines what a `Render` action represents (an item or a group).
+        /// Determines what type of object a `Render` action is associated with.
         /// </summary>
         public enum RenderType
         {
@@ -23,20 +31,17 @@ namespace Artemis.Engine.Graphics
             /// <summary>
             /// Indicates to render a group.
             /// </summary>
-            Group
-        }
-
-        internal enum RenderOrderActionType
-        {
-            RenderItem,
-            RenderGroup,
-            SetRenderProperties
+            Group,
+            /// <summary>
+            /// Indicates to render a layer.
+            /// </summary>
+            Layer
         }
 
         /// <summary>
-        /// Options indicating how to render a group.
+        /// Options indicating how to render a traversable object such as a RenderableGroup or a layer.
         /// </summary>
-        public enum RenderGroupOptions
+        public enum RenderTraversalOptions
         {
             /// <summary>
             /// Render the subgroups before rendering the items in the top level.
@@ -60,7 +65,7 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// A RenderOrderAction indicating to render the item with the given name.
         /// </summary>
-        public class RenderItem : AbstractRenderOrderAction
+        public sealed class RenderItem : AbstractRenderOrderAction
         {
 
             /// <summary>
@@ -85,10 +90,7 @@ namespace Artemis.Engine.Graphics
             }
         }
 
-        /// <summary>
-        /// A RenderOrderAction indicating to render the group with the given name.
-        /// </summary>
-        public class RenderGroup : AbstractRenderOrderAction
+        public abstract class AbstractRenderTraversable : AbstractRenderOrderAction
         {
             /// <summary>
             /// The name of the item to render.
@@ -98,31 +100,59 @@ namespace Artemis.Engine.Graphics
             /// <summary>
             /// Options regarding which of the items in the group to render.
             /// </summary>
-            public RenderGroupOptions Options;
+            public RenderTraversalOptions Options;
 
             /// <summary>
             /// Whether or not to skip duplicate renders.
             /// </summary>
             public bool SkipDuplicates;
-            
-            public RenderType RenderType { get; private set; }
-            
-            public RenderGroup(
-                string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool skipDuplicates = true)
+
+            public RenderType RenderType { get; protected set; }
+
+            public AbstractRenderTraversable( string name
+                                            , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                                            , bool skipDuplicates = true )
             {
                 Name = name;
                 Options = options;
-                RenderType = RenderOrder.RenderType.Group;
                 SkipDuplicates = skipDuplicates;
+            }
+        }
 
+        /// <summary>
+        /// A RenderOrderAction indicating to render the group with the given name.
+        /// </summary>
+        public sealed class RenderGroup : AbstractRenderTraversable
+        {   
+            public RenderGroup( string name
+                              , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                              , bool skipDuplicates = true )
+                : base(name, options, skipDuplicates)
+            {
+                RenderType = RenderOrder.RenderType.Group;
                 ActionType = RenderOrderActionType.RenderGroup;
+            }
+        }
+
+        /// <summary>
+        /// A RenderOrderAction indicating to render the layer with the given name.
+        /// </summary>
+        public sealed class RenderLayer : AbstractRenderTraversable
+        {
+            public RenderLayer( string name
+                              , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                              , bool skipDuplicates = true )
+                : base(name, options, skipDuplicates)
+            {
+                RenderType = RenderOrder.RenderType.Layer;
+                ActionType = RenderOrderActionType.RenderLayer;
             }
         }
 
         /// <summary>
         /// A RenderOrderAction indicating to set the render properties to the given values.
         /// </summary>
-        public class SetRenderProperties : AbstractRenderOrderAction
+        public sealed class SetRenderProperties : AbstractRenderOrderAction
         {
             /// <summary>
             /// The properties to apply.
@@ -187,7 +217,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="name"></param>
         /// <param name="options"></param>
         public void AddRenderGroup(
-            string name, RenderGroupOptions options = RenderGroupOptions.AllPre, bool skipDuplicates = true)
+            string name, RenderTraversalOptions options = RenderTraversalOptions.AllPre, bool skipDuplicates = true)
         {
             Actions.Add(new RenderGroup(name, options, skipDuplicates));
         }
