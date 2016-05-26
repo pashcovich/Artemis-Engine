@@ -79,6 +79,11 @@ namespace Artemis.Engine
             Updater = updater;
         }
 
+        public void AddUpdater(Updater updater)
+        {
+            Updater += updater;
+        }
+
         public virtual void Update()
         {
             if (NeedsUpdate)

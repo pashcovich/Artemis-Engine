@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Animation>
 	<SpriteSheet>
-		<LoadImageAsTile>
-			<Adjustments>
-				<CropTile Name="Gordon Freeman/shotgun/idle/freeman-idle_shotgun_0.png" TileGroup=""/>
-			</Adjustments>
-		</LoadImageAsTile>
+		<LoadImageAsTile Name="Gordon Freeman/shotgun/idle/freeman-idle_shotgun_0.png" TileGroup="Idle"/>
 	</SpriteSheet>
   
-	<AnimationMap InitState="idle">
+	<AnimationMap InitState="Idle">
+    <AnimationState Name="Idle">
+      <Frames>Idle.0</Frames>
+    </AnimationState>
 	</AnimationMap>
 </Animation>

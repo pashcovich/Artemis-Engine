@@ -11,7 +11,7 @@ namespace Artemis.Engine
         /// <summary>
         /// The name of this form.
         /// </summary>
-        public string Name { get; set; }
+        public string Name;
 
         /// <summary>
         /// Whether or not this form has a name.

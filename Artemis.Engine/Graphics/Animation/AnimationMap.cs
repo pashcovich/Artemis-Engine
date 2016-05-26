@@ -29,6 +29,7 @@ namespace Artemis.Engine.Graphics
             States = states;
             SpriteSheet = spriteSheet;
             CurrentState = initState;
+            Updater += MainUpdate;
         }
 
         public AnimationMap(List<AnimationState> states, SpriteSheet spriteSheet, string initState)
@@ -43,10 +44,8 @@ namespace Artemis.Engine.Graphics
             CurrentState = stateName;
         }
 
-        internal override void AuxiliaryUpdate()
+        private void MainUpdate()
         {
-            base.AuxiliaryUpdate();
-
             States[CurrentState].Update(this);
         }
 
