@@ -100,6 +100,7 @@ namespace Artemis.Engine.Multiforms
     /// A Multiform represents a specific part of a game with a specific
     /// update loop and a specific render loop.
     /// </summary>
+    [ManualUpdate] // Multiform updating is handled by the MultiformManager
     public abstract class Multiform : ArtemisObject
     {
 
