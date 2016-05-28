@@ -69,7 +69,7 @@ namespace Artemis.Engine.Graphics
         private Renderer Renderer;
 
         private Renderer _requiredRenderer;
-        protected Renderer RequiredRenderer
+        protected internal Renderer RequiredRenderer
         {
             get { return _requiredRenderer; }
             set

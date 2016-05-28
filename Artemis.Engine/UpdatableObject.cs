@@ -51,7 +51,7 @@ namespace Artemis.Engine
         private Updater Updater;
 
         private Updater _requiredUpdater;
-        protected Updater RequiredUpdater
+        protected internal Updater RequiredUpdater
         {
             get { return _requiredUpdater; }
             set
