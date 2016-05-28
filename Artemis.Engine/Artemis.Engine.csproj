@@ -91,8 +91,9 @@
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
+    <Compile Include="Graphics\ResolutionRelativeRenderLayer.cs" />
     <Compile Include="Graphics\SpriteProperties.cs" />
-    <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\WorldRenderLayer.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
@@ -185,7 +186,7 @@
     <Compile Include="Utilities\Partial\PartialEngineAdapter.cs" />
     <Compile Include="Utilities\Partial\PartialEngineAttribute.cs" />
     <Compile Include="Utilities\Serialize\AbstractStringSerializer.cs" />
-    <Compile Include="Utilities\TraversalOrder.cs" />
+    <Compile Include="Utilities\TraversalOptions.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
