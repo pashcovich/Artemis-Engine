@@ -11,9 +11,89 @@ using System.Linq;
 namespace Artemis.Engine.Multiforms
 {
 
+    public enum FormType
+    {
+        Named,
+        Anonymous,
+        Both
+    }
+
     public sealed class FormGroup : UriTreeMutableGroup<FormGroup, Form>
     {
-        public FormGroup(string name) : base(name) { }
+        public FormGroup(string name) : base(name)
+        {
+            OnItemAdded += OnFormAdded;
+            OnItemRemoved += OnFormRemoved;
+        } 
+
+        private void OnFormAdded(string name, Form form)
+        {
+            form._formGroup = this;
+            form._formName = name;
+        }
+
+        private void OnFormRemoved(string name, Form form)
+        {
+            form._formGroup = null;
+            form._formName = null;
+        }
+
+        public void Update(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
+        {
+            switch (order)
+            {
+                case TraversalOptions.Pre:
+                    UpdateSubgroups(order, formType);
+                    UpdateTop(formType);
+                    break;
+                case TraversalOptions.Post:
+                    UpdateTop(formType);
+                    UpdateSubgroups(order, formType);
+                    break;
+                case TraversalOptions.Top:
+                    UpdateTop(formType);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void UpdateSubgroups(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
+        {
+            foreach (var subnode in Subnodes.Values)
+            {
+                subnode.Update(order, formType);
+            }
+        }
+
+        public void UpdateTop(FormType formType = FormType.Both)
+        {
+            switch (formType)
+            {
+                case FormType.Named:
+                    foreach (var item in Items.Values)
+                    {
+                        item.Update();
+                    }
+                    break;
+                case FormType.Anonymous:
+                    foreach (var item in AnonymousItems)
+                    {
+                        item.Update();
+                    }
+                    break;
+                case FormType.Both:
+                    foreach (var item in Items.Values)
+                    {
+                        item.Update();
+                    }
+                    foreach (var item in AnonymousItems)
+                    {
+                        item.Update();
+                    }
+                    break;
+            }
+        }
     }
 
     /// <summary>
@@ -33,7 +113,6 @@ namespace Artemis.Engine.Multiforms
 
         private const string TOP_FORM_GROUP_NAME = "ALL"; // The name of _allForms.
         private FormGroup _allForms; // The root FormGroup.
-        private Renderer renderer; // The current renderer for the multiform.
         private bool reconstructable; // Whether or not the multiform uses reconstruction upon multiple activation.
 
         /// <summary>
@@ -151,6 +230,10 @@ namespace Artemis.Engine.Multiforms
                 _allForms.InsertItem(form.Name, form, disallowDuplicates);
             }
             form.Parent = this;
+            if (form.OnAddedToMultiform != null)
+            {
+                form.OnAddedToMultiform();
+            }
         }
 
         /// <summary>
@@ -216,6 +299,11 @@ namespace Artemis.Engine.Multiforms
             return _allForms.GetItem(name);
         }
 
+        public Form GetForm<T>(string name) where T : Form
+        {
+            return (T)_allForms.GetItem(name);
+        }
+
         /// <summary>
         /// Get the anonymous forms from the group with the given name.
         /// </summary>
@@ -224,6 +312,11 @@ namespace Artemis.Engine.Multiforms
         public IEnumerable<Form> GetAnonymousForms(string name)
         {
             return _allForms.GetSubnode(name).AnonymousItems;
+        }
+
+        public IEnumerable<T> GetAnonymousForms<T>(string name) where T : Form
+        {
+            return _allForms.GetSubnode(name).AnonymousItems.Cast<T>();
         }
 
         /// <summary>
@@ -236,6 +329,11 @@ namespace Artemis.Engine.Multiforms
             return GetForms(names);
         }
 
+        public IEnumerable<T> GetForms<T>(params string[] names) where T : Form
+        {
+            return GetForms<T>(names);
+        }
+
         /// <summary>
         /// Get the forms with the given names.
         /// </summary>
@@ -244,6 +342,11 @@ namespace Artemis.Engine.Multiforms
         public IEnumerable<Form> GetForms(IEnumerable<string> names)
         {
             return from name in names select _allForms.GetItem(name);
+        }
+
+        public IEnumerable<T> GetForms<T>(IEnumerable<string> names) where T : Form
+        {
+            return from name in names select (T)_allForms.GetItem(name);
         }
 
         /// <summary>
@@ -423,18 +526,95 @@ namespace Artemis.Engine.Multiforms
             _allForms.GetSubnode(groupName).ClearAnonymousItems(recursive);
         }
 
+        #region Directly Copied from RenderableObject
+
         /// <summary>
-        /// Set the current renderer for this multiform.
+        /// The renderer action.
         /// </summary>
-        /// <param name="action"></param>
-        protected void SetRenderer(Renderer action)
+        internal Renderer Renderer;
+
+        private Renderer _requiredRenderer;
+        protected Renderer RequiredRenderer
         {
-            renderer = action;
+            get { return _requiredRenderer; }
+            set
+            {
+                _requiredRenderer = value;
+                Renderer = value;
+            }
         }
+
+        /// <summary>
+        /// Set the renderer for this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void SetRenderer(Renderer renderer)
+        {
+            Renderer = null;
+            Renderer += RequiredRenderer;
+            Renderer += renderer;
+        }
+
+        /// <summary>
+        /// Add a renderer to this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void AddRenderer(Renderer renderer)
+        {
+            Renderer += renderer;
+        }
+
+        /// <summary>
+        /// Remove a renderer from this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void RemoveRenderer(Renderer renderer)
+        {
+            Renderer -= renderer;
+        }
+
+        /// <summary>
+        /// Remove all renderers from this object.
+        /// </summary>
+        public void ClearRenderer()
+        {
+            Renderer = null;
+            Renderer += RequiredRenderer;
+        }
+
+        public void UpdateForms(TraversalOptions order = TraversalOptions.Pre)
+        {
+            _allForms.Update(order);
+        }
+
+        public void UdpateForms(string groupName, TraversalOptions order = TraversalOptions.Pre)
+        {
+            _allForms.GetSubnode(groupName).Update(order);
+        }
+
+        public void UpdateForm(string name)
+        {
+            _allForms.GetItem(name).Update();
+        }
+
+        public void UpdateForms(params string[] names)
+        {
+            UpdateForms(names);
+        }
+
+        public void UpdateForms(IEnumerable<string> names)
+        {
+            foreach (var name in names)
+            {
+                _allForms.GetItem(name).Update();
+            }
+        }
+
+        #endregion
 
         internal void Render()
         {
-            renderer();
+            Renderer();
         }
     }
 }

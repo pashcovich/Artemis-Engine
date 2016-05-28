@@ -47,10 +47,13 @@
     <Compile Include="Assets\AssetImportException.cs" />
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
+    <Compile Include="Fixin.cs" />
+    <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Fixins\TextureFixin.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
