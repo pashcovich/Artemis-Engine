@@ -34,6 +34,9 @@ namespace FarseerPhysics.Collision.Shapes
     {
         internal Vector2 _position;
 
+        public CircleShape(float radius)
+            : this(radius, 1) { }
+
         /// <summary>
         /// Create a new circle with the desired radius and density.
         /// </summary>

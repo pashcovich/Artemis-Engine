@@ -36,6 +36,9 @@ namespace FarseerPhysics.Collision.Shapes
         private Vertices _vertices;
         private Vertices _normals;
 
+        public PolygonShape(Vertices vertices)
+            : this(vertices, 1) { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PolygonShape"/> class.
         /// </summary>
