@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderComponents
+    public class SpriteProperties
     {
         /// <summary>
         /// A rectangle that specifies (in texels) the source texels from 
@@ -45,7 +45,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public SpriteEffects SpriteEffects { get; set; }
 
-        public RenderComponents( Rectangle? sourceRectangle = null
+        public SpriteProperties( Rectangle? sourceRectangle = null
                                , Color? colour              = null
                                , double rotation            = 0
                                , Vector2? scale             = null

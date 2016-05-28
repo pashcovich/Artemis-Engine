@@ -270,17 +270,17 @@ namespace Artemis.Engine.Graphics
                 scale = Vector2.One;
             }
 
-            bool hasOriginalScale = obj.RenderComponents.Scale.HasValue;
-            Vector2 originalScale = hasOriginalScale ? obj.RenderComponents.Scale.Value : Vector2.One;
+            bool hasOriginalScale = obj.SpriteProperties.Scale.HasValue;
+            Vector2 originalScale = hasOriginalScale ? obj.SpriteProperties.Scale.Value : Vector2.One;
 
             var resultingScale = VectorUtils.ComponentwiseProduct(originalScale, scale);
 
             // Swap out the original scale for the newly calculated scale.
-            obj.RenderComponents.Scale = resultingScale;
+            obj.SpriteProperties.Scale = resultingScale;
 
             obj.InternalRender(SeenRenderables);
 
-            obj.RenderComponents.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
+            obj.SpriteProperties.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
         }
 
         /// <summary>

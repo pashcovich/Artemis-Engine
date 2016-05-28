@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using Microsoft.Xna.Framework;
@@ -209,23 +210,23 @@ namespace Artemis.Engine.Graphics
         /// Render all items and sublayers on this layer.
         /// </summary>
         public void Render( HashSet<AbstractRenderLayer> seenLayers
-                          , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre
+                          , TraversalOptions order = TraversalOptions.Pre
                           , bool skipDuplicates = true )
         {
             MidRender = true;
             switch (order)
             {
-                case RenderOrder.RenderTraversalOptions.AllPre:
+                case TraversalOptions.Pre:
                     RenderSublayers(seenLayers, order, skipDuplicates);
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     break;
-                case RenderOrder.RenderTraversalOptions.AllPost:
+                case TraversalOptions.Post:
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     RenderSublayers(seenLayers, order, skipDuplicates);
                     break;
-                case RenderOrder.RenderTraversalOptions.Top:
+                case TraversalOptions.Top:
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     break;
@@ -270,7 +271,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         /// <param name="order"></param>
         public virtual void RenderSublayers( HashSet<AbstractRenderLayer> seenLayers
-                                           , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre  
+                                           , TraversalOptions order = TraversalOptions.Pre  
                                            , bool skipDuplicates = true )
         {
             foreach (var layer in Subnodes.Values)
