@@ -39,9 +39,9 @@ namespace Artemis.Engine.Effectors
             effector.InternalInitialize(this);
         }
 
-        internal override void AutomaticUpdate()
+        internal override void InternalUpdate()
         {
-            base.AutomaticUpdate();
+            base.InternalUpdate();
 
             if (!IsPaused)
             {

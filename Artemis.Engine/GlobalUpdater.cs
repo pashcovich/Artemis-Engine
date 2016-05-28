@@ -37,7 +37,7 @@ namespace Artemis.Engine
             {
                 if (obj.NeedsUpdate)
                 {
-                    obj.AutomaticUpdate();
+                    obj.InternalUpdate();
 
                     if (!(obj.IsPaused || obj.ManuallyUpdate))
                     {

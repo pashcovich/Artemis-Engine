@@ -46,9 +46,20 @@ namespace Artemis.Engine
         public bool DisallowMultipleUpdates;
 
         /// <summary>
-        /// The updater exposed to the user.
+        /// The updater.
         /// </summary>
-        public Updater Updater { get; set; }
+        private Updater Updater;
+
+        private Updater _requiredUpdater;
+        protected Updater RequiredUpdater
+        {
+            get { return _requiredUpdater; }
+            set
+            {
+                _requiredUpdater = value;
+                Updater = value;
+            }
+        }
 
         public UpdatableObject() : base()
         {
@@ -56,6 +67,44 @@ namespace Artemis.Engine
             {
                 ArtemisEngine.GameUpdater.Add(this);
             }
+        }
+
+        /// <summary>
+        /// Set the updater for this object.
+        /// </summary>
+        /// <param name="updater"></param>
+        public void SetUpdater(Updater updater)
+        {
+            Updater = null;
+            Updater += RequiredUpdater;
+            Updater += updater;
+        }
+
+        /// <summary>
+        /// Add an updater to this object.
+        /// </summary>
+        /// <param name="updater"></param>
+        public void AddUpdater(Updater updater)
+        {
+            Updater += updater;
+        }
+
+        /// <summary>
+        /// Remove an updater from this object.
+        /// </summary>
+        /// <param name="updater"></param>
+        public void RemoveUpdater(Updater updater)
+        {
+            Updater -= updater;
+        }
+
+        /// <summary>
+        /// Remove all updaters from this object.
+        /// </summary>
+        public void ClearUpdater()
+        {
+            Updater = null;
+            Updater += RequiredUpdater;
         }
 
         /// <summary>
@@ -78,16 +127,11 @@ namespace Artemis.Engine
             IsPaused = false;
         }
 
-        public void SetUpdater(Updater updater)
-        {
-            Updater = updater;
-        }
-
         public virtual void Update()
         {
             if (NeedsUpdate)
             {
-                AutomaticUpdate();
+                InternalUpdate();
 
                 AuxiliaryUpdate();
 
@@ -104,21 +148,6 @@ namespace Artemis.Engine
                             )
                         );
                 }
-
-                AuxiliaryUpdate();
-            }
-        }
-
-        /// <summary>
-        /// This is the update method for everything that doesn't need to appear in
-        /// AutomaticUpdate. It essentially just invokes the assigned Updater, which is
-        /// publicly exposed.
-        /// </summary>
-        internal virtual void AuxiliaryUpdate()
-        {
-            if (Updater != null)
-            {
-                Updater();
             }
         }
 
@@ -126,14 +155,20 @@ namespace Artemis.Engine
         /// This is the update method for everything that must be updated every frame
         /// regardless of the values of IsPaused or ManuallyUpdate.
         /// 
-        /// AutomaticUpdate is always called by the engine once per game tick, unless
+        /// InternalUpdate is always called by the engine once per game tick, unless
         /// the user manually calls "Update".
         /// 
-        /// For example, TimeableObject uses AutomaticUpdate to update it's internal
+        /// For example, TimeableObject uses InternalUpdate to update it's internal
         /// lifetime. This can only be called once every game tick and MUST be called.
         /// </summary>
-        internal virtual void AutomaticUpdate() { }
+        internal virtual void InternalUpdate() { }
 
+        public virtual void AuxiliaryUpdate()
+        {
+            if (Updater != null)
+                Updater();
+        }
+        
         public virtual void Kill()
         {
             if (!IsPartial)
