@@ -113,7 +113,7 @@
     <Compile Include="Persistence\OptionValidator.cs" />
     <Compile Include="Persistence\SimpleOptionRecord.cs" />
     <Compile Include="Persistence\UserOptions.cs" />
-    <Compile Include="PhysicalObject.cs" />
+    <Compile Include="PhysicalForm.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
     <Compile Include="ResolutionRelativeObject.cs" />

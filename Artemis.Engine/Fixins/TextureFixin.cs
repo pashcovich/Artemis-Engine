@@ -10,7 +10,6 @@ namespace Artemis.Engine.Fixins
 {
     public class TextureFixin : Fixin
     {
-
         public override FixinType FixinType { get { return FixinType.Render; } }
 
         /// <summary>
@@ -45,9 +44,11 @@ namespace Artemis.Engine.Fixins
         {
             if (Texture != null)
             {
+                /*
                 var properties = Form.SpriteProperties;
                 ArtemisEngine.RenderPipeline.Render(
                     Texture, Form.WorldPosition, properties);
+                 */
             }
         }
     }

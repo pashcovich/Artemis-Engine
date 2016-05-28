@@ -13,7 +13,7 @@ namespace Artemis.Engine
 {
     public delegate void FormDelegate(Form form);
 
-    public class Form : PhysicalObject
+    public class Form : RenderableObject
     {
         private bool _midUpdateFixins;
         private bool _midRenderFixins;

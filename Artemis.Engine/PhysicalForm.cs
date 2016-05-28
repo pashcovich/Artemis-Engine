@@ -3,6 +3,7 @@
 using Artemis.Engine.Graphics;
 using Artemis.Engine.Utilities.Dynamics;
 
+using FarseerPhysics;
 using FarseerPhysics.Dynamics;
 
 using Microsoft.Xna.Framework;
@@ -18,7 +19,7 @@ namespace Artemis.Engine
         "RelativeTargetPosition", 
         "ScreenPosition" 
     }, true)]
-    public abstract class PhysicalObject : RenderableObject
+    public class PhysicalForm : Form
     {
         private Body _body;
 
@@ -32,36 +33,9 @@ namespace Artemis.Engine
             {
                 _body = value;
                 _body.UserData = this; // We use the UserData of a body to give a forward reference to the
-                                       // Artemis.Engine.PhysicalObject instance it belongs to. This is used
-                                       // specifically in RenderLayer to retrieve the RenderableObjects from
-                                       // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
-            }
-        }
-
-        private AbstractCamera _nullCamera = new NullCamera();
-        private bool _useNullCamera;
-
-        /// <summary>
-        /// The Camera this physical object is being viewed by.
-        /// </summary>
-        public AbstractCamera Camera
-        {
-            get
-            {
-                if (!_useNullCamera)
-                {
-                    var layer = Layer as WorldRenderLayer;
-                    if (layer == null)
-                    {
-                        _useNullCamera = true;
-                        return _nullCamera;
-                    }
-                    return layer.Camera;
-                }
-                else
-                {
-                    return _nullCamera;
-                }
+                // Artemis.Engine.PhysicalObject instance it belongs to. This is used
+                // specifically in RenderLayer to retrieve the RenderableObjects from
+                // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
             }
         }
 
@@ -82,11 +56,18 @@ namespace Artemis.Engine
             {
                 // Camera is never null, instead there's a NullCamera that's automatically supplied.
                 // Also, Camera.WorldToTarget converts units.
-                return Camera.WorldToTarget(Body.Position);
+                var cam = Camera;
+                if (cam == null)
+                    return ConvertUnits.ToDisplayUnits(Body.Position);
+                return cam.WorldToTarget(Body.Position);
             }
             set
             {
-                Body.Position = Camera.TargetToWorld(value);
+                var cam = Camera;
+                if (cam == null)
+                    Body.Position = ConvertUnits.ToSimUnits(value);
+                else
+                    Body.Position = cam.TargetToWorld(value);
             }
         }
 
@@ -100,11 +81,18 @@ namespace Artemis.Engine
         {
             get
             {
-                return Camera.WorldToScreen(Body.Position);
+                var cam = Camera;
+                if (cam == null)
+                    return ConvertUnits.ToDisplayUnits(Body.Position);
+                return cam.WorldToScreen(Body.Position);
             }
             set
             {
-                Body.Position = Camera.ScreenToWorld(value);
+                var cam = Camera;
+                if (cam == null)
+                    Body.Position = ConvertUnits.ToSimUnits(value);
+                else
+                    Body.Position = cam.ScreenToWorld(value);
             }
         }
 
@@ -132,7 +120,7 @@ namespace Artemis.Engine
             }
         }
 
-        public PhysicalObject() : base() 
+        public PhysicalForm(string name) : base(name) 
         {
             OnLayerTargetChanged += _UpdateScreenPosition;
         }

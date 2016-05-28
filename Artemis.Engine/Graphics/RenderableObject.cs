@@ -19,10 +19,25 @@ namespace Artemis.Engine.Graphics
 
     public class RenderableObject : ResolutionRelativeObject
     {
+
         /// <summary>
         /// The Layer this object belongs to.
         /// </summary>
         public AbstractRenderLayer Layer { get; internal set; }
+
+        /// <summary>
+        /// The Camera this physical object is being viewed by.
+        /// </summary>
+        public AbstractCamera Camera
+        {
+            get
+            {
+                if (Layer == null)
+                    return null;
+                var worldLayer = Layer as WorldRenderLayer;
+                return worldLayer == null ? null : worldLayer.Camera;
+            }
+        }
 
         /// <summary>
         /// Whether or not this object is visible.

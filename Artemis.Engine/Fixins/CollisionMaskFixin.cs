@@ -9,7 +9,6 @@ using System;
 
 namespace Artemis.Engine.Fixins
 {
-
     public class CollisionMaskFixin : Fixin
     {
         public override FixinType FixinType { get { return FixinType.Update; } }
@@ -45,7 +44,9 @@ namespace Artemis.Engine.Fixins
         {
             if (Attached)
             {
+                /*
                 Form.Body.CreateFixture(_shape);
+                 */
             }
         }
     }
