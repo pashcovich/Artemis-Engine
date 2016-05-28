@@ -108,13 +108,22 @@ namespace Artemis.Engine
         {
             get
             {
-                var bounds = Layer.TargetBounds;
+                Rectangle bounds;
+                if (Layer == null)
+                    bounds = (Rectangle)ArtemisEngine.DisplayManager.WindowResolution;
+                else
+                    bounds = Layer.TargetBounds;
                 var targetPosition = TargetPosition;
                 return new Vector2(targetPosition.X / bounds.X, targetPosition.Y / bounds.Y);
             }
             set
             {
-                var bounds = Layer.TargetBounds;
+                Rectangle bounds;
+                if (Layer == null)
+                    bounds = (Rectangle)ArtemisEngine.DisplayManager.WindowResolution;
+                else
+                    bounds = Layer.TargetBounds;
+                
                 TargetPosition = new Vector2(value.X * bounds.X, value.Y * bounds.Y);
                 _relativeTargetPosMemo = value;
             }

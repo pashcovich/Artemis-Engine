@@ -83,5 +83,10 @@ namespace Artemis.Engine
         {
             return new Vector2((float)a.Width / b.Width, (float)a.Height / b.Height);
         }
+
+        public static explicit operator Rectangle(Resolution r)
+        {
+            return new Rectangle(0, 0, r.Width, r.Height);
+        }
     }
 }
