@@ -43,9 +43,9 @@ namespace Artemis.Engine.Graphics
             CurrentState = stateName;
         }
 
-        internal override void AuxiliaryUpdate()
+        internal override void InternalUpdate()
         {
-            base.AuxiliaryUpdate();
+            base.InternalUpdate();
 
             States[CurrentState].Update(this);
         }

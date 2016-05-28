@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using Microsoft.Xna.Framework;
@@ -40,7 +41,7 @@ namespace Artemis.Engine.Graphics
         /// 
         /// Note: If RenderOrder is not null, this value is not used.
         /// </summary>
-        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
+        public TraversalOptions GlobalTraversalOptions;
 
         /// <summary>
         /// The list of actions representing the render order.
@@ -58,7 +59,7 @@ namespace Artemis.Engine.Graphics
         public AbstractOrderableRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
-            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
+            GlobalTraversalOptions = TraversalOptions.Pre;
         }
 
         /// <summary>

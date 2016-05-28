@@ -126,9 +126,9 @@ namespace Artemis.Engine
             ElapsedFrames++;
         }
 
-        internal override void AutomaticUpdate()
+        internal override void InternalUpdate()
         {
-            base.AutomaticUpdate();
+            base.InternalUpdate();
 
             UpdateTime();
 

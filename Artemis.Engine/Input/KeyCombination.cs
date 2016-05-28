@@ -6,9 +6,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Artemis.Engine.Input
 {
-    public class KeyCombination
+    public struct KeyCombination
     {
-        public Keys[] Keys { get; private set; }
+
+        /// <summary>
+        /// The keys to check in this combination.
+        /// </summary>
+        public Keys[] Keys;
 
         public KeyCombination(params Keys[] keys)
         {

@@ -47,10 +47,13 @@
     <Compile Include="Assets\AssetImportException.cs" />
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
+    <Compile Include="Fixin.cs" />
+    <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Fixins\TextureFixin.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
@@ -88,7 +91,7 @@
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
-    <Compile Include="Graphics\RenderComponents.cs" />
+    <Compile Include="Graphics\SpriteProperties.cs" />
     <Compile Include="Graphics\RenderLayer.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
@@ -182,6 +185,7 @@
     <Compile Include="Utilities\Partial\PartialEngineAdapter.cs" />
     <Compile Include="Utilities\Partial\PartialEngineAttribute.cs" />
     <Compile Include="Utilities\Serialize\AbstractStringSerializer.cs" />
+    <Compile Include="Utilities\TraversalOrder.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />

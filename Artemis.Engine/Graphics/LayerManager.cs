@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using System;
@@ -24,11 +25,11 @@ namespace Artemis.Engine.Graphics
         /// 
         /// Note: If RenderOrder is not null, this value is not used.
         /// </summary>
-        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
+        public TraversalOptions GlobalTraversalOptions;
 
         public LayerManager() 
         {
-            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
+            GlobalTraversalOptions = TraversalOptions.Pre;
         }
 
         /// <summary>
@@ -56,7 +57,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="order"></param>
         /// <param name="traversal"></param>
         public void SetRenderOrder( string[] order
-                                  , RenderOrder.RenderTraversalOptions traversal = RenderOrder.RenderTraversalOptions.AllPre)
+                                  , TraversalOptions traversal = TraversalOptions.Pre)
         {
             var actions = from name in order
                           select (RenderOrder.AbstractRenderOrderAction)
@@ -70,7 +71,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="order"></param>
         /// <param name="traversalOptions"></param>
         public void SetRenderOrder( string[] order 
-                                  , RenderOrder.RenderTraversalOptions[] traversalOptions )
+                                  , TraversalOptions[] traversalOptions )
         {
             if (order.Length != traversalOptions.Length)
             {
