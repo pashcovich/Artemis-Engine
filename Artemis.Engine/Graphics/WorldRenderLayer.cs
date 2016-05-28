@@ -155,7 +155,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         private void RecalculateTargetTransform()
         {
-            if (LayerScaleType == GlobalLayerScaleType.Uniform)
+            if (LayerScaleType == GlobalLayerScaleType.Dynamic)
             {
                 _targetTransform = Matrix.Identity;
             }
