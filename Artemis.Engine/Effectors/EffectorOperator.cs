@@ -32,7 +32,7 @@ namespace Artemis.Engine.Effectors
         /// </summary>
         public EffectorOperatorType? InternalType { get; protected set; }
 
-        internal EffectorOperator(EffectorOperatorType type)
+        public EffectorOperator(EffectorOperatorType type)
         {
             InternalType = type;
             var _ops = Operators;
@@ -66,7 +66,7 @@ namespace Artemis.Engine.Effectors
             }
         }
 
-        internal EffectorOperator(Func<T, T, T> operate)
+        public EffectorOperator(Func<T, T, T> operate)
         {
             Operate = operate;
         }
@@ -92,7 +92,9 @@ namespace Artemis.Engine.Effectors
             get { return _operators; }
         }
 
-        internal IntEffectorOperator(EffectorOperatorType type) : base(type) { }
+        public IntEffectorOperator(EffectorOperatorType type) : base(type) { }
+
+        public IntEffectorOperator(Func<int, int, int> operate) : base(operate) { }
     }
 
     public class DoubleEffectorOperator : EffectorOperator<double>
@@ -111,7 +113,9 @@ namespace Artemis.Engine.Effectors
             get { return _operators; }
         }
 
-        internal DoubleEffectorOperator(EffectorOperatorType type) : base(type) { }
+        public DoubleEffectorOperator(EffectorOperatorType type) : base(type) { }
+
+        public DoubleEffectorOperator(Func<double, double, double> operate) : base(operate) { }
     }
 
     public class VectorEffectorOperator : EffectorOperator<Vector2>
@@ -130,6 +134,8 @@ namespace Artemis.Engine.Effectors
             get { return _operators; }
         }
 
-        internal VectorEffectorOperator(EffectorOperatorType type) : base(type) { }
+        public VectorEffectorOperator(EffectorOperatorType type) : base(type) { }
+
+        public VectorEffectorOperator(Func<Vector2, Vector2, Vector2> operate) : base(operate) { }
     }
 }
