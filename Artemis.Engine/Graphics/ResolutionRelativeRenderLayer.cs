@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿#region Using Statements
+
 using Artemis.Engine.Maths.Geometry;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using System;
+
+#endregion
 
 namespace Artemis.Engine.Graphics
 {
