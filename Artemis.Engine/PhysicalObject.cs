@@ -50,7 +50,7 @@ namespace Artemis.Engine
             {
                 if (!_useNullCamera)
                 {
-                    var layer = Layer as RenderLayer;
+                    var layer = Layer as WorldRenderLayer;
                     if (layer == null)
                     {
                         _useNullCamera = true;

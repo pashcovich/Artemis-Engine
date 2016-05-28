@@ -14,7 +14,7 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// The layer this camera is attached to.
         /// </summary>
-        public RenderLayer Layer { get; internal set; }
+        public WorldRenderLayer Layer { get; internal set; }
 
         /// <summary>
         /// The AABB that contains everything in this camera's FOV.

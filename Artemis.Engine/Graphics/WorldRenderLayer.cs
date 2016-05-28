@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderLayer : AbstractOrderableRenderLayer
+    public class WorldRenderLayer : AbstractOrderableRenderLayer
     {
         private RenderPipeline rp; // the global render pipeline,
         private World _world;
@@ -113,16 +113,16 @@ namespace Artemis.Engine.Graphics
             get { return _world; }
         }
 
-        public RenderLayer(string fullName)
+        public WorldRenderLayer(string fullName)
             : this(fullName, new NullCamera()) { }
 
-        public RenderLayer(string fullName, AbstractCamera camera)
+        public WorldRenderLayer(string fullName, AbstractCamera camera)
             : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, null) { }
 
-        public RenderLayer(string fullName, AbstractCamera camera, World world)
+        public WorldRenderLayer(string fullName, AbstractCamera camera, World world)
             : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, world) { }
 
-        public RenderLayer( string fullName
+        public WorldRenderLayer( string fullName
                           , AbstractCamera camera
                           , GlobalLayerScaleType layerScaleType    = GlobalLayerScaleType.Dynamic
                           , UniformLayerScaleType uniformScaleType = UniformLayerScaleType.Stretch
