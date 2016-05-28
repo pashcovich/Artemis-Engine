@@ -40,7 +40,16 @@ namespace Artemis.Engine.Graphics
         /// 
         /// This is set by the RenderLayer this camera is attached to.
         /// </summary>
-        public Matrix TargetToScreenTransform { get { return Layer._targetTransform; } }
+        public Matrix TargetToScreenTransform 
+        { 
+            get 
+            { 
+                // Allowing Layer to be null means PhysicalObjects can convert between World coordinates,
+                // target coordinates, and screen coordinates even when they aren't added to a Layer, which 
+                // can is sometimes necessary.
+                return Layer == null ? Matrix.Identity : Layer._targetTransform; 
+            } 
+        }
 
         /// <summary>
         /// The transform matrix that transforms from screen coordinates to target coordinates.
