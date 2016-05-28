@@ -11,6 +11,24 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
+
+    /// <summary>
+    /// Delegate invoked upon encountering an AbstractRenderOrderAction with a given type in a Layer object.
+    /// </summary>
+    /// <param name="layer"></param>
+    /// <param name="action"></param>
+    /// <param name="renderableHandler"></param>
+    public delegate void LayerRenderOrderActionHandler(
+        AbstractOrderableRenderLayer layer, RenderOrder.AbstractRenderOrderAction action, RenderableHandler renderableHandler);
+
+    /// <summary>
+    /// Delegate invoked upon encountering an AbstractRenderOrderAction with a given type in a LayerManager object.
+    /// </summary>
+    /// <param name="manager"></param>
+    /// <param name="action"></param>
+    public delegate void LayerManagerRenderOrderActionHandler(
+        LayerManager manager, RenderOrder.AbstractRenderOrderAction action);
+
     public class RenderOrder
     {
         internal enum RenderOrderActionType
