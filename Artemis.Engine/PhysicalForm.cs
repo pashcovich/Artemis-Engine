@@ -19,7 +19,7 @@ namespace Artemis.Engine
         "RelativeTargetPosition", 
         "ScreenPosition" 
     }, true)]
-    public class PhysicalForm : Form
+    public class PhysicalForm : PositionalForm
     {
         private Body _body;
 
@@ -81,10 +81,9 @@ namespace Artemis.Engine
         {
             get
             {
-                var cam = Camera;
-                if (cam == null)
-                    return ConvertUnits.ToDisplayUnits(Body.Position);
-                return cam.WorldToScreen(Body.Position);
+                if (Layer == null)
+                    return TargetPosition;
+                return Layer.TargetToScreen(TargetPosition);
             }
             set
             {
@@ -92,7 +91,12 @@ namespace Artemis.Engine
                 if (cam == null)
                     Body.Position = ConvertUnits.ToSimUnits(value);
                 else
-                    Body.Position = cam.ScreenToWorld(value);
+                {
+                    if (Layer == null)
+                        Body.Position = cam.TargetToWorld(value);
+                    else
+                        Body.Position = cam.TargetToWorld(Layer.ScreenToTarget(value));
+                }
             }
         }
 
