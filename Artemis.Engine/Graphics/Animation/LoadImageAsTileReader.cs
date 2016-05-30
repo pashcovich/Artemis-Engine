@@ -90,10 +90,6 @@ namespace Artemis.Engine.Graphics.Animation
                         {
                             TileGroup = "";
                         }
-                        else
-                        {
-                            TileGroup += ".";
-                        }
                         break;
 
                     case TOP_LEFT:

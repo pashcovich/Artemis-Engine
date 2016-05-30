@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Artemis.Engine\bin\Windows\Debug\MonoGame.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -62,6 +66,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Animation\game.constants" />
+    <None Include="Animation\LoadDirectoryAAMLTestFile.aaml" />
+    <None Include="Animation\LoadDirectoryFullAAMLTestFile.aaml" />
     <None Include="Animation\LoadTileAAMLTestFile.aaml" />
   </ItemGroup>
   <ItemGroup>

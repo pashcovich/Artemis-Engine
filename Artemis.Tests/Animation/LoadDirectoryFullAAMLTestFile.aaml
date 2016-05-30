@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Animation>
 	<SpriteSheet>
-		<LoadImageAsTile Name="Gordon Freeman/shotgun/idle/freeman-idle_shotgun_0.png" TileGroup="Idle"/>
+		<LoadDirectoryFull Name="Gordon Freeman/shotgun"/>
 	</SpriteSheet>
   
 	<AnimationMap InitState="Idle">

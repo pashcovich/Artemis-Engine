@@ -110,7 +110,7 @@ namespace Artemis.Engine.Graphics.Animation
             sheetReader.Load();
             mapReader.Load();
 
-            Map = new AnimationMap(mapReader.States, sheetReader.Sheet, mapReader.InitState); 
+            Map = new AnimationMap(mapReader.States, sheetReader.Sheet, mapReader.InitState);
         }
     }
 }
