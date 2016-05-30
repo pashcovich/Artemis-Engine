@@ -127,16 +127,6 @@ namespace Artemis.Engine
             IsPaused = false;
         }
 
-        public void SetUpdater(Updater updater)
-        {
-            Updater = updater;
-        }
-
-        public void AddUpdater(Updater updater)
-        {
-            Updater += updater;
-        }
-
         public virtual void Update()
         {
             if (NeedsUpdate)
