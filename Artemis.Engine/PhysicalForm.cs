@@ -31,7 +31,7 @@ namespace Artemis.Engine
         {
             var emptyBodyHandler = new AttributeMemoService<PhysicalForm>
                                        .AttributeHandler(t => t.FillInBody(DefaultBodyPresets.Empty));
-            attrMemoService.RegisterHandler<>(emptyBodyHandler);
+            attrMemoService.RegisterHandler<EmptyBodyAttribute>(emptyBodyHandler);
         }
 
         private enum DefaultBodyPresets { Empty }
