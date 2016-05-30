@@ -28,8 +28,9 @@ namespace Artemis.Engine.Graphics
         {
             States = states;
             SpriteSheet = spriteSheet;
-            CurrentState = initState;
             Updater += MainUpdate;
+
+            SetState(initState);
         }
 
         public AnimationMap(List<AnimationState> states, SpriteSheet spriteSheet, string initState)
