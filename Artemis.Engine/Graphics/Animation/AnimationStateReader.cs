@@ -247,7 +247,7 @@ namespace Artemis.Engine.Graphics.Animation
                     case NAME:
                         if (!attrib.Value.Equals(string.Empty))
                         {
-                            StateName = attrib.Value + ".";
+                            StateName = attrib.Value;
                         }
                         break;
 
