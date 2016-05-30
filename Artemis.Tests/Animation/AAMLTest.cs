@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Artemis.Tests.Animation
 {
@@ -18,6 +19,51 @@ namespace Artemis.Tests.Animation
         {
             ArtemisEngine.Setup("game.constants", Setup);
             ArtemisEngine.Begin(Initialize);
+
+            AAMLFileReader fileReader = new AAMLFileReader("../../Animation/LoadTileAAMLTestFile.aaml");
+            try
+            {
+                fileReader.Read();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message + "\nAt:\n" + e.StackTrace);
+            }
+        }
+
+        [TestMethod]
+        public void AAMLLoadDirectoryTest()
+        {
+            ArtemisEngine.Setup("game.constants", Setup);
+            ArtemisEngine.Begin(Initialize);
+
+            AAMLFileReader fileReader = new AAMLFileReader("../../Animation/LoadDirectoryAAMLTestFile.aaml");
+            try
+            {
+                fileReader.Read();
+                Assert.AreEqual(20, fileReader.Map.SpriteSheet.LoadedTextures.Count);
+            }
+            catch(Exception e)
+            {
+                Assert.Fail(e.Message + "\nAt:\n" + e.StackTrace);
+            }
+        }
+
+        [TestMethod]
+        public void AAMLLoadDirectoryFullTest()
+        {
+            ArtemisEngine.Setup("game.constants", Setup);
+            ArtemisEngine.Begin(Initialize);
+
+            AAMLFileReader fileReader = new AAMLFileReader("../../Animation/LoadDirectoryFullAAMLTestFile.aaml");
+            try
+            {
+                fileReader.Read();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.Message + "\nAt:\n" + e.StackTrace);
+            }
         }
 
         static void Setup()
@@ -29,16 +75,6 @@ namespace Artemis.Tests.Animation
         {
             ArtemisEngine.RegisterMultiforms(new MultiformTemplate());
             ArtemisEngine.StartWith("MultiformTemplate");
-
-            AAMLFileReader fileReader = new AAMLFileReader("../../Animation/LoadTileAAMLTestFile.aaml");
-            try
-            {
-                fileReader.Read();
-            }
-            catch (Exception e)
-            {
-                Assert.Fail(e.Message + "\nAt:\n" + e.StackTrace);
-            }
         }
     }
 }
