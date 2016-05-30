@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Graphics;
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.Dynamics;
 
 using FarseerPhysics;
@@ -19,8 +20,29 @@ namespace Artemis.Engine
         "RelativeTargetPosition", 
         "ScreenPosition" 
     }, true)]
-    public class PhysicalForm : Form
+    public class PhysicalForm : PositionalForm
     {
+        // UNFINISHED
+        /*
+        private static AttributeMemoService<PhysicalForm> attrMemoService
+            = new AttributeMemoService<PhysicalForm>();
+
+        static PhysicalForm()
+        {
+            var emptyBodyHandler = new AttributeMemoService<PhysicalForm>
+                                       .AttributeHandler(t => t.FillInBody(DefaultBodyPresets.Empty));
+            attrMemoService.RegisterHandler<>(emptyBodyHandler);
+        }
+
+        private enum DefaultBodyPresets { Empty }
+
+
+        private void FillInBody()
+        {
+
+        }
+        */
+
         private Body _body;
 
         /// <summary>
@@ -33,9 +55,7 @@ namespace Artemis.Engine
             {
                 _body = value;
                 _body.UserData = this; // We use the UserData of a body to give a forward reference to the
-                // Artemis.Engine.PhysicalObject instance it belongs to. This is used
-                // specifically in RenderLayer to retrieve the RenderableObjects from
-                // fixtures retrieved by an AABB query of the world. (Michael, 5/15/2016)
+                // Artemis.Engine.PhysicalForm instance it belongs to.
             }
         }
 
@@ -50,7 +70,7 @@ namespace Artemis.Engine
         /// <summary>
         /// The position on the LayerTarget.
         /// </summary>
-        public Vector2 TargetPosition
+        public sealed override Vector2 TargetPosition
         {
             get
             {
@@ -70,79 +90,7 @@ namespace Artemis.Engine
                     Body.Position = cam.TargetToWorld(value);
             }
         }
-
-        /// <summary>
-        /// The position on the screen.
-        /// 
-        /// You should almost always use TargetPosition if you want to position an object
-        /// relative to the display instead of ScreenPosition.
-        /// </summary>
-        public Vector2 ScreenPosition
-        {
-            get
-            {
-                var cam = Camera;
-                if (cam == null)
-                    return ConvertUnits.ToDisplayUnits(Body.Position);
-                return cam.WorldToScreen(Body.Position);
-            }
-            set
-            {
-                var cam = Camera;
-                if (cam == null)
-                    Body.Position = ConvertUnits.ToSimUnits(value);
-                else
-                    Body.Position = cam.ScreenToWorld(value);
-            }
-        }
-
-        private Vector2 _relativeTargetPosMemo;
-        /// <summary>
-        /// The position on the LayerTarget as a relative coordinate (i.e. mapped so
-        /// that (0, 0) is the top left of the target and (1, 1) is the bottom right).
-        /// 
-        /// NOTE: When `UseTargetRelativePositioning` is true, this value is held constant
-        /// when the resolution changes (meaning the World position changes).
-        /// </summary>
-        public Vector2 RelativeTargetPosition
-        {
-            get
-            {
-                Rectangle bounds;
-                if (Layer == null)
-                    bounds = (Rectangle)ArtemisEngine.DisplayManager.WindowResolution;
-                else
-                    bounds = Layer.TargetBounds;
-                var targetPosition = TargetPosition;
-                return new Vector2(targetPosition.X / bounds.X, targetPosition.Y / bounds.Y);
-            }
-            set
-            {
-                Rectangle bounds;
-                if (Layer == null)
-                    bounds = (Rectangle)ArtemisEngine.DisplayManager.WindowResolution;
-                else
-                    bounds = Layer.TargetBounds;
-                
-                TargetPosition = new Vector2(value.X * bounds.X, value.Y * bounds.Y);
-                _relativeTargetPosMemo = value;
-            }
-        }
-
-        public PhysicalForm(string name) : base(name) 
-        {
-            OnLayerTargetChanged += _UpdateScreenPosition;
-        }
-
-        private void _UpdateScreenPosition( RenderTarget2D previousTarget
-                                          , RenderTarget2D currentTarget )
-        {
-            if (UseTargetRelativePositioning)
-            {
-                // This will reset the World position to match the new Target bounds, whilst keeping the
-                // RelativeTargetPosition constant (which is what we want when using TargetRelativePositioning).
-                RelativeTargetPosition = _relativeTargetPosMemo;
-            }
-        }
+        
+        public PhysicalForm(string name) : base(name) { }
     }
 }

@@ -14,9 +14,6 @@ namespace Artemis.Engine.Graphics
     public class ResolutionRelativeRenderLayer : AbstractOrderableRenderLayer
     {
         private RenderPipeline rp; // the global render pipeline,
-        private bool _requiresTargetTransformRecalc; // whether or not we need to recalculate the TargetTransform 
-        // matrix (when target resolution changes for example).
-        internal Matrix _targetTransform;
 
         private GlobalLayerScaleType _layerScaleType;
         private UniformLayerScaleType _uniformScaleType;
@@ -40,7 +37,7 @@ namespace Artemis.Engine.Graphics
                 if (MidRender)
                 {
                     _newLayerScaleType = value;
-                    _requiresTargetTransformRecalc = true;
+                    RequiresTargetTransformRecalc = true;
                 }
                 else
                 {
@@ -65,7 +62,7 @@ namespace Artemis.Engine.Graphics
                 if (MidRender)
                 {
                     _newUniformScaleType = value;
-                    _requiresTargetTransformRecalc = true;
+                    RequiresTargetTransformRecalc = true;
                 }
                 else
                 {
@@ -90,18 +87,20 @@ namespace Artemis.Engine.Graphics
             RecalculateTargetTransform();
         }
 
+        
+
         /// <summary>
-        /// Recalculate the TargetTransform matrix (required when resolution changes).
+        /// Recalculate the TargetToScreenTransform matrix (required when resolution changes).
         /// </summary>
-        private void RecalculateTargetTransform()
+        protected internal override void RecalculateTargetTransform()
         {
             if (LayerScaleType == GlobalLayerScaleType.Dynamic)
             {
-                _targetTransform = Matrix.Identity;
+                TargetToScreenTransform = Matrix.Identity;
             }
             else if (ArtemisEngine.DisplayManager.IsBaseResolution)
             {
-                _targetTransform = Matrix.Identity;
+                TargetToScreenTransform = Matrix.Identity;
             }
             else
             {
@@ -137,9 +136,9 @@ namespace Artemis.Engine.Graphics
                             String.Format(
                                 "Invalid UniformLayerScaleType value '{0}' supplied.", UniformScaleType));
                 }
-                _targetTransform = transform;
+                TargetToScreenTransform = transform;
             }
-            _requiresTargetTransformRecalc = false;
+            RequiresTargetTransformRecalc = false;
         }
 
         /// <summary>
@@ -200,9 +199,7 @@ namespace Artemis.Engine.Graphics
                     default:
                         throw new RenderLayerException(
                             String.Format(
-                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj
-                                )
-                            );
+                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj));
                 }
             }
             else
@@ -302,7 +299,7 @@ namespace Artemis.Engine.Graphics
             rp.SetRenderProperties(
                 SpriteSortMode.Immediate,
                 BlendState.AlphaBlend,
-                m: _targetTransform);
+                m: TargetToScreenTransform);
 
             rp.Render(LayerTarget, Vector2.Zero);
 
@@ -314,7 +311,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         protected override void PostRender()
         {
-            if (_requiresTargetTransformRecalc)
+            if (RequiresTargetTransformRecalc)
             {
                 if (_newLayerScaleType.HasValue)
                     _layerScaleType = _newLayerScaleType.Value;

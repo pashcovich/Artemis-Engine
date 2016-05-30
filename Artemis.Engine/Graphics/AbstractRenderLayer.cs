@@ -30,6 +30,12 @@ namespace Artemis.Engine.Graphics
         internal string tempFullName;
 
         /// <summary>
+        /// Whether or not we need to recalculate the TargetToScreenTransform matrix (when the target resolution
+        /// changes for example).
+        /// </summary>
+        protected internal bool RequiresTargetTransformRecalc;
+
+        /// <summary>
         /// The top RenderableGroup.
         /// </summary>
         public RenderableGroup AllRenderables { get; private set; }
@@ -87,6 +93,10 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public Rectangle TargetBounds { get { return LayerTarget.Bounds; } }
 
+        public Matrix TargetToScreenTransform { get; protected internal set; }
+
+        public Matrix ScreenToTargetTransform { get { return Matrix.Invert(TargetToScreenTransform); } }
+
         public AbstractRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
@@ -105,6 +115,23 @@ namespace Artemis.Engine.Graphics
             PreferredMultiSampleCount = 0;
             TargetUsage               = RenderTargetUsage.DiscardContents;
             TargetIsMipMap            = false;
+        }
+
+        public Vector2 TargetToScreen(Vector2 vector)
+        {
+            return Vector2.Transform(vector, TargetToScreenTransform);
+        }
+
+        public Vector2 ScreenToTarget(Vector2 vector)
+        {
+            return Vector2.Transform(vector, ScreenToTargetTransform);
+        }
+
+        protected internal virtual void RecalculateTargetTransform()
+        {
+            // In an AbstractRenderLayer, no resolution relative target scaling takes place, thus
+            // the target space *is* the screen space.
+            TargetToScreenTransform = Matrix.Identity;
         }
 
         /// <summary>
