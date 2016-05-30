@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using Microsoft.Xna.Framework;
@@ -27,6 +28,12 @@ namespace Artemis.Engine.Graphics
         }
 
         internal string tempFullName;
+
+        /// <summary>
+        /// Whether or not we need to recalculate the TargetToScreenTransform matrix (when the target resolution
+        /// changes for example).
+        /// </summary>
+        protected internal bool RequiresTargetTransformRecalc;
 
         /// <summary>
         /// The top RenderableGroup.
@@ -86,6 +93,10 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         public Rectangle TargetBounds { get { return LayerTarget.Bounds; } }
 
+        public Matrix TargetToScreenTransform { get; protected internal set; }
+
+        public Matrix ScreenToTargetTransform { get { return Matrix.Invert(TargetToScreenTransform); } }
+
         public AbstractRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
@@ -104,6 +115,23 @@ namespace Artemis.Engine.Graphics
             PreferredMultiSampleCount = 0;
             TargetUsage               = RenderTargetUsage.DiscardContents;
             TargetIsMipMap            = false;
+        }
+
+        public Vector2 TargetToScreen(Vector2 vector)
+        {
+            return Vector2.Transform(vector, TargetToScreenTransform);
+        }
+
+        public Vector2 ScreenToTarget(Vector2 vector)
+        {
+            return Vector2.Transform(vector, ScreenToTargetTransform);
+        }
+
+        protected internal virtual void RecalculateTargetTransform()
+        {
+            // In an AbstractRenderLayer, no resolution relative target scaling takes place, thus
+            // the target space *is* the screen space.
+            TargetToScreenTransform = Matrix.Identity;
         }
 
         /// <summary>
@@ -209,23 +237,23 @@ namespace Artemis.Engine.Graphics
         /// Render all items and sublayers on this layer.
         /// </summary>
         public void Render( HashSet<AbstractRenderLayer> seenLayers
-                          , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre
+                          , TraversalOptions order = TraversalOptions.Pre
                           , bool skipDuplicates = true )
         {
             MidRender = true;
             switch (order)
             {
-                case RenderOrder.RenderTraversalOptions.AllPre:
+                case TraversalOptions.Pre:
                     RenderSublayers(seenLayers, order, skipDuplicates);
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     break;
-                case RenderOrder.RenderTraversalOptions.AllPost:
+                case TraversalOptions.Post:
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     RenderSublayers(seenLayers, order, skipDuplicates);
                     break;
-                case RenderOrder.RenderTraversalOptions.Top:
+                case TraversalOptions.Top:
                     if (!(skipDuplicates && seenLayers.Contains(this)))
                         RenderTop();
                     break;
@@ -270,7 +298,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         /// <param name="order"></param>
         public virtual void RenderSublayers( HashSet<AbstractRenderLayer> seenLayers
-                                           , RenderOrder.RenderTraversalOptions order = RenderOrder.RenderTraversalOptions.AllPre  
+                                           , TraversalOptions order = TraversalOptions.Pre  
                                            , bool skipDuplicates = true )
         {
             foreach (var layer in Subnodes.Values)

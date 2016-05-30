@@ -5,7 +5,6 @@ namespace Artemis.Engine.Utilities
 {
     public static class GenericOperators
     {
-
         /// <summary>
         /// Add two objects of generic type. This is a workaround to the issue of
         /// C# having no generic constraint requiring a type to implement the + 

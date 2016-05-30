@@ -17,12 +17,27 @@ namespace Artemis.Engine.Graphics
     /// <param name="currentTarget"></param>
     public delegate void LayerTargetChangedDelegate(RenderTarget2D previousTarget, RenderTarget2D currentTarget);
 
-    public abstract class RenderableObject : ResolutionRelativeObject
+    public class RenderableObject : ResolutionRelativeObject
     {
+
         /// <summary>
         /// The Layer this object belongs to.
         /// </summary>
         public AbstractRenderLayer Layer { get; internal set; }
+
+        /// <summary>
+        /// The Camera this physical object is being viewed by.
+        /// </summary>
+        public AbstractCamera Camera
+        {
+            get
+            {
+                if (Layer == null)
+                    return null;
+                var worldLayer = Layer as WorldRenderLayer;
+                return worldLayer == null ? null : worldLayer.Camera;
+            }
+        }
 
         /// <summary>
         /// Whether or not this object is visible.
@@ -37,17 +52,80 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// The components that specify how this object is to be rendered.
         /// </summary>
-        public RenderComponents RenderComponents;
-
-        /// <summary>
-        /// An abstract method for rendering this object.
-        /// </summary>
-        public abstract void Render();
+        public SpriteProperties SpriteProperties;
 
         /// <summary>
         /// The event fired when the target of the layer is changed.
         /// </summary>
         public LayerTargetChangedDelegate OnLayerTargetChanged;
+
+        // Info for killing the object.
+        internal RenderableGroup _renderableGroup;
+        internal string _renderableName;
+
+        /// <summary>
+        /// The renderer action.
+        /// </summary>
+        private Renderer Renderer;
+
+        private Renderer _requiredRenderer;
+        protected internal Renderer RequiredRenderer
+        {
+            get { return _requiredRenderer; }
+            set
+            {
+                _requiredRenderer = value;
+                Renderer = value;
+            }
+        }
+
+        /// <summary>
+        /// An abstract method for rendering this object.
+        /// </summary>
+        public void Render()
+        {
+            if (Renderer != null)
+                Renderer();
+        }
+
+        
+        /// <summary>
+        /// Set the renderer for this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void SetRenderer(Renderer renderer)
+        {
+            Renderer = null;
+            Renderer += RequiredRenderer;
+            Renderer += renderer;
+        }
+
+        /// <summary>
+        /// Add a renderer to this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void AddRenderer(Renderer renderer)
+        {
+            Renderer += renderer;
+        }
+
+        /// <summary>
+        /// Remove a renderer from this object.
+        /// </summary>
+        /// <param name="renderer"></param>
+        public void RemoveRenderer(Renderer renderer)
+        {
+            Renderer -= renderer;
+        }
+
+        /// <summary>
+        /// Remove all renderers from this object.
+        /// </summary>
+        public void ClearRenderer()
+        {
+            Renderer = null;
+            Renderer += RequiredRenderer;
+        }
 
         internal void InternalRender(HashSet<RenderableObject> seenObjects)
         {
@@ -70,8 +148,16 @@ namespace Artemis.Engine.Graphics
         public override void Kill()
         {
             base.Kill();
-
-            Layer.targetChangeListeners.Remove(this);
+            if (Layer != null)
+            {
+                Layer.targetChangeListeners.Remove(this);
+                if (_renderableGroup == null)
+                    return;
+                if (_renderableName == null)
+                    _renderableGroup.RemoveAnonymousItem(this, false);
+                else
+                    _renderableGroup.RemoveItem(_renderableName);
+            }
         }
     }
 }

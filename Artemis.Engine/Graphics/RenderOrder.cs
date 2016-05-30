@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,6 +11,24 @@ using System.Collections.Generic;
 
 namespace Artemis.Engine.Graphics
 {
+
+    /// <summary>
+    /// Delegate invoked upon encountering an AbstractRenderOrderAction with a given type in a Layer object.
+    /// </summary>
+    /// <param name="layer"></param>
+    /// <param name="action"></param>
+    /// <param name="renderableHandler"></param>
+    public delegate void LayerRenderOrderActionHandler(
+        AbstractOrderableRenderLayer layer, RenderOrder.AbstractRenderOrderAction action, RenderableHandler renderableHandler);
+
+    /// <summary>
+    /// Delegate invoked upon encountering an AbstractRenderOrderAction with a given type in a LayerManager object.
+    /// </summary>
+    /// <param name="manager"></param>
+    /// <param name="action"></param>
+    public delegate void LayerManagerRenderOrderActionHandler(
+        LayerManager manager, RenderOrder.AbstractRenderOrderAction action);
+
     public class RenderOrder
     {
         internal enum RenderOrderActionType
@@ -36,25 +56,6 @@ namespace Artemis.Engine.Graphics
             /// Indicates to render a layer.
             /// </summary>
             Layer
-        }
-
-        /// <summary>
-        /// Options indicating how to render a traversable object such as a RenderableGroup or a layer.
-        /// </summary>
-        public enum RenderTraversalOptions
-        {
-            /// <summary>
-            /// Render the subgroups before rendering the items in the top level.
-            /// </summary>
-            AllPre,
-            /// <summary>
-            /// Render the subgroups after rendering the items in the top level.
-            /// </summary>
-            AllPost,
-            /// <summary>
-            /// Only render the items in the top level.
-            /// </summary>
-            Top
         }
 
         public abstract class AbstractRenderOrderAction
@@ -100,7 +101,7 @@ namespace Artemis.Engine.Graphics
             /// <summary>
             /// Options regarding which of the items in the group to render.
             /// </summary>
-            public RenderTraversalOptions Options;
+            public TraversalOptions Options;
 
             /// <summary>
             /// Whether or not to skip duplicate renders.
@@ -110,7 +111,7 @@ namespace Artemis.Engine.Graphics
             public RenderType RenderType { get; protected set; }
 
             public AbstractRenderTraversable( string name
-                                            , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                                            , TraversalOptions options = TraversalOptions.Pre
                                             , bool skipDuplicates = true )
             {
                 Name = name;
@@ -125,7 +126,7 @@ namespace Artemis.Engine.Graphics
         public sealed class RenderGroup : AbstractRenderTraversable
         {   
             public RenderGroup( string name
-                              , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                              , TraversalOptions options = TraversalOptions.Pre
                               , bool skipDuplicates = true )
                 : base(name, options, skipDuplicates)
             {
@@ -140,7 +141,7 @@ namespace Artemis.Engine.Graphics
         public sealed class RenderLayer : AbstractRenderTraversable
         {
             public RenderLayer( string name
-                              , RenderTraversalOptions options = RenderTraversalOptions.AllPre
+                              , TraversalOptions options = TraversalOptions.Pre
                               , bool skipDuplicates = true )
                 : base(name, options, skipDuplicates)
             {
@@ -217,7 +218,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="name"></param>
         /// <param name="options"></param>
         public void AddRenderGroup(
-            string name, RenderTraversalOptions options = RenderTraversalOptions.AllPre, bool skipDuplicates = true)
+            string name, TraversalOptions options = TraversalOptions.Pre, bool skipDuplicates = true)
         {
             Actions.Add(new RenderGroup(name, options, skipDuplicates));
         }

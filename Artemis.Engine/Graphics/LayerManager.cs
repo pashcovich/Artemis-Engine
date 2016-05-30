@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using System;
@@ -12,7 +13,6 @@ namespace Artemis.Engine.Graphics
 {
     public class LayerManager : UriTreeObserver<AbstractRenderLayer>
     {
-
         /// <summary>
         /// The order in which the layers are rendered.
         /// </summary>
@@ -24,11 +24,14 @@ namespace Artemis.Engine.Graphics
         /// 
         /// Note: If RenderOrder is not null, this value is not used.
         /// </summary>
-        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
+        public TraversalOptions GlobalTraversalOptions;
+
+        private Dictionary<Type, LayerManagerRenderOrderActionHandler> UnknownRenderOrderActionHandlers
+            = new Dictionary<Type, LayerManagerRenderOrderActionHandler>();
 
         public LayerManager() 
         {
-            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
+            GlobalTraversalOptions = TraversalOptions.Pre;
         }
 
         /// <summary>
@@ -56,7 +59,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="order"></param>
         /// <param name="traversal"></param>
         public void SetRenderOrder( string[] order
-                                  , RenderOrder.RenderTraversalOptions traversal = RenderOrder.RenderTraversalOptions.AllPre)
+                                  , TraversalOptions traversal = TraversalOptions.Pre)
         {
             var actions = from name in order
                           select (RenderOrder.AbstractRenderOrderAction)
@@ -70,7 +73,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="order"></param>
         /// <param name="traversalOptions"></param>
         public void SetRenderOrder( string[] order 
-                                  , RenderOrder.RenderTraversalOptions[] traversalOptions )
+                                  , TraversalOptions[] traversalOptions )
         {
             if (order.Length != traversalOptions.Length)
             {
@@ -103,6 +106,37 @@ namespace Artemis.Engine.Graphics
         }
 
         /// <summary>
+        /// Register a custom RenderOrderActionHandler to be invoked when an 
+        /// AbstractRenderOrderAction of type "T" is encountered.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void RegisterRenderOrderActionHandler<T>(LayerManagerRenderOrderActionHandler handler)
+            where T : RenderOrder.AbstractRenderOrderAction
+        {
+            RegisterRenderOrderActionHandler(typeof(T), handler);
+        }
+
+        /// <summary>
+        /// Register a custom RenderOrderActionHandler to be invoked when an 
+        /// AbstractRenderOrderAction of the given type is encountered.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="handler"></param>
+        public void RegisterRenderOrderActionHandler(Type type, LayerManagerRenderOrderActionHandler handler)
+        {
+            if (!type.IsSubclassOf(typeof(RenderOrder.AbstractRenderOrderAction)))
+            {
+                throw new RenderOrderException(
+                    String.Format(
+                        "Cannot specify RenderOrderAction handler for type '{0}'." +
+                        "The given type must be a subclass of '{1}'.",
+                        type, typeof(RenderOrder.AbstractRenderOrderAction)));
+            }
+            UnknownRenderOrderActionHandlers.Add(type, handler);
+        }
+
+        /// <summary>
         /// Render every layer.
         /// </summary>
         public void Render()
@@ -125,7 +159,18 @@ namespace Artemis.Engine.Graphics
                             HandleRenderOrderAction_RenderLayer((RenderOrder.RenderLayer)action, seenLayers);
                             break;
                         default:
-                            HandleUnknownRenderOrderAction(action);
+                            var handled = false;
+                            if (UnknownRenderOrderActionHandlers.Count > 0)
+                            {
+                                var type = action.GetType();
+                                if (UnknownRenderOrderActionHandlers.ContainsKey(type))
+                                {
+                                    UnknownRenderOrderActionHandlers[type](this, action);
+                                    handled = true;
+                                }
+                            }
+                            if (!handled)
+                                HandleUnknownRenderOrderAction(action);
                             break;
                     }
                 }

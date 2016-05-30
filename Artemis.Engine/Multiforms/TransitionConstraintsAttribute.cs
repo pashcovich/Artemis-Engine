@@ -13,12 +13,12 @@ namespace Artemis.Engine.Multiforms
         public string[] NotAllowedFrom { get; private set; }
 
         public TransitionConstraintsAttribute(
-            string[] allowedFrom = null,
-            string[] notAllowedFrom = null
+            string[] AllowedFrom = null,
+            string[] NotAllowedFrom = null
             )
         {
-            AllowedFrom    = allowedFrom;
-            NotAllowedFrom = notAllowedFrom;
+            this.AllowedFrom    = AllowedFrom;
+            this.NotAllowedFrom = NotAllowedFrom;
         }
     }
 }

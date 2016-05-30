@@ -1,51 +1,47 @@
 ﻿#region Using Statements
 
-using Microsoft.Xna.Framework;
-
 using System;
 
 #endregion
 
-namespace Artemis.Engine.Effectors.Special
+namespace Artemis.Engine.Effectors
 {
     /// <summary>
-    /// An effector that acts on Vector2 objects.
+    /// An effector that acts on doubles.
     /// </summary>
-    public class VectorEffector : Effector<Vector2> 
+    public class DoubleEffector : Effector<double> 
     {
-
         #region Constructors
 
-        public VectorEffector( string fieldName
+        public DoubleEffector( string fieldName
                              , string effectorName
-                             , EffectorFunction<Vector2> func
+                             , EffectorFunction<double> func
                              , EffectorOperatorType opType = EffectorOperatorType.InPlace
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
             : base(fieldName, effectorName, func, opType, valueType, reusable) { }
 
-        public VectorEffector( string fieldName
+        public DoubleEffector( string fieldName
                              , string effectorName
-                             , EffectorFunction<Vector2> func
-                             , Func<Vector2, Vector2, Vector2> op
+                             , EffectorFunction<double> func
+                             , Func<double, double, double> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
             : base(fieldName, effectorName, func, op, valueType, reusable) { }
 
-        public VectorEffector( string fieldName
+        public DoubleEffector( string fieldName
                              , string effectorName
-                             , EffectorFunction<Vector2> func
-                             , EffectorOperator<Vector2> op
+                             , EffectorFunction<double> func
+                             , EffectorOperator<double> op
                              , EffectorValueType valueType = EffectorValueType.RelativeToStart
                              , bool reusable = false )
             : base(fieldName, effectorName, func, op, valueType, reusable) { }
 
         #endregion
 
-        protected override Vector2 Combine_InPlaceAndRelativeToStart(Vector2 init, Vector2 combined)
+        protected override double Combine_InPlaceAndRelativeToStart(double init, double combined)
         {
             return init + combined;
         }
-
     }
 }

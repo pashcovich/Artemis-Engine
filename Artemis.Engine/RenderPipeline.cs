@@ -1,5 +1,7 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Graphics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -186,6 +188,25 @@ namespace Artemis.Engine
         }
 
         /// <summary>
+        /// Directly render a texture to the screen with the given position and properties.
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <param name="position"></param>
+        /// <param name="properties"></param>
+        public void Render(Texture2D texture, Vector2 position, SpriteProperties properties)
+        {
+            Render( texture
+                  , position
+                  , properties.SourceRectangle
+                  , properties.Tint
+                  , properties.Rotation 
+                  , properties.Origin
+                  , properties.Scale
+                  , properties.SpriteEffects
+                  , originIsRelative: properties.OriginIsRelative);
+        }
+
+        /// <summary>
         /// Directly render a texture to the screen with the given parameters.
         /// </summary>
         /// <param name="texture"></param>
@@ -197,7 +218,7 @@ namespace Artemis.Engine
         /// <param name="scale"></param>
         /// <param name="effects"></param>
         /// <param name="layerDepth"></param>
-        public void Render(Texture2D texture
+        public void Render( Texture2D texture
                           , Vector2 position
                           , Rectangle? sourceRectangle = null
                           , Color? colour              = null
@@ -230,14 +251,13 @@ namespace Artemis.Engine
 
                 if (!spriteBatchBegun)
                 {
-                    SpriteBatch.Begin(
-                        _spriteSortMode.Value,
-                        _blendState.Value,
-                        _samplerState.Value,
-                        _depthStencilState.Value,
-                        _rasterizerState.Value,
-                        _effect.Value,
-                        _matrix.Value);
+                    SpriteBatch.Begin( _spriteSortMode.Value
+                                     , _blendState.Value
+                                     , _samplerState.Value
+                                     , _depthStencilState.Value
+                                     , _rasterizerState.Value
+                                     , _effect.Value
+                                     , _matrix.Value );
                     spriteBatchBegun = true;
                 }
 

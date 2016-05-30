@@ -38,12 +38,13 @@ namespace Artemis.Engine.Utilities.UriTree
         /// <summary>
         /// The list of all unnamed items in this group.
         /// </summary>
-        public List<U> AnonymousItems { get; protected set; }
+        public ICollection<U> AnonymousItems { get; protected set; }
 
-        protected UriTreeGroup(string name)
+        protected UriTreeGroup(string name, ICollection<U> anonymousItemsCollection = null)
             : base(name)
         {
             Items = new Dictionary<string, U>();
+            AnonymousItems = anonymousItemsCollection == null ? anonymousItemsCollection : new HashSet<U>();
         }
 
         /// <summary>

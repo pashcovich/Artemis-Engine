@@ -31,7 +31,7 @@ namespace Artemis.Engine
         /// Whether or not the position of this object is a Target coordinate, as opposed to a
         /// World coordinate.
         /// </summary>
-        public bool UseTargetRelativePositioning { get; set; } // CURRENTLY NOT IN USE
+        public bool UseTargetRelativePositioning;
 
         /// <summary>
         /// Whether or not to maintain the aspect ratio of this object upon dynamically

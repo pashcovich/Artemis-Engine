@@ -6,16 +6,16 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine.Effectors.Special
+namespace Artemis.Engine.Effectors
 {
     /// <summary>
-    /// An effector that acts on the x-component of a Vector2 object.
+    /// An effector that acts on the y-component of a Vector2 object.
     /// </summary>
-    public class XCoordEffector : CoerciveEffector<Vector2, float>
+    public class YCoordEffector : CoerciveEffector<Vector2, float>
     {
         #region Constructors
 
-        public XCoordEffector( string fieldName
+        public YCoordEffector( string fieldName
                              , string effectorName
                              , EffectorFunction<float> func
                              , EffectorOperatorType opType = EffectorOperatorType.InPlace
@@ -23,7 +23,7 @@ namespace Artemis.Engine.Effectors.Special
                              , bool reusable = false )
             : base(fieldName, effectorName, func, opType, valueType, reusable) { }
 
-        public XCoordEffector( string fieldName
+        public YCoordEffector( string fieldName
                              , string effectorName
                              , EffectorFunction<float> func
                              , Func<float, float, float> op
@@ -31,7 +31,7 @@ namespace Artemis.Engine.Effectors.Special
                              , bool reusable = false )
             : base(fieldName, effectorName, func, op, valueType, reusable) { }
 
-        public XCoordEffector( string fieldName
+        public YCoordEffector( string fieldName
                              , string effectorName
                              , EffectorFunction<float> func
                              , EffectorOperator<float> op
@@ -43,13 +43,13 @@ namespace Artemis.Engine.Effectors.Special
 
         protected override float CoerceTo(Vector2 val)
         {
-            return val.X;
+            return val.Y;
         }
 
         protected override void AssignNextValue(EffectableObject obj, float nextVal)
         {
             var prevVec = obj.Get<Vector2>(EffectedPropertyName);
-            prevVec.X = nextVal;
+            prevVec.Y = nextVal;
             obj.Set(EffectedPropertyName, prevVec);
         }
 

@@ -1,30 +1,19 @@
 ﻿#region Using Statements
 
 using Artemis.Engine.Maths.Geometry;
-using Artemis.Engine.Utilities.UriTree;
-
-using FarseerPhysics.Dynamics;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 #endregion
 
 namespace Artemis.Engine.Graphics
 {
-    public class RenderLayer : AbstractOrderableRenderLayer
+    public class ResolutionRelativeRenderLayer : AbstractOrderableRenderLayer
     {
         private RenderPipeline rp; // the global render pipeline,
-        private World _world;
-        private AbstractCamera _camera;
-        private bool _requiresTargetTransformRecalc; // whether or not we need to recalculate the TargetTransform 
-                                                     // matrix (when target resolution changes for example).
-        internal Matrix _targetTransform;
-        private Predicate<RenderableObject> isVisibleToCameraPredicate;
 
         private GlobalLayerScaleType _layerScaleType;
         private UniformLayerScaleType _uniformScaleType;
@@ -48,7 +37,7 @@ namespace Artemis.Engine.Graphics
                 if (MidRender)
                 {
                     _newLayerScaleType = value;
-                    _requiresTargetTransformRecalc = true;
+                    RequiresTargetTransformRecalc = true;
                 }
                 else
                 {
@@ -69,11 +58,11 @@ namespace Artemis.Engine.Graphics
             set
             {
                 if (value == _uniformScaleType)
-                    return;               
+                    return;
                 if (MidRender)
                 {
                     _newUniformScaleType = value;
-                    _requiresTargetTransformRecalc = true;
+                    RequiresTargetTransformRecalc = true;
                 }
                 else
                 {
@@ -83,85 +72,35 @@ namespace Artemis.Engine.Graphics
             }
         }
 
-        /// <summary>
-        /// The camera attached to this layer.
-        /// </summary>
-        public AbstractCamera Camera
-        {
-            get { return _camera; }
-            set
-            {
-                if (MidRender)
-                    throw new CameraException(
-                        String.Format(
-                            "Cannot set Camera on render layer with name '{0}' " +
-                            "until after the render cycle is complete.", tempFullName
-                            )
-                        );
-                if (value == null)
-                    value = new NullCamera();
-                _camera = value;
-                _camera.Layer = this;
-            }
-        }
+        public ResolutionRelativeRenderLayer(string fullName)
+            : this(fullName, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch) { }
 
-        /// <summary>
-        /// The world this layer is attached to.
-        /// </summary>
-        public World World
-        {
-            get { return _world; }
-        }
-
-        public RenderLayer(string fullName)
-            : this(fullName, new NullCamera()) { }
-
-        public RenderLayer(string fullName, AbstractCamera camera)
-            : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, null) { }
-
-        public RenderLayer(string fullName, AbstractCamera camera, World world)
-            : this(fullName, camera, GlobalLayerScaleType.Dynamic, UniformLayerScaleType.Stretch, world) { }
-
-        public RenderLayer( string fullName
-                          , AbstractCamera camera
-                          , GlobalLayerScaleType layerScaleType    = GlobalLayerScaleType.Dynamic
-                          , UniformLayerScaleType uniformScaleType = UniformLayerScaleType.Stretch
-                          , World world = null )
-            : base(UriUtilities.GetLastPart(fullName))
+        public ResolutionRelativeRenderLayer( string fullName
+                                            , GlobalLayerScaleType layerScaleType 
+                                            , UniformLayerScaleType uniformScaleType )
+            : base(fullName)
         {
             rp = ArtemisEngine.RenderPipeline; // for convenience
 
             LayerScaleType = layerScaleType;
             UniformScaleType = uniformScaleType;
             RecalculateTargetTransform();
-
-            Camera = camera;
-            camera.Layer = this;
-
-            _world = world;
         }
 
-        /// <summary>
-        /// Attach this layer to a world.
-        /// </summary>
-        /// <param name="world"></param>
-        public void AttachToWorld(World world)
-        {
-            _world = world;
-        }
+        
 
         /// <summary>
-        /// Recalculate the TargetTransform matrix (required when resolution changes).
+        /// Recalculate the TargetToScreenTransform matrix (required when resolution changes).
         /// </summary>
-        private void RecalculateTargetTransform()
+        protected internal override void RecalculateTargetTransform()
         {
-            if (LayerScaleType == GlobalLayerScaleType.Uniform)
+            if (LayerScaleType == GlobalLayerScaleType.Dynamic)
             {
-                _targetTransform = Matrix.Identity;
+                TargetToScreenTransform = Matrix.Identity;
             }
             else if (ArtemisEngine.DisplayManager.IsBaseResolution)
             {
-                _targetTransform = Matrix.Identity;
+                TargetToScreenTransform = Matrix.Identity;
             }
             else
             {
@@ -197,9 +136,9 @@ namespace Artemis.Engine.Graphics
                             String.Format(
                                 "Invalid UniformLayerScaleType value '{0}' supplied.", UniformScaleType));
                 }
-                _targetTransform = transform;
+                TargetToScreenTransform = transform;
             }
-            _requiresTargetTransformRecalc = false;
+            RequiresTargetTransformRecalc = false;
         }
 
         /// <summary>
@@ -209,7 +148,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="isBaseRes"></param>
         /// <param name="crntRes"></param>
         /// <param name="resScale"></param>
-        private void ProcessDynamicallyScaledRenderable(
+        protected void ProcessDynamicallyScaledRenderable(
             RenderableObject obj, bool isBaseRes, Resolution crntRes, Vector2 resScale)
         {
             var maintainAspectRatio = obj.MaintainAspectRatio;
@@ -260,9 +199,7 @@ namespace Artemis.Engine.Graphics
                     default:
                         throw new RenderLayerException(
                             String.Format(
-                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj
-                                )
-                            );
+                                "Unknown ResolutionScaleType '{0}' received on object '{1}'.", scaleType, obj));
                 }
             }
             else
@@ -270,17 +207,17 @@ namespace Artemis.Engine.Graphics
                 scale = Vector2.One;
             }
 
-            bool hasOriginalScale = obj.RenderComponents.Scale.HasValue;
-            Vector2 originalScale = hasOriginalScale ? obj.RenderComponents.Scale.Value : Vector2.One;
+            bool hasOriginalScale = obj.SpriteProperties.Scale.HasValue;
+            Vector2 originalScale = hasOriginalScale ? obj.SpriteProperties.Scale.Value : Vector2.One;
 
             var resultingScale = VectorUtils.ComponentwiseProduct(originalScale, scale);
 
             // Swap out the original scale for the newly calculated scale.
-            obj.RenderComponents.Scale = resultingScale;
+            obj.SpriteProperties.Scale = resultingScale;
 
             obj.InternalRender(SeenRenderables);
 
-            obj.RenderComponents.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
+            obj.SpriteProperties.Scale = hasOriginalScale ? (Vector2?)originalScale : null;
         }
 
         /// <summary>
@@ -295,55 +232,19 @@ namespace Artemis.Engine.Graphics
             switch (LayerScaleType)
             {
                 case GlobalLayerScaleType.Uniform:
-                    if (isVisibleToCameraPredicate == null)
-                        return obj => obj.InternalRender(SeenRenderables);
-                    else
-                        return obj =>
-                        {
-                            if (isVisibleToCameraPredicate(obj))
-                                obj.InternalRender(SeenRenderables);
-                        };
+                    return obj => obj.InternalRender(SeenRenderables);
                 case GlobalLayerScaleType.Dynamic:
                     var isBaseRes = ArtemisEngine.DisplayManager.IsBaseResolution;
                     var crntRes   = ArtemisEngine.DisplayManager.WindowResolution;
                     var resScale  = ArtemisEngine.DisplayManager.ResolutionScale;
 
-                    if (isVisibleToCameraPredicate == null)
-                        return obj => ProcessDynamicallyScaledRenderable(obj, isBaseRes, crntRes, resScale);
-                    else
-                        return obj =>
-                        {
-                            if (isVisibleToCameraPredicate(obj))
-                                ProcessDynamicallyScaledRenderable(obj, isBaseRes, crntRes, resScale);
-                        };
+                    return obj => ProcessDynamicallyScaledRenderable(obj, isBaseRes, crntRes, resScale);
                 default:
                     throw new RenderLayerException(
                         String.Format(
                             "Unknown GlobalLayerScaleType '{0}' supplied to layer '{1}'.",
                             LayerScaleType, tempFullName));
             }
-        }
-
-        /// <summary>
-        /// Get the list of all RenderableObjects visible to the Camera.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<RenderableObject> GetCameraVisibleRenderables()
-        {
-            if (Camera is NullCamera)
-                return AllRenderables.RetrieveAll();
-
-            var renderables = new HashSet<RenderableObject>();
-            var aabb = Camera.ViewAABB;
-            _world.QueryAABB(f =>
-            {
-                var obj = (RenderableObject)f.Body.UserData;
-                renderables.Add(obj); // A renderable object might have multiple fixtures, but
-                // we only want to render the object itself once.
-                return true;
-            }, ref aabb);
-
-            return renderables;
         }
 
         protected override void PreRender()
@@ -356,19 +257,19 @@ namespace Artemis.Engine.Graphics
                 // If we're scaling dynamically then our layer target fills the entire screen.
                 if (LayerScaleType == GlobalLayerScaleType.Dynamic)
                     LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
-                        TargetFormat, 
-                        TargetDepthFormat, 
-                        PreferredMultiSampleCount, 
-                        TargetUsage, 
-                        TargetFill, 
+                        TargetFormat,
+                        TargetDepthFormat,
+                        PreferredMultiSampleCount,
+                        TargetUsage,
+                        TargetFill,
                         TargetIsMipMap);
                 else
                     LayerTarget = ArtemisEngine.RenderPipeline.CreateRenderTarget(
-                        TargetFormat, 
-                        TargetDepthFormat, 
-                        PreferredMultiSampleCount, 
-                        TargetUsage, 
-                        TargetFill, 
+                        TargetFormat,
+                        TargetDepthFormat,
+                        PreferredMultiSampleCount,
+                        TargetUsage,
+                        TargetFill,
                         TargetIsMipMap);
 
                 foreach (var item in targetChangeListeners)
@@ -383,26 +284,6 @@ namespace Artemis.Engine.Graphics
 
                 RecalculateTargetTransform();
             }
-
-            // Get all the renderable objects.
-            var renderables = GetCameraVisibleRenderables();
-
-            // Create the predicate that checks if a given renderable is visible.
-            isVisibleToCameraPredicate = null; // if null, then every renderable is visible.
-            if (!(Camera is NullCamera))
-            {
-                var hashSet = (HashSet<RenderableObject>)renderables;
-                isVisibleToCameraPredicate = obj => hashSet.Contains(obj);
-            }
-        }
-
-        /// <summary>
-        /// Called directly after "SetupLayerTarget" and directly before any rendering.
-        /// </summary>
-        protected override void PostSetupLayerTarget()
-        {
-            rp.SetRenderProperties(m: Camera.WorldToTargetTransform);
-            rp.LockMatrix();
         }
 
         /// <summary>
@@ -418,7 +299,7 @@ namespace Artemis.Engine.Graphics
             rp.SetRenderProperties(
                 SpriteSortMode.Immediate,
                 BlendState.AlphaBlend,
-                m: _targetTransform);
+                m: TargetToScreenTransform);
 
             rp.Render(LayerTarget, Vector2.Zero);
 
@@ -430,7 +311,7 @@ namespace Artemis.Engine.Graphics
         /// </summary>
         protected override void PostRender()
         {
-            if (_requiresTargetTransformRecalc)
+            if (RequiresTargetTransformRecalc)
             {
                 if (_newLayerScaleType.HasValue)
                     _layerScaleType = _newLayerScaleType.Value;

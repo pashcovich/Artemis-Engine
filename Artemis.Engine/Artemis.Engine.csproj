@@ -47,10 +47,13 @@
     <Compile Include="Assets\AssetImportException.cs" />
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
+    <Compile Include="Fixin.cs" />
+    <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
+    <Compile Include="Fixins\TextureFixin.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
@@ -88,8 +91,9 @@
     <Compile Include="Graphics\LayerManager.cs" />
     <Compile Include="Graphics\NullCamera.cs" />
     <Compile Include="Graphics\RenderableGroup.cs" />
-    <Compile Include="Graphics\RenderComponents.cs" />
-    <Compile Include="Graphics\RenderLayer.cs" />
+    <Compile Include="Graphics\ResolutionRelativeRenderLayer.cs" />
+    <Compile Include="Graphics\SpriteProperties.cs" />
+    <Compile Include="Graphics\WorldRenderLayer.cs" />
     <Compile Include="Assets\IAssetImporter.cs" />
     <Compile Include="DisplayManager.cs" />
     <Compile Include="DisplayManagerException.cs" />
@@ -109,14 +113,14 @@
     <Compile Include="Persistence\OptionValidator.cs" />
     <Compile Include="Persistence\SimpleOptionRecord.cs" />
     <Compile Include="Persistence\UserOptions.cs" />
-    <Compile Include="PhysicalObject.cs" />
+    <Compile Include="PhysicalForm.cs" />
+    <Compile Include="PositionalForm.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
     <Compile Include="ResolutionRelativeObject.cs" />
     <Compile Include="ResolutionScaleRules.cs" />
     <Compile Include="ResolutionScaleType.cs" />
     <Compile Include="UpdatableObject.cs" />
-    <Compile Include="Updater.cs" />
     <Compile Include="Utilities\Dynamics\ComplexDynamicProperty.cs" />
     <Compile Include="Effectors\Effector.cs" />
     <Compile Include="Effectors\EffectorException.cs" />
@@ -125,11 +129,11 @@
     <Compile Include="Effectors\EffectorOperatorType.cs" />
     <Compile Include="Effectors\EffectorValueType.cs" />
     <Compile Include="Effectors\PresetFunctions.cs" />
-    <Compile Include="Effectors\Special\DoubleEffector.cs" />
-    <Compile Include="Effectors\Special\IntEffector.cs" />
-    <Compile Include="Effectors\Special\VectorEffector.cs" />
-    <Compile Include="Effectors\Special\XCoordEffector.cs" />
-    <Compile Include="Effectors\Special\YCoordEffector.cs" />
+    <Compile Include="Effectors\DoubleEffector.cs" />
+    <Compile Include="Effectors\IntEffector.cs" />
+    <Compile Include="Effectors\VectorEffector.cs" />
+    <Compile Include="Effectors\XCoordEffector.cs" />
+    <Compile Include="Effectors\YCoordEffector.cs" />
     <Compile Include="ManualUpdateAttribute.cs" />
     <Compile Include="GameKernel.cs" />
     <Compile Include="GlobalTimer.cs" />
@@ -183,6 +187,7 @@
     <Compile Include="Utilities\Partial\PartialEngineAdapter.cs" />
     <Compile Include="Utilities\Partial\PartialEngineAttribute.cs" />
     <Compile Include="Utilities\Serialize\AbstractStringSerializer.cs" />
+    <Compile Include="Utilities\TraversalOptions.cs" />
     <Compile Include="Utilities\UriTree\UriTreeGroup.cs" />
     <Compile Include="Utilities\UriTree\UriTreeException.cs" />
     <Compile Include="Utilities\UriTree\UriTreeMutableGroup.cs" />
@@ -209,7 +214,10 @@
       <Name>Farseer Physics MonoGame</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Effectors\Paths\" />
+    <Folder Include="Forms\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

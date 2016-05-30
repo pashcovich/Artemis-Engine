@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using System;
@@ -12,7 +13,16 @@ namespace Artemis.Engine.Graphics
     public class RenderableGroup : UriTreeMutableGroup<RenderableGroup, RenderableObject>
     {
 
-        public RenderableGroup(string name) : base(name) { }
+        public RenderableGroup(string name) : base(name) 
+        {
+            OnItemAdded += OnRenderableAdded;
+        }
+
+        private void OnRenderableAdded(string name, RenderableObject obj)
+        {
+            obj._renderableGroup = this;
+            obj._renderableName = name;
+        }
 
         /// <summary>
         /// Return all top level renderable objects in this group (i.e. no objects that
@@ -47,6 +57,10 @@ namespace Artemis.Engine.Graphics
             {
                 renderables.Add(item);
             }
+            foreach (var item in AnonymousItems)
+            {
+                renderables.Add(item);
+            }
         }
 
         /// <summary>
@@ -65,6 +79,13 @@ namespace Artemis.Engine.Graphics
                     continue;
                 renderAction(item);
             }
+
+            foreach (var item in AnonymousItems)
+            {
+                if (skipDuplicates && seenRenderables.Contains(item))
+                    continue;
+                renderAction(item);
+            }
         }
 
         /// <summary>
@@ -75,7 +96,7 @@ namespace Artemis.Engine.Graphics
         /// <param name="seenRenderables">The list of RenderableObjects already seen by the layer in this render cycle.</param>
         /// <param name="seenGroups">The list of RenderableGroups already seen by the layer in this render cycle.</param>
         /// <param name="skipDuplicates">Whether or not to skip duplicate items/subgroups (if they're present in the seenRenderables/seenGroups lists).</param>
-        public virtual void Render( RenderOrder.RenderTraversalOptions options
+        public virtual void Render( TraversalOptions options
                                   , RenderableHandler renderAction
                                   , HashSet<RenderableObject> seenRenderables
                                   , HashSet<RenderableGroup> seenGroups
@@ -83,13 +104,13 @@ namespace Artemis.Engine.Graphics
         {
             switch (options)
             {
-                case RenderOrder.RenderTraversalOptions.Top:
+                case TraversalOptions.Top:
                     if (!(skipDuplicates && seenGroups.Contains(this)))
                     {
                         RenderTop(renderAction, seenRenderables, skipDuplicates);
                     }
                     break;
-                case RenderOrder.RenderTraversalOptions.AllPre:
+                case TraversalOptions.Pre:
                     foreach (var subgroup in Subnodes.Values)
                     {
                         subgroup.Render(options, renderAction, seenRenderables, seenGroups, skipDuplicates);
@@ -99,7 +120,7 @@ namespace Artemis.Engine.Graphics
                         RenderTop(renderAction, seenRenderables, skipDuplicates);
                     }
                     break;
-                case RenderOrder.RenderTraversalOptions.AllPost:
+                case TraversalOptions.Post:
                     if (!(skipDuplicates && seenGroups.Contains(this)))
                         RenderTop(renderAction, seenRenderables, skipDuplicates);
                     foreach (var subgroup in Subnodes.Values)

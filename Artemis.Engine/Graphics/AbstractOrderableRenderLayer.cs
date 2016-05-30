@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Utilities;
 using Artemis.Engine.Utilities.UriTree;
 
 using Microsoft.Xna.Framework;
@@ -40,7 +41,7 @@ namespace Artemis.Engine.Graphics
         /// 
         /// Note: If RenderOrder is not null, this value is not used.
         /// </summary>
-        public RenderOrder.RenderTraversalOptions GlobalTraversalOptions;
+        public TraversalOptions GlobalTraversalOptions;
 
         /// <summary>
         /// The list of actions representing the render order.
@@ -55,10 +56,13 @@ namespace Artemis.Engine.Graphics
             }
         }
 
+        private Dictionary<Type, LayerRenderOrderActionHandler> UnknownRenderOrderActionHandlers
+            = new Dictionary<Type, LayerRenderOrderActionHandler>();
+
         public AbstractOrderableRenderLayer(string fullName)
             : base(UriUtilities.GetLastPart(fullName))
         {
-            GlobalTraversalOptions = RenderOrder.RenderTraversalOptions.AllPre;
+            GlobalTraversalOptions = TraversalOptions.Pre;
         }
 
         /// <summary>
@@ -138,6 +142,37 @@ namespace Artemis.Engine.Graphics
         }
 
         /// <summary>
+        /// Register a custom RenderOrderActionHandler to be invoked when an 
+        /// AbstractRenderOrderAction of type "T" is encountered.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
+        public void RegisterRenderOrderActionHandler<T>(LayerRenderOrderActionHandler handler)
+            where T : RenderOrder.AbstractRenderOrderAction
+        {
+            RegisterRenderOrderActionHandler(typeof(T), handler);
+        }
+
+        /// <summary>
+        /// Register a custom RenderOrderActionHandler to be invoked when an 
+        /// AbstractRenderOrderAction of the given type is encountered.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="handler"></param>
+        public void RegisterRenderOrderActionHandler(Type type, LayerRenderOrderActionHandler handler)
+        {
+            if (!type.IsSubclassOf(typeof(RenderOrder.AbstractRenderOrderAction)))
+            {
+                throw new RenderOrderException(
+                    String.Format(
+                        "Cannot specify RenderOrderAction handler for type '{0}'." +
+                        "The given type must be a subclass of '{1}'.",
+                        type, typeof(RenderOrder.AbstractRenderOrderAction)));
+            }
+            UnknownRenderOrderActionHandlers.Add(type, handler);
+        }
+
+        /// <summary>
         /// Get the RenderableHandler, which determines how to handle each encountered
         /// RenderableObject.
         /// </summary>
@@ -197,7 +232,18 @@ namespace Artemis.Engine.Graphics
                                     "RenderOrder for layer '{0}'. This RenderOrderAction can only " +
                                     "be used in a LayerManager's render order.", FullName));
                         default:
-                            HandleUnknownRenderOrderAction(item, renderableHandler);
+                            var handled = false;
+                            if (UnknownRenderOrderActionHandlers.Count > 0)
+                            {
+                                var type = item.GetType();
+                                if (UnknownRenderOrderActionHandlers.ContainsKey(type))
+                                {
+                                    UnknownRenderOrderActionHandlers[type](this, item, renderableHandler);
+                                    handled = true;
+                                }
+                            }
+                            if (!handled)
+                                HandleUnknownRenderOrderAction(item, renderableHandler);
                             break;
                     }
                 }
