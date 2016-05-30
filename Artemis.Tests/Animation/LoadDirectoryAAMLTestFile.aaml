@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Animation>
+	<SpriteSheet>
+		<LoadDirectory Name="Gordon Freeman/shotgun/idle" TileGroup="Idle"/>
+	</SpriteSheet>
+  
+	<AnimationMap InitState="Idle">
+    <AnimationState Name="Idle">
+      <Frames>Idle.0</Frames>
+    </AnimationState>
+	</AnimationMap>
+</Animation>

@@ -96,10 +96,6 @@ namespace Artemis.Engine.Graphics.Animation
 
                     case TILE_GROUP:
                         GroupName = element.Value;
-                        if (!GroupName.Equals(string.Empty))
-                        {
-                            GroupName += ".";
-                        }
                         break;
 
                     case TOP_LEFT:
