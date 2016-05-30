@@ -67,7 +67,7 @@ namespace Artemis.Engine.Graphics.Animation
             foreach (XmlAttribute attrib in element.Attributes)
             {
                 if (attrib.Name == INIT_STATE)
-                    InitState = attrib.Value + ".";
+                    InitState = attrib.Value;
             }
         }
     }
