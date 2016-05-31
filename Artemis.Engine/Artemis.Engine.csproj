@@ -47,6 +47,7 @@
     <Compile Include="Assets\AssetImportException.cs" />
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
+    <Compile Include="BodyConstructor.cs" />
     <Compile Include="Fixin.cs" />
     <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
