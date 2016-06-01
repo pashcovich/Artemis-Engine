@@ -216,19 +216,19 @@ namespace Artemis.Engine
             return this;
         }
 
-        public BodyConstructor IsStatic()
+        public BodyConstructor AsStatic()
         {
             BodyType = FarseerPhysics.Dynamics.BodyType.Static;
             return this;
         }
 
-        public BodyConstructor IsKinematic()
+        public BodyConstructor AsKinematic()
         {
             BodyType = FarseerPhysics.Dynamics.BodyType.Kinematic;
             return this;
         }
 
-        public BodyConstructor IsDynamic()
+        public BodyConstructor AsDynamic()
         {
             BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
             return this;
