@@ -87,8 +87,6 @@ namespace Artemis.Engine.Graphics
             RecalculateTargetTransform();
         }
 
-        
-
         /// <summary>
         /// Recalculate the TargetToScreenTransform matrix (required when resolution changes).
         /// </summary>

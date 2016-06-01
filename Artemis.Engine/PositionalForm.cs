@@ -74,9 +74,41 @@ namespace Artemis.Engine
             }
         }
 
+        public PositionalForm() : this(null) { }
+
         public PositionalForm(string name) : base(name)
         {
             OnLayerTargetChanged += _UpdateScreenPosition;
+        }
+
+        public PositionalForm(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+            : this(null, position, positionType) { }
+
+        public PositionalForm(
+            string name, Vector2 position, PositionType positionType = PositionType.TargetSpace)
+            : this(name)
+        {
+            SetPosition(position, positionType);
+        }
+
+        public virtual void SetPosition(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+        {
+            switch (positionType)
+            {
+                case PositionType.TargetSpace:
+                    TargetPosition = position;
+                    break;
+                case PositionType.ScreenSpace:
+                    ScreenPosition = position;
+                    break;
+                case PositionType.WorldSpace:
+                    throw new FormException(
+                        String.Format(
+                            "Cannot set the WorldPosition on PositionalForm '{0}'.",
+                            Anonymous ? (object)this : Name));
+                default:
+                    throw new FormException(String.Format("Unknown PositionType '{0}'.", positionType));
+            }
         }
 
         private void _UpdateScreenPosition( RenderTarget2D previousTarget

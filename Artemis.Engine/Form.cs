@@ -59,6 +59,8 @@ namespace Artemis.Engine
         /// </summary>
         public Action OnAddedToMultiform { get; protected set; }
 
+        public Form() : this(null) { }
+
         public Form(string name)
             : base() 
         { 

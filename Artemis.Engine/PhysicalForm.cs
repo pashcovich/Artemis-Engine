@@ -10,6 +10,8 @@ using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using System;
+
 #endregion
 
 namespace Artemis.Engine
@@ -53,6 +55,9 @@ namespace Artemis.Engine
             get { return _body; }
             set
             {
+                if (value == null)
+                    throw new NullReferenceException(
+                        string.Format("Cannot set null Body on Form '{0}'.", Anonymous ? (object)this : Name));
                 _body = value;
                 _body.UserData = this; // We use the UserData of a body to give a forward reference to the
                 // Artemis.Engine.PhysicalForm instance it belongs to.
@@ -90,7 +95,31 @@ namespace Artemis.Engine
                     Body.Position = cam.TargetToWorld(value);
             }
         }
+
+        public PhysicalForm() : base() { }
+
+        public PhysicalForm(Body body) : this(null, body) { }
         
         public PhysicalForm(string name) : base(name) { }
+
+        public PhysicalForm(BodyConstructor constructor)
+            : this(constructor.Construct()) { }
+
+        public PhysicalForm(string name, BodyConstructor constructor)
+            : this(name, constructor.Construct()) { }
+
+        public PhysicalForm(string name, Body body)
+            : base(name)
+        {
+            Body = body;
+        }
+
+        public sealed override void SetPosition(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+        {
+            if (positionType == PositionType.WorldSpace)
+                WorldPosition = position;
+            else
+                base.SetPosition(position, positionType);
+        }
     }
 }
