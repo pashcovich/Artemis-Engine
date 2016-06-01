@@ -1,17 +1,12 @@
 ﻿#region Using Statements
 
-using FarseerPhysics;
-using FarseerPhysics.Collision;
 using FarseerPhysics.Collision.Shapes;
-using FarseerPhysics.Common;
 using FarseerPhysics.Dynamics;
 
 using Microsoft.Xna.Framework;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.Serialization;
 
 #endregion
@@ -31,47 +26,46 @@ namespace Artemis.Engine
     {
         private class FixtureData
         {
-            public float? Restitution;
-            public float? Friction;
+            public Shape     Shape;
+            public float?    Restitution;
+            public float?    Friction;
             public Category? CollisionCategories;
             public Category? CollidesWith;
             public Category? IgnoreCCDWith;
-            public short? CollisionGroup;
-            public bool? IsSensor;
-            public AfterCollisionEventHandler AfterCollision;
+            public short?    CollisionGroup;
+            public bool?     IsSensor;
+
+            public AfterCollisionEventHandler  AfterCollision;
             public BeforeCollisionEventHandler BeforeCollision;
-            public OnCollisionEventHandler OnCollision;
-            public OnSeparationEventHandler OnSeparation;
-            public Shape Shape;
+            public OnCollisionEventHandler     OnCollision;
+            public OnSeparationEventHandler    OnSeparation;
         }
 
-        public World World { get; private set; }
-        public BodyType? BodyType { get; private set; }
-        public List<Shape> Shapes { get; private set; }
-        public int? IslandIndex { get; private set; }
-        public float? GravityScale { get; private set; }
-        public Vector2? InitialLinearVelocity { get; private set; }
-        public float? InitialAngularVelocity { get; private set; }
-        public float? LinearDamping { get; private set; }
-        public float? AngularDamping { get; private set; }
-        public bool? IsBullet { get; private set; }
-        public bool? SleepingAllowed { get; private set; }
-        public bool? InitiallyAwake { get; private set; }
-        public bool? InitiallyEnabled { get; private set; }
-        public bool? FixedRotation { get; private set; }
-        public bool? IgnoreCCD { get; private set; }
-        public Vector2? Position { get; private set; }
-        public float? Rotation { get; private set; }
-        public bool? IgnoreGravity { get; private set; }
-        public Vector2? LocalCenter { get; private set; }
-        public float? Mass { get; private set; }
-        public float? Inertia { get; private set; }
+        public World       World                  { get; private set; }
+        public BodyType?   BodyType               { get; private set; }
+        public List<Shape> Shapes                 { get; private set; }
+        public int?        IslandIndex            { get; private set; }
+        public float?      GravityScale           { get; private set; }
+        public Vector2?    InitialLinearVelocity  { get; private set; }
+        public float?      InitialAngularVelocity { get; private set; }
+        public float?      LinearDamping          { get; private set; }
+        public float?      AngularDamping         { get; private set; }
+        public bool?       IsBullet               { get; private set; }
+        public bool?       SleepingAllowed        { get; private set; }
+        public bool?       InitiallyAwake         { get; private set; }
+        public bool?       InitiallyEnabled       { get; private set; }
+        public bool?       FixedRotation          { get; private set; }
+        public bool?       IgnoreCCD              { get; private set; }
+        public Vector2?    Position               { get; private set; }
+        public float?      Rotation               { get; private set; }
+        public bool?       IgnoreGravity          { get; private set; }
+        public Vector2?    LocalCenter            { get; private set; }
+        public float?      Mass                   { get; private set; }
+        public float?      Inertia                { get; private set; }
 
         private FixtureData anonymousFixtureData = new FixtureData();
         private Dictionary<string, FixtureData> fixtureBuilderData
             = new Dictionary<string, FixtureData>();
-
-        private bool? fixtureSpecificShapes;
 
         public BodyConstructor() : this(null) { }
 
@@ -79,7 +73,6 @@ namespace Artemis.Engine
         {
             World = world;
             Shapes = new List<Shape>();
-            fixtureSpecificShapes = null;
         }
 
         public Body Construct()
@@ -141,12 +134,25 @@ namespace Artemis.Engine
 
             if (fixtureBuilderData.Count > 0)
             {
-                foreach (var fixtureData in fixtureBuilderData.Values) // names don't matter other than
-                                                                       // just for specifying which fixture
-                                                                       // certain properties are to be applied
-                                                                       // to.
+                Shape defaultShape = null;
+                if (Shapes.Count > 0)
                 {
-                    var fixture = body.CreateFixture(fixtureData.Shape);
+                    defaultShape = Shapes[0];
+                }
+                foreach (var kvp in fixtureBuilderData)
+                {
+                    var fixtureData = kvp.Value;
+                    Fixture fixture;
+                    if (fixtureData.Shape == null)
+                    {
+                        if (defaultShape == null)
+                            throw new BodyConstructorException(
+                                String.Format(
+                                    "FixtureData with name '{0}' has no associated Shape. Either set " +
+                                    "a default shape using WithShape(Shape), or add a shape specifically " +
+                                    "to this Fixture using WithShape(\"{0}\", Shape).", kvp.Key));
+                    }
+                    fixture = body.CreateFixture(fixtureData.Shape);
                     SetFixtureData(fixture, fixtureData);
                 }
             }
@@ -332,18 +338,18 @@ namespace Artemis.Engine
 
         public BodyConstructor WithShape(Shape shape)
         {
-            if (fixtureSpecificShapes.HasValue && fixtureSpecificShapes.Value)
-                throw new BodyConstructorException();
+            if (fixtureBuilderData.Count > 0 && Shapes.Count > 0)
+                throw new BodyConstructorException(
+                    "Ambiguous Body definition; multiple unnamed shapes and multiple " +
+                    "named fixtures supplied. Either have a single, unnamed default shape, " +
+                    "or supply each named fixture with a specific shape.");
+
             Shapes.Add(shape);
-            fixtureSpecificShapes = false;
             return this;
         }
 
         public BodyConstructor WithShape(string fixtureName, Shape shape)
         {
-            if (fixtureSpecificShapes.HasValue && !fixtureSpecificShapes.Value)
-                throw new BodyConstructorException();
-
             if (fixtureBuilderData.ContainsKey(fixtureName))
             {
                 var newData = new FixtureData { Shape = shape };
@@ -351,8 +357,6 @@ namespace Artemis.Engine
             }
             else
                 fixtureBuilderData[fixtureName].Shape = shape;
-
-            fixtureSpecificShapes = true;
             return this;
         }
 

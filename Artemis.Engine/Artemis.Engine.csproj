@@ -56,6 +56,7 @@
     <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="Fixins\TextureFixin.cs" />
     <Compile Include="Form.cs" />
+    <Compile Include="FormException.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
     <Compile Include="Graphics\AbstractOrderableRenderLayer.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Persistence\UserOptions.cs" />
     <Compile Include="PhysicalForm.cs" />
     <Compile Include="PositionalForm.cs" />
+    <Compile Include="PositionType.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
     <Compile Include="ResolutionRelativeObject.cs" />
