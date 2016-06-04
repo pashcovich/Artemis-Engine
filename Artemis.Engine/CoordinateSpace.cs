@@ -1,7 +1,7 @@
 ﻿
 namespace Artemis.Engine
 {
-    public enum PositionType
+    public enum CoordinateSpace
     {
         ScreenSpace,
         TargetSpace,

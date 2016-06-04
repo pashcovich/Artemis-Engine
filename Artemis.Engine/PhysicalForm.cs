@@ -16,12 +16,7 @@ using System;
 
 namespace Artemis.Engine
 {
-    [HasDynamicProperties(new string[] {
-        "WorldPosition", 
-        "TargetPosition", 
-        "RelativeTargetPosition", 
-        "ScreenPosition" 
-    }, true)]
+    [HasDynamicProperties(new string[] { "WorldPosition" })]
     public class PhysicalForm : PositionalForm
     {
         // UNFINISHED
@@ -114,12 +109,29 @@ namespace Artemis.Engine
             Body = body;
         }
 
-        public sealed override void SetPosition(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+        /// <summary>
+        /// Get the position of this form in the given coordinate space.
+        /// </summary>
+        /// <param name="coordinateSpace"></param>
+        /// <returns></returns>
+        public sealed override Vector2 GetPosition(CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
         {
-            if (positionType == PositionType.WorldSpace)
+            if (coordinateSpace == CoordinateSpace.WorldSpace)
+                return WorldPosition;
+            return base.GetPosition(coordinateSpace);
+        }
+
+        /// <summary>
+        /// Set the position of this form.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="coordinateSpace"></param>
+        public sealed override void SetPosition(Vector2 position, CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
+        {
+            if (coordinateSpace == CoordinateSpace.WorldSpace)
                 WorldPosition = position;
             else
-                base.SetPosition(position, positionType);
+                base.SetPosition(position, coordinateSpace);
         }
     }
 }

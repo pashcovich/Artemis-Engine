@@ -1,17 +1,22 @@
 ﻿#region Using Statements
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Artemis.Engine.Utilities.Dynamics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using System;
 
 #endregion
 
 namespace Artemis.Engine
 {
-    public class PositionalForm : Form
+    [HasDynamicProperties(new string[] { 
+        "TargetPosition",
+        "ScreenPosition",
+        "RelativeTargetPosition"
+        }, true)]
+    public class PositionalForm : Form, IPositional
     {
         /// <summary>
         /// The position on the LayerTarget.
@@ -81,37 +86,17 @@ namespace Artemis.Engine
             OnLayerTargetChanged += _UpdateScreenPosition;
         }
 
-        public PositionalForm(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+        public PositionalForm(Vector2 position, CoordinateSpace positionType = CoordinateSpace.TargetSpace)
             : this(null, position, positionType) { }
 
         public PositionalForm(
-            string name, Vector2 position, PositionType positionType = PositionType.TargetSpace)
+            string name, Vector2 position, CoordinateSpace positionType = CoordinateSpace.TargetSpace)
             : this(name)
         {
             SetPosition(position, positionType);
         }
 
-        public virtual void SetPosition(Vector2 position, PositionType positionType = PositionType.TargetSpace)
-        {
-            switch (positionType)
-            {
-                case PositionType.TargetSpace:
-                    TargetPosition = position;
-                    break;
-                case PositionType.ScreenSpace:
-                    ScreenPosition = position;
-                    break;
-                case PositionType.WorldSpace:
-                    throw new FormException(
-                        String.Format(
-                            "Cannot set the WorldPosition on PositionalForm '{0}'.",
-                            Anonymous ? (object)this : Name));
-                default:
-                    throw new FormException(String.Format("Unknown PositionType '{0}'.", positionType));
-            }
-        }
-
-        private void _UpdateScreenPosition( RenderTarget2D previousTarget
+        private void _UpdateScreenPosition(RenderTarget2D previousTarget
                                           , RenderTarget2D currentTarget)
         {
             if (UseTargetRelativePositioning)
@@ -119,6 +104,54 @@ namespace Artemis.Engine
                 // This will reset the World position to match the new Target bounds, whilst keeping the
                 // RelativeTargetPosition constant (which is what we want when using TargetRelativePositioning).
                 RelativeTargetPosition = _relativeTargetPosMemo;
+            }
+        }
+
+        /// <summary>
+        /// Get the position of this form in the given coordinate space.
+        /// </summary>
+        /// <param name="coordinateSpace"></param>
+        /// <returns></returns>
+        public virtual Vector2 GetPosition(CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
+        {
+            switch (coordinateSpace)
+            {
+                case CoordinateSpace.TargetSpace:
+                    return TargetPosition;
+                case CoordinateSpace.ScreenSpace:
+                    return ScreenPosition;
+                case CoordinateSpace.WorldSpace:
+                    throw new FormException(
+                        String.Format(
+                            "Cannot get the WorldPosition on PositionalForm '{0}'.",
+                            Anonymous ? (object)this : Name));
+                default:
+                    throw new FormException(String.Format("Unknown CoordinateSpace '{0}'.", coordinateSpace));
+            }
+        }
+
+        /// <summary>
+        /// Set the position of this form.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="coordinateSpace"></param>
+        public virtual void SetPosition(Vector2 position, CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
+        {
+            switch (coordinateSpace)
+            {
+                case CoordinateSpace.TargetSpace:
+                    TargetPosition = position;
+                    break;
+                case CoordinateSpace.ScreenSpace:
+                    ScreenPosition = position;
+                    break;
+                case CoordinateSpace.WorldSpace:
+                    throw new FormException(
+                        String.Format(
+                            "Cannot set the WorldPosition on PositionalForm '{0}'.",
+                            Anonymous ? (object)this : Name));
+                default:
+                    throw new FormException(String.Format("Unknown CoordinateSpace '{0}'.", coordinateSpace));
             }
         }
     }

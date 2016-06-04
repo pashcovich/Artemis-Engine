@@ -104,6 +104,7 @@
     <Compile Include="Graphics\RenderOrderException.cs" />
     <Compile Include="Graphics\TextureOrigins.cs" />
     <Compile Include="Graphics\UniformLayerScaleType.cs" />
+    <Compile Include="IPositional.cs" />
     <Compile Include="Multiforms\Menu\MenuMultiform.cs" />
     <Compile Include="Multiforms\TransitionConstraintsAttribute.cs" />
     <Compile Include="MultipleUpdateException.cs" />
@@ -117,7 +118,7 @@
     <Compile Include="Persistence\UserOptions.cs" />
     <Compile Include="PhysicalForm.cs" />
     <Compile Include="PositionalForm.cs" />
-    <Compile Include="PositionType.cs" />
+    <Compile Include="CoordinateSpace.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
     <Compile Include="ResolutionRelativeObject.cs" />

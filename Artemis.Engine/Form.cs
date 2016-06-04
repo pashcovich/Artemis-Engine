@@ -207,11 +207,15 @@ namespace Artemis.Engine
 
             _midUpdateFixins = false;
 
-            foreach (var fixin in _fixinsToAdd)
-                AttachFixin(fixin);
+            if (_fixinsToAdd.Count > 0)
+            {
+                foreach (var fixin in _fixinsToAdd)
+                    AttachFixin(fixin);
 
-            _fixinsToAdd.Clear();
+                _fixinsToAdd.Clear();
+            }
 
+            AddNewFixins();
             RemoveDeadFixins();
         }
 
@@ -230,22 +234,32 @@ namespace Artemis.Engine
 
             _midRenderFixins = false;
 
-            foreach (var fixin in _fixinsToAdd)
-                AttachFixin(fixin);
-
-            _fixinsToAdd.Clear();
-
+            AddNewFixins();
             RemoveDeadFixins();
+        }
+
+        private void AddNewFixins()
+        {
+            if (_fixinsToAdd.Count > 0)
+            {
+                foreach (var fixin in _fixinsToAdd)
+                    AttachFixin(fixin);
+
+                _fixinsToAdd.Clear();
+            }
         }
 
         private void RemoveDeadFixins()
         {
-            foreach (var fixinName in _fixinsToRemove)
+            if (_fixinsToRemove.Count > 0)
             {
-                DetachFixin(null, fixinName);
-            }
+                foreach (var fixinName in _fixinsToRemove)
+                {
+                    DetachFixin(null, fixinName);
+                }
 
-            _fixinsToRemove.Clear();
+                _fixinsToRemove.Clear();
+            }
         }
 
         public override void Kill()
