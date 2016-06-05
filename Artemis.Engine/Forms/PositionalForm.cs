@@ -121,6 +121,8 @@ namespace Artemis.Engine
                     return TargetPosition;
                 case CoordinateSpace.ScreenSpace:
                     return ScreenPosition;
+                case CoordinateSpace.RelativeTargetSpace:
+                    return RelativeTargetPosition;
                 case CoordinateSpace.WorldSpace:
                     throw new FormException(
                         String.Format(
@@ -145,6 +147,9 @@ namespace Artemis.Engine
                     break;
                 case CoordinateSpace.ScreenSpace:
                     ScreenPosition = position;
+                    break;
+                case CoordinateSpace.RelativeTargetSpace:
+                    RelativeTargetPosition = position;
                     break;
                 case CoordinateSpace.WorldSpace:
                     throw new FormException(
