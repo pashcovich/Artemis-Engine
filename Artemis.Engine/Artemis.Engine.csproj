@@ -53,6 +53,8 @@
     <Compile Include="Fixins\BasePhysicalFixin.cs" />
     <Compile Include="Fixins\BasePositionalFixin.cs" />
     <Compile Include="IAttachableToFixin.cs" />
+    <Compile Include="Input\ControlIntent.cs" />
+    <Compile Include="Input\ControlScheme.cs" />
     <Compile Include="Fixins\AbstractFixin.cs" />
     <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
