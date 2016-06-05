@@ -1,5 +1,6 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Fixins;
 using Artemis.Engine.Utilities.Dynamics;
 
 using Microsoft.Xna.Framework;
@@ -16,7 +17,7 @@ namespace Artemis.Engine
         "ScreenPosition",
         "RelativeTargetPosition"
         }, true)]
-    public class PositionalForm : Form, IPositional
+    public class PositionalForm : Form, IPositional, IAttachableToFixin<BasePositionalFixin>
     {
         /// <summary>
         /// The position on the LayerTarget.
@@ -153,6 +154,15 @@ namespace Artemis.Engine
                 default:
                     throw new FormException(String.Format("Unknown CoordinateSpace '{0}'.", coordinateSpace));
             }
+        }
+
+        /// <summary>
+        /// Attach a given fixin to this form.
+        /// </summary>
+        /// <param name="fixin"></param>
+        public void AttachFixin(BasePositionalFixin fixin)
+        {
+            AttachFixin((AbstractFixin)fixin);
         }
     }
 }

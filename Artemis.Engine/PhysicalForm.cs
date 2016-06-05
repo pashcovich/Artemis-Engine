@@ -1,14 +1,12 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Graphics;
-using Artemis.Engine.Utilities;
+using Artemis.Engine.Fixins;
 using Artemis.Engine.Utilities.Dynamics;
 
 using FarseerPhysics;
 using FarseerPhysics.Dynamics;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 using System;
 
@@ -17,7 +15,7 @@ using System;
 namespace Artemis.Engine
 {
     [HasDynamicProperties(new string[] { "WorldPosition" })]
-    public class PhysicalForm : PositionalForm
+    public class PhysicalForm : PositionalForm, IAttachableToFixin<BasePhysicalFixin>
     {
         // UNFINISHED
         /*
@@ -132,6 +130,15 @@ namespace Artemis.Engine
                 WorldPosition = position;
             else
                 base.SetPosition(position, coordinateSpace);
+        }
+
+        /// <summary>
+        /// Attach a given fixin to this form.
+        /// </summary>
+        /// <param name="fixin"></param>
+        public void AttachFixin(BasePhysicalFixin fixin)
+        {
+            AttachFixin((AbstractFixin)fixin);
         }
     }
 }

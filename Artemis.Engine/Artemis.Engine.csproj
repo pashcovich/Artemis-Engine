@@ -48,7 +48,12 @@
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
     <Compile Include="BodyConstructor.cs" />
-    <Compile Include="Fixin.cs" />
+    <Compile Include="Fixins\AbstractGenericFixin.cs" />
+    <Compile Include="Fixins\BaseFixin.cs" />
+    <Compile Include="Fixins\BasePhysicalFixin.cs" />
+    <Compile Include="Fixins\BasePositionalFixin.cs" />
+    <Compile Include="IAttachableToFixin.cs" />
+    <Compile Include="Fixins\AbstractFixin.cs" />
     <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />

@@ -9,7 +9,7 @@ using System;
 
 namespace Artemis.Engine.Fixins
 {
-    public class CollisionMaskFixin : Fixin
+    public class CollisionMaskFixin : AbstractFixin
     {
         public override FixinType FixinType { get { return FixinType.Update; } }
 

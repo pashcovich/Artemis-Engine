@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Artemis.Engine.Fixins
 {
-    public class TextureFixin : Fixin
+    public class TextureFixin : AbstractFixin
     {
         public override FixinType FixinType { get { return FixinType.Render; } }
 

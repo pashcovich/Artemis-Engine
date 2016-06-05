@@ -1,11 +1,11 @@
 ﻿#region Using Statements
 
+using Artemis.Engine.Fixins;
 using Artemis.Engine.Graphics;
 using Artemis.Engine.Multiforms;
-using Artemis.Engine.Utilities.UriTree;
 
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 #endregion
 
@@ -13,12 +13,12 @@ namespace Artemis.Engine
 {
     public delegate void FormDelegate(Form form);
 
-    public class Form : RenderableObject
+    public class Form : RenderableObject, IAttachableToFixin<BaseFixin>
     {
         private bool _midUpdateFixins;
         private bool _midRenderFixins;
 
-        private List<Fixin> _fixinsToAdd = new List<Fixin>();
+        private List<AbstractFixin> _fixinsToAdd = new List<AbstractFixin>();
         private List<string> _fixinsToRemove = new List<string>();
 
         internal FormGroup _formGroup;
@@ -47,12 +47,12 @@ namespace Artemis.Engine
         /// <summary>
         /// The dictionary of fixins whose FixinType is FixinType.Render.
         /// </summary>
-        public Dictionary<string, Fixin> RenderFixins { get; private set; }
+        public Dictionary<string, AbstractFixin> RenderFixins { get; private set; }
 
         /// <summary>
         /// The dictionary of fixins whose FixinType is FixinType.Update.
         /// </summary>
-        public Dictionary<string, Fixin> UpdateFixins { get; private set; }
+        public Dictionary<string, AbstractFixin> UpdateFixins { get; private set; }
 
         /// <summary>
         /// The delegate invoked when this form has been added to a multiform.
@@ -65,8 +65,8 @@ namespace Artemis.Engine
             : base() 
         { 
             Name = name;
-            RenderFixins = new Dictionary<string, Fixin>();
-            UpdateFixins = new Dictionary<string, Fixin>();
+            RenderFixins = new Dictionary<string, AbstractFixin>();
+            UpdateFixins = new Dictionary<string, AbstractFixin>();
 
             RequiredUpdater += UpdateAllFixins;
             RequiredRenderer += RenderAllFixins;
@@ -76,7 +76,16 @@ namespace Artemis.Engine
         /// Attach a given fixin to this form.
         /// </summary>
         /// <param name="fixin"></param>
-        public void AttachFixin(Fixin fixin)
+        public void AttachFixin(BaseFixin fixin)
+        {
+            AttachFixin((AbstractFixin)fixin);
+        }
+
+        /// <summary>
+        /// Attach a given fixin to this form.
+        /// </summary>
+        /// <param name="fixin"></param>
+        protected internal void AttachFixin(AbstractFixin fixin)
         {
             if (fixin == null)
                 throw new ArgumentNullException(
@@ -90,7 +99,7 @@ namespace Artemis.Engine
                     else
                     {
                         RenderFixins.Add(fixin.Name, fixin);
-                        fixin.Form = this;
+                        fixin._form = this;
                         attached = true;
                     }
                     break;
@@ -100,7 +109,7 @@ namespace Artemis.Engine
                     else
                     {
                         UpdateFixins.Add(fixin.Name, fixin);
-                        fixin.Form = this;
+                        fixin._form = this;
                         attached = true;
                     }
                     break;
@@ -111,7 +120,7 @@ namespace Artemis.Engine
                     {
                         RenderFixins.Add(fixin.Name, fixin);
                         UpdateFixins.Add(fixin.Name, fixin);
-                        fixin.Form = this;
+                        fixin._form = this;
                         attached = true;
                     }
                     break;
@@ -123,7 +132,25 @@ namespace Artemis.Engine
             }
         }
 
-        private void DetachFixin(Fixin fixin, string fixinName)
+        /// <summary>
+        /// Detach the given fixin.
+        /// </summary>
+        /// <param name="fixin"></param>
+        public void DetachFixin(AbstractFixin fixin)
+        {
+            DetachFixin(fixin, null);
+        }
+
+        /// <summary>
+        /// Detach the fixin with the given name.
+        /// </summary>
+        /// <param name="fixinName"></param>
+        public void DetachFixin(string fixinName)
+        {
+            DetachFixin(null, fixinName);
+        }
+
+        private void DetachFixin(AbstractFixin fixin, string fixinName)
         {
             if (fixin == null && fixinName == null)
                 throw new ArgumentNullException(
@@ -168,26 +195,7 @@ namespace Artemis.Engine
                         break;
                 }
                 fixin.Kill(false);
-                fixin.Form = null;
             }
-        }
-
-        /// <summary>
-        /// Detach the given fixin.
-        /// </summary>
-        /// <param name="fixin"></param>
-        public void DetachFixin(Fixin fixin)
-        {
-            DetachFixin(fixin, null);
-        }
-
-        /// <summary>
-        /// Detach the fixin with the given name.
-        /// </summary>
-        /// <param name="fixinName"></param>
-        public void DetachFixin(string fixinName)
-        {
-            DetachFixin(null, fixinName);
         }
 
         /// <summary>
