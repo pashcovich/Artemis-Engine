@@ -60,6 +60,8 @@ namespace Artemis.Engine
             }
         }
 
+        // Don't want to directly inherit from RenderableObject to prevent the ability to add
+        // Fixins to Layers.
         #region Directly Copied from RenderableObject
 
         /// <summary>
