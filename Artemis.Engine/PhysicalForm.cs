@@ -1,14 +1,12 @@
 ﻿#region Using Statements
 
-using Artemis.Engine.Graphics;
-using Artemis.Engine.Utilities;
+using Artemis.Engine.Fixins;
 using Artemis.Engine.Utilities.Dynamics;
 
 using FarseerPhysics;
 using FarseerPhysics.Dynamics;
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 using System;
 
@@ -16,13 +14,8 @@ using System;
 
 namespace Artemis.Engine
 {
-    [HasDynamicProperties(new string[] {
-        "WorldPosition", 
-        "TargetPosition", 
-        "RelativeTargetPosition", 
-        "ScreenPosition" 
-    }, true)]
-    public class PhysicalForm : PositionalForm
+    [HasDynamicProperties(new string[] { "WorldPosition" })]
+    public class PhysicalForm : PositionalForm, IAttachableToFixin<BasePhysicalFixin>
     {
         // UNFINISHED
         /*
@@ -114,12 +107,38 @@ namespace Artemis.Engine
             Body = body;
         }
 
-        public sealed override void SetPosition(Vector2 position, PositionType positionType = PositionType.TargetSpace)
+        /// <summary>
+        /// Get the position of this form in the given coordinate space.
+        /// </summary>
+        /// <param name="coordinateSpace"></param>
+        /// <returns></returns>
+        public sealed override Vector2 GetPosition(CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
         {
-            if (positionType == PositionType.WorldSpace)
+            if (coordinateSpace == CoordinateSpace.WorldSpace)
+                return WorldPosition;
+            return base.GetPosition(coordinateSpace);
+        }
+
+        /// <summary>
+        /// Set the position of this form.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="coordinateSpace"></param>
+        public sealed override void SetPosition(Vector2 position, CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace)
+        {
+            if (coordinateSpace == CoordinateSpace.WorldSpace)
                 WorldPosition = position;
             else
-                base.SetPosition(position, positionType);
+                base.SetPosition(position, coordinateSpace);
+        }
+
+        /// <summary>
+        /// Attach a given fixin to this form.
+        /// </summary>
+        /// <param name="fixin"></param>
+        public void AttachFixin(BasePhysicalFixin fixin)
+        {
+            AttachFixin((AbstractFixin)fixin);
         }
     }
 }

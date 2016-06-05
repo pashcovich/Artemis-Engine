@@ -15,7 +15,7 @@ namespace Artemis.Engine
     }
 
     [ManualUpdate]
-    public abstract class Fixin : ArtemisObject
+    public abstract class AbstractFixin : ArtemisObject
     {
         /// <summary>
         /// The fixin type. This determines how the Form it's attached to handles it.
@@ -25,12 +25,12 @@ namespace Artemis.Engine
         /// <summary>
         /// The form this fixin is attached to.
         /// </summary>
-        public Form Form { get; internal set; }
+        internal Form _form;
 
         /// <summary>
         /// Whether or not this fixin is attached to a form.
         /// </summary>
-        public bool Attached { get { return Form != null; } }
+        public bool Attached { get { return _form != null; } }
 
         /// <summary>
         /// Whether or not this fixin is active (i.e. effects the form it's attached to).
@@ -48,9 +48,9 @@ namespace Artemis.Engine
         /// </summary>
         public Action OnAttachToForm { get; protected set; }
 
-        public Fixin(string name) : this(name, null) { }
+        public AbstractFixin(string name) : this(name, null) { }
 
-        public Fixin(string name, Form form)
+        public AbstractFixin(string name, Form form)
             : base()
         {
             Name = name;
@@ -60,24 +60,8 @@ namespace Artemis.Engine
             }
         }
 
-        /// <summary>
-        /// Attach this fixin to the given form.
-        /// </summary>
-        /// <param name="form"></param>
-        public void AttachTo(Form form)
-        {
-            form.AttachFixin(this);
-        }
-
-        /// <summary>
-        /// Detach this fixin from the given form.
-        /// </summary>
-        /// <param name="form"></param>
-        public void DetachFrom(Form form)
-        {
-            form.DetachFixin(this);
-        }
-
+        // Don't want to directly inherit from RenderableObject to prevent the ability to add
+        // Fixins to Layers.
         #region Directly Copied from RenderableObject
 
         /// <summary>
@@ -140,7 +124,8 @@ namespace Artemis.Engine
         {
             if (detach)
             {
-                Form.DetachFixin(Name);
+                _form.DetachFixin(Name);
+                _form = null;
             }
 
             Kill();

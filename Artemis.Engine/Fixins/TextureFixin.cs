@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Artemis.Engine.Fixins
 {
-    public class TextureFixin : Fixin
+    public class TextureFixin : BasePositionalFixin
     {
         public override FixinType FixinType { get { return FixinType.Render; } }
 
@@ -17,23 +17,44 @@ namespace Artemis.Engine.Fixins
         /// </summary>
         public Texture2D Texture;
 
+        /// <summary>
+        /// The coordinate space from which to get the position of the texture.
+        /// </summary>
+        public CoordinateSpace CoordinateSpace;
+
         #region Constructors
 
         public TextureFixin(string name) : this(name, (Texture2D)null) { }
 
-        public TextureFixin(string name, string textureName, bool treatAsAssetUri = true)
-            : this(name, textureName, null, treatAsAssetUri) { }
+        public TextureFixin( string name
+                           , string textureName
+                           , bool treatAsAssetUri = true
+                           , CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace )
+            : this(name, textureName, null, treatAsAssetUri, coordinateSpace) { }
 
-        public TextureFixin(string name, Form form) : this(name, null, form) { }
+        public TextureFixin( string name
+                           , PositionalForm form
+                           , CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace )
+            : this(name, null, form, coordinateSpace) { }
 
-        public TextureFixin(string name, Texture2D texture) : this(name, texture, null) { }
+        public TextureFixin( string name
+                           , Texture2D texture
+                           , CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace ) 
+            : this(name, texture, null, coordinateSpace) { }
 
-        public TextureFixin(string name, string textureName, Form form, bool treatAsAssetUri = true)
-            : this(name, AssetLoader.Load<Texture2D>(textureName, treatAsAssetUri), form) { }
+        public TextureFixin( string name
+                           , string textureName
+                           , PositionalForm form
+                           , bool treatAsAssetUri = true
+                           , CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace )
+            : this(name, AssetLoader.Load<Texture2D>(textureName, treatAsAssetUri), form, coordinateSpace) { }
 
         #endregion
 
-        public TextureFixin(string name, Texture2D texture, Form form)
+        public TextureFixin( string name
+                           , Texture2D texture
+                           , PositionalForm form
+                           , CoordinateSpace coordinateSpace = CoordinateSpace.TargetSpace )
             : base(name, form)
         {
             Texture = texture;
@@ -44,11 +65,9 @@ namespace Artemis.Engine.Fixins
         {
             if (Texture != null)
             {
-                /*
                 var properties = Form.SpriteProperties;
                 ArtemisEngine.RenderPipeline.Render(
-                    Texture, Form.WorldPosition, properties);
-                 */
+                    Texture, Form.GetPosition(CoordinateSpace), properties);
             }
         }
     }

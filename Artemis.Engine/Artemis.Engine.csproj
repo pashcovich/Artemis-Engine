@@ -48,7 +48,14 @@
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
     <Compile Include="BodyConstructor.cs" />
-    <Compile Include="Fixin.cs" />
+    <Compile Include="Fixins\AbstractGenericFixin.cs" />
+    <Compile Include="Fixins\BaseFixin.cs" />
+    <Compile Include="Fixins\BasePhysicalFixin.cs" />
+    <Compile Include="Fixins\BasePositionalFixin.cs" />
+    <Compile Include="IAttachableToFixin.cs" />
+    <Compile Include="Input\ControlIntent.cs" />
+    <Compile Include="Input\ControlScheme.cs" />
+    <Compile Include="Fixins\AbstractFixin.cs" />
     <Compile Include="Fixins\CollisionMaskFixin.cs" />
     <Compile Include="Effectors\CoerciveEffector.cs" />
     <Compile Include="Effectors\EffectableObject.cs" />
@@ -104,6 +111,7 @@
     <Compile Include="Graphics\RenderOrderException.cs" />
     <Compile Include="Graphics\TextureOrigins.cs" />
     <Compile Include="Graphics\UniformLayerScaleType.cs" />
+    <Compile Include="IPositional.cs" />
     <Compile Include="Multiforms\Menu\MenuMultiform.cs" />
     <Compile Include="Multiforms\TransitionConstraintsAttribute.cs" />
     <Compile Include="MultipleUpdateException.cs" />
@@ -117,7 +125,7 @@
     <Compile Include="Persistence\UserOptions.cs" />
     <Compile Include="PhysicalForm.cs" />
     <Compile Include="PositionalForm.cs" />
-    <Compile Include="PositionType.cs" />
+    <Compile Include="CoordinateSpace.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
     <Compile Include="ResolutionRelativeObject.cs" />
