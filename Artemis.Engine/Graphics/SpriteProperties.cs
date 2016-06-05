@@ -57,7 +57,7 @@ namespace Artemis.Engine.Graphics
             Tint = colour;
             Rotation = rotation;
             Scale = scale;
-            Origin = origin.HasValue ? origin.Value : TextureOrigins.TopLeft;
+            Origin = origin.HasValue ? origin.Value : PositionOffsets.TopLeft;
             SpriteEffects = effects;
             OriginIsRelative = originIsRelative;
         }
