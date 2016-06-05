@@ -9,7 +9,7 @@ using System;
 
 namespace Artemis.Engine.Fixins
 {
-    public class CollisionMaskFixin : AbstractFixin
+    public class CollisionMaskFixin :  BasePhysicalFixin
     {
         public override FixinType FixinType { get { return FixinType.Update; } }
 
@@ -33,7 +33,7 @@ namespace Artemis.Engine.Fixins
         public CollisionMaskFixin(string name, Shape shape)
             : this(name, null, shape) { }
 
-        public CollisionMaskFixin(string name, Form form, Shape shape)
+        public CollisionMaskFixin(string name, PhysicalForm form, Shape shape)
             : base(name, form)
         {
             _shape = shape;
@@ -44,9 +44,7 @@ namespace Artemis.Engine.Fixins
         {
             if (Attached)
             {
-                /*
                 Form.Body.CreateFixture(_shape);
-                 */
             }
         }
     }
