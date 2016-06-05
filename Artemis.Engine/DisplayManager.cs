@@ -144,6 +144,9 @@ namespace Artemis.Engine
 
         private HashSet<ResolutionRelativeObject> registeredResolutionChangeListeners
             = new HashSet<ResolutionRelativeObject>();
+        private bool iteratingResolutionChangeListeners = false;
+        private List<ResolutionRelativeObject> _toAdd = new List<ResolutionRelativeObject>();
+        private List<ResolutionRelativeObject> _toRemove = new List<ResolutionRelativeObject>();
 
         internal DisplayManager( GameKernel game
                                , RenderPipeline renderPipeline
@@ -167,12 +170,18 @@ namespace Artemis.Engine
 
         internal void RegisterResolutionChangeListener(ResolutionRelativeObject obj)
         {
-            registeredResolutionChangeListeners.Add(obj);
+            if (iteratingResolutionChangeListeners)
+                _toAdd.Add(obj);
+            else
+                registeredResolutionChangeListeners.Add(obj);
         }
 
         internal void RemoveResolutionChangeListener(ResolutionRelativeObject obj)
         {
-            registeredResolutionChangeListeners.Remove(obj);
+            if (iteratingResolutionChangeListeners)
+                _toRemove.Add(obj);
+            else
+                registeredResolutionChangeListeners.Remove(obj);
         }
 
         /// <summary>
@@ -324,10 +333,25 @@ namespace Artemis.Engine
             WindowResolution = resolution;
             dirty = true;
 
+            iteratingResolutionChangeListeners = true;
             foreach (var obj in registeredResolutionChangeListeners)
             {
                 if (obj.OnResolutionChanged != null)
                     obj.OnResolutionChanged(prev, resolution, ResolutionScale);
+            }
+            iteratingResolutionChangeListeners = false;
+
+            if (_toAdd.Count > 0)
+            {
+                foreach (var obj in _toAdd)
+                    registeredResolutionChangeListeners.Add(obj);
+                _toAdd.Clear();
+            }
+            if (_toRemove.Count > 0)
+            {
+                foreach (var obj in _toRemove)
+                    registeredResolutionChangeListeners.Remove(obj);
+                _toRemove.Clear();
             }
         }
 
