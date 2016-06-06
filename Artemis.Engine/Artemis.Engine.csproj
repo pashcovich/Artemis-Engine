@@ -52,6 +52,7 @@
     <Compile Include="Fixins\BaseFixin.cs" />
     <Compile Include="Fixins\BasePhysicalFixin.cs" />
     <Compile Include="Fixins\BasePositionalFixin.cs" />
+    <Compile Include="Graphics\FontProperties.cs" />
     <Compile Include="IAttachableToFixin.cs" />
     <Compile Include="Input\ControlIntent.cs" />
     <Compile Include="Input\ControlScheme.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Graphics\RenderLayerException.cs" />
     <Compile Include="Graphics\RenderOrder.cs" />
     <Compile Include="Graphics\RenderOrderException.cs" />
+    <Compile Include="LayoutDesigner.cs" />
     <Compile Include="PositionOffsets.cs" />
     <Compile Include="Graphics\UniformLayerScaleType.cs" />
     <Compile Include="IPositional.cs" />

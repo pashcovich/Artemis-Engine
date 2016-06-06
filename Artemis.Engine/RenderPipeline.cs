@@ -5,6 +5,8 @@ using Artemis.Engine.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using System.Text;
+
 #endregion
 
 namespace Artemis.Engine
@@ -212,7 +214,7 @@ namespace Artemis.Engine
         /// <param name="texture"></param>
         /// <param name="position"></param>
         /// <param name="sourceRectangle"></param>
-        /// <param name="colour"></param>
+        /// <param name="color"></param>
         /// <param name="rotation"></param>
         /// <param name="origin"></param>
         /// <param name="scale"></param>
@@ -221,17 +223,17 @@ namespace Artemis.Engine
         public void Render( Texture2D texture
                           , Vector2 position
                           , Rectangle? sourceRectangle = null
-                          , Color? colour              = null
+                          , Color? color              = null
                           , double rotation            = 0
                           , Vector2? origin            = null
                           , Vector2? scale             = null
                           , SpriteEffects effects      = SpriteEffects.None
                           , float layerDepth           = 0
-                          , bool originIsRelative      = false)
+                          , bool originIsRelative      = false )
         {
             if (BegunRenderCycle)
             {
-                var _colour = colour.HasValue ? colour.Value : Color.White;
+                var _colour = color.HasValue ? color.Value : Color.White;
                 var _origin = origin.HasValue ? origin.Value : Vector2.Zero;
                 var _scale  = scale.HasValue  ? scale.Value  : Vector2.One;
 
@@ -263,6 +265,86 @@ namespace Artemis.Engine
 
                 SpriteBatch.Draw(
                     texture, position, sourceRectangle, _colour, (float)rotation,
+                    _origin, _scale, effects, layerDepth
+                    );
+            }
+            else
+            {
+                throw new RenderPipelineException(
+                    "Rendering must occur in the render cycle.");
+            }
+        }
+
+        /// <summary>
+        /// Directly render text to the screen.
+        /// </summary>
+        /// <param name="spriteFont"></param>
+        /// <param name="text"></param>
+        /// <param name="position"></param>
+        /// <param name="properties"></param>
+        public void RenderText(SpriteFont spriteFont, StringBuilder text, Vector2 position, FontProperties properties)
+        {
+            RenderText(spriteFont
+                      , text
+                      , position
+                      , properties.Tint
+                      , properties.Rotation
+                      , properties.Origin
+                      , properties.Scale
+                      , properties.SpriteEffects
+                      , originIsRelative: properties.OriginIsRelative );
+        }
+
+        /// <summary>
+        /// Directly render text to the screen.
+        /// </summary>
+        /// <param name="spriteFont"></param>
+        /// <param name="text"></param>
+        /// <param name="position"></param>
+        /// <param name="color"></param>
+        /// <param name="rotation"></param>
+        /// <param name="origin"></param>
+        /// <param name="scale"></param>
+        /// <param name="effects"></param>
+        /// <param name="layerDepth"></param>
+        /// <param name="originIsRelative"></param>
+        public void RenderText( SpriteFont spriteFont
+                              , StringBuilder text
+                              , Vector2 position
+                              , Color? color = null
+                              , double rotation = 0
+                              , Vector2? origin = null
+                              , Vector2? scale = null
+                              , SpriteEffects effects = SpriteEffects.None
+                              , float layerDepth = 0
+                              , bool originIsRelative = false )
+        {
+            if (BegunRenderCycle)
+            {
+                var _color  = color.HasValue ? color.Value : Color.White;
+                var _origin = origin.HasValue ? origin.Value : Vector2.Zero;
+                var _scale  = scale.HasValue ? scale.Value : Vector2.One;
+
+                if (originIsRelative && _origin != Vector2.Zero)
+                {
+                    Vector2 dimensions = spriteFont.MeasureString(text);
+                    _origin = new Vector2(dimensions.X * _origin.X, dimensions.Y * _origin.Y);
+                }
+
+                if (!spriteBatchBegun)
+                {
+                    SpriteBatch.Begin(_spriteSortMode.Value
+                                     , _blendState.Value
+                                     , _samplerState.Value
+                                     , _depthStencilState.Value
+                                     , _rasterizerState.Value
+                                     , _effect.Value
+                                     , _matrix.Value);
+                    spriteBatchBegun = true;
+                }
+
+                SpriteBatch.DrawString(
+                    spriteFont, text, position, _color, (float)rotation, 
                     _origin, _scale, effects, layerDepth
                     );
             }

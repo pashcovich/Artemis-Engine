@@ -43,7 +43,7 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// Effects to apply.
         /// </summary>
-        public SpriteEffects SpriteEffects { get; set; }
+        public SpriteEffects SpriteEffects;
 
         public SpriteProperties( Rectangle? sourceRectangle = null
                                , Color? colour              = null
