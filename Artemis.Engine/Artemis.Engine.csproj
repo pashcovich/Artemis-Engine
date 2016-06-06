@@ -48,6 +48,7 @@
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
     <Compile Include="BodyConstructor.cs" />
+    <Compile Include="BodyExtensions.cs" />
     <Compile Include="Fixins\AbstractGenericFixin.cs" />
     <Compile Include="Fixins\BaseFixin.cs" />
     <Compile Include="Fixins\BasePhysicalFixin.cs" />
