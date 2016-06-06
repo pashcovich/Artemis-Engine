@@ -53,6 +53,8 @@
     <Compile Include="Fixins\BaseFixin.cs" />
     <Compile Include="Fixins\BasePhysicalFixin.cs" />
     <Compile Include="Fixins\BasePositionalFixin.cs" />
+    <Compile Include="Forms\Menu\BaseMenuForm.cs" />
+    <Compile Include="Forms\Menu\ButtonForm.cs" />
     <Compile Include="Graphics\FontProperties.cs" />
     <Compile Include="IAttachableToFixin.cs" />
     <Compile Include="Input\ControlIntent.cs" />
