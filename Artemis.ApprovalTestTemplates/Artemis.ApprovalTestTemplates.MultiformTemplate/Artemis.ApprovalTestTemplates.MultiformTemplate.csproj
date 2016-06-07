@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MultiformTemplate.cs" />
+    <Compile Include="MyForm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,6 +60,10 @@
     <ProjectReference Include="..\..\Artemis.Engine\Artemis.Engine.csproj">
       <Project>{82995a65-f12c-4737-99c1-93ccc29e5456}</Project>
       <Name>Artemis.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Farseer Physics Engine 3.5\Farseer Physics MonoGame.csproj">
+      <Project>{0aad36e3-51a5-4a07-ab60-5c8a66bd38b7}</Project>
+      <Name>Farseer Physics MonoGame</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

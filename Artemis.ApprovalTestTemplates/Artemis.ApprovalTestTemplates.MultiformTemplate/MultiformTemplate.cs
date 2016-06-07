@@ -11,6 +11,8 @@ namespace Artemis.ApprovalTestTemplates.MultiformTemplate
 
         public override void Construct(MultiformConstructionArgs args)
         {
+            var myForm = new MyForm("name");
+
             SetUpdater(MainUpdate);
             SetRenderer(MainRender);
         }

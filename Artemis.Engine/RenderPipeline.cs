@@ -284,7 +284,7 @@ namespace Artemis.Engine
         /// <param name="properties"></param>
         public void RenderText(SpriteFont spriteFont, StringBuilder text, Vector2 position, FontProperties properties)
         {
-            RenderText(spriteFont
+            RenderText( spriteFont
                       , text
                       , position
                       , properties.Tint
