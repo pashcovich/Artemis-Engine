@@ -19,7 +19,7 @@ namespace Artemis.Engine
         public static bool CollidingWithMouse(this Body @this)
         {
             var pos = ConvertUnits.ToSimUnits(ArtemisEngine.Mouse.PositionVector);
-            return @this.FixtureList.Any(f => f.TestPoint(pos));
+            return @this.FixtureList.Any(f => f.TestPoint(ref pos));
         }
     }
 }

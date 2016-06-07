@@ -10,7 +10,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Forms
 {
     [HasDynamicProperties(new string[] { 
         "TargetPosition",
