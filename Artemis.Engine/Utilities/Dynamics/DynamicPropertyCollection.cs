@@ -19,6 +19,9 @@ namespace Artemis.Engine.Utilities.Dynamics
     public class DynamicPropertyCollection
     {
 
+        private static Dictionary<Type, HashSet<PropertyInfo>> knownDynamicProperties
+            = new Dictionary<Type, HashSet<PropertyInfo>>();
+
         private static AttributeMemoService<DynamicPropertyCollection> attrMemoService
             = new AttributeMemoService<DynamicPropertyCollection>();
 
@@ -35,8 +38,15 @@ namespace Artemis.Engine.Utilities.Dynamics
         private void SetupDynamicProperties()
         {
             var type = GetType();
+            HashSet<PropertyInfo> properties;
+            if (knownDynamicProperties.TryGetValue(type, out properties))
+            {
+                foreach (var property in properties)
+                    AddDynamicProperty(property);
+                return;
+            }
             var finalParent = typeof(DynamicPropertyCollection);
-            var properties = new HashSet<PropertyInfo>();
+            properties = new HashSet<PropertyInfo>();
             // THIS IS A TEMPORARY SOLUTION
             // The problem is that "HasDynamicPropertiesAttribute" is "Inheritable" so that
             // the AttributeMemoService can determine if a subclass is decorated with this
@@ -74,6 +84,8 @@ namespace Artemis.Engine.Utilities.Dynamics
             {
                 AddDynamicProperty(property);
             }
+
+            knownDynamicProperties.Add(type, properties);
         }
 
         /// <summary>
