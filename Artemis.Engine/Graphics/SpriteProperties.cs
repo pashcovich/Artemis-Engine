@@ -43,7 +43,7 @@ namespace Artemis.Engine.Graphics
         /// <summary>
         /// Effects to apply.
         /// </summary>
-        public SpriteEffects SpriteEffects { get; set; }
+        public SpriteEffects SpriteEffects;
 
         public SpriteProperties( Rectangle? sourceRectangle = null
                                , Color? colour              = null
@@ -57,7 +57,7 @@ namespace Artemis.Engine.Graphics
             Tint = colour;
             Rotation = rotation;
             Scale = scale;
-            Origin = origin.HasValue ? origin.Value : TextureOrigins.TopLeft;
+            Origin = origin.HasValue ? origin.Value : PositionOffsets.TopLeft;
             SpriteEffects = effects;
             OriginIsRelative = originIsRelative;
         }

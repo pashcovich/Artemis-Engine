@@ -5,6 +5,7 @@ namespace Artemis.Engine
     {
         ScreenSpace,
         TargetSpace,
-        WorldSpace
+        WorldSpace,
+        RelativeTargetSpace
     }
 }

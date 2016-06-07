@@ -15,6 +15,7 @@ namespace Artemis.Engine.Input
     /// </summary>
     public sealed class MouseInput
     {
+        public static readonly MouseButton[] MouseButtons = { MouseButton.Left, MouseButton.Middle, MouseButton.Right };
 
         /// <summary>
         /// The number of frames passed since a mouse button was initially pressed, 
@@ -147,7 +148,7 @@ namespace Artemis.Engine.Input
         }
 
         /// <summary>
-        /// Check if a button is being held down.
+        /// Check if a button is being held down (coincides with IsClicked).
         /// </summary>
         /// <param name="button"></param>
         /// <returns></returns>

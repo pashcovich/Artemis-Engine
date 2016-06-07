@@ -9,7 +9,7 @@ namespace Artemis.Engine.Utilities.Dynamics
     /// <summary>
     /// An attribute representing whether or not a class has DynamicProperties.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class HasDynamicPropertiesAttribute : Attribute
     {
 

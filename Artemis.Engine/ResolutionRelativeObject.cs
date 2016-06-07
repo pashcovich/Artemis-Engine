@@ -37,13 +37,13 @@ namespace Artemis.Engine
         /// Whether or not to maintain the aspect ratio of this object upon dynamically
         /// scaling it to match the current resolution.
         /// </summary>
-        public bool MaintainAspectRatio { get; set; }
+        public bool MaintainAspectRatio;
 
         /// <summary>
         /// Determines how to dynamically scale the object to match the current resolution.
         /// For more information on the definition of individual values, see ResolutionScaleType.
         /// </summary>
-        public ResolutionScaleType ScaleType { get; set; }
+        public ResolutionScaleType ScaleType;
 
         /// <summary>
         /// The ResolutionScaleRules as a single object.

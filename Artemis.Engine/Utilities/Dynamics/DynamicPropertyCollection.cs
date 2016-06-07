@@ -37,6 +37,17 @@ namespace Artemis.Engine.Utilities.Dynamics
             var type = GetType();
             var finalParent = typeof(DynamicPropertyCollection);
             var properties = new HashSet<PropertyInfo>();
+            // THIS IS A TEMPORARY SOLUTION
+            // The problem is that "HasDynamicPropertiesAttribute" is "Inheritable" so that
+            // the AttributeMemoService can determine if a subclass is decorated with this
+            // attribute, but then that means here when we traverse the inheritance tree and
+            // get the HasDynamicPropertiesAttributes for each subclass in the tree, the same
+            // attribute instance can be returned multiple times.
+            //
+            // For example, if A : B and B : C, and C is decorated with a HasDynamicProperties
+            // attribute, then the GetCustomAttribute(HasDynamicPropertiesAttribute) call will
+            // return the attribute on C for BOTH A and B.
+            var seen = new HashSet<string>();
 
             while (type != finalParent)
             {
@@ -47,7 +58,10 @@ namespace Artemis.Engine.Utilities.Dynamics
                 {
                     foreach (var name in attribute.DynamicPropertyNames)
                     {
+                        if (seen.Contains(name))
+                            continue;
                         properties.Add(type.GetProperty(name));
+                        seen.Add(name);
                     }
 
                     if (attribute.Complete)

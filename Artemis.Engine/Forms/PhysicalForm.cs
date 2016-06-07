@@ -12,7 +12,7 @@ using System;
 
 #endregion
 
-namespace Artemis.Engine
+namespace Artemis.Engine.Forms
 {
     [HasDynamicProperties(new string[] { "WorldPosition" })]
     public class PhysicalForm : PositionalForm, IAttachableToFixin<BasePhysicalFixin>
@@ -72,8 +72,9 @@ namespace Artemis.Engine
         {
             get
             {
-                // Camera is never null, instead there's a NullCamera that's automatically supplied.
-                // Also, Camera.WorldToTarget converts units.
+                // What's going on here? Camera is never null, instead there's a 
+                // NullCamera that's automatically supplied. Also, Camera.WorldToTarget
+                // converts units.
                 var cam = Camera;
                 if (cam == null)
                     return ConvertUnits.ToDisplayUnits(Body.Position);

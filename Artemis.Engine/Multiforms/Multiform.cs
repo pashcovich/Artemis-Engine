@@ -38,6 +38,15 @@ namespace Artemis.Engine.Multiforms
             form._formName = null;
         }
 
+        /// <summary>
+        /// Update all the Forms in this form group and it's subgroups, in the order 
+        /// specified by the TraversalOptions.
+        /// 
+        /// You can specify to render only named forms, only anonymous forms, or both 
+        /// using the FormType parameter.
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="formType"></param>
         public void Update(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
         {
             switch (order)
@@ -58,6 +67,11 @@ namespace Artemis.Engine.Multiforms
             }
         }
 
+        /// <summary>
+        /// Update the subgroups of this form group.
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="formType"></param>
         public void UpdateSubgroups(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
         {
             foreach (var subnode in Subnodes.Values)
@@ -66,6 +80,10 @@ namespace Artemis.Engine.Multiforms
             }
         }
 
+        /// <summary>
+        /// Update the forms in this form group.
+        /// </summary>
+        /// <param name="formType"></param>
         public void UpdateTop(FormType formType = FormType.Both)
         {
             switch (formType)

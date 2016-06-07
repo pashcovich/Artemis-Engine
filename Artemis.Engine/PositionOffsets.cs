@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Artemis.Engine.Graphics
 {
-    public static class TextureOrigins
+    public static class PositionOffsets
     {
         public static readonly Vector2 Center = new Vector2(0.5f, 0.5f);
         public static readonly Vector2 TopLeft = new Vector2(0f, 0f);

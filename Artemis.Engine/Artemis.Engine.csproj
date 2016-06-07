@@ -48,10 +48,14 @@
     <Compile Include="Assets\AssetLoadException.cs" />
     <Compile Include="Assets\BuiltinAssetImporter.cs" />
     <Compile Include="BodyConstructor.cs" />
+    <Compile Include="BodyExtensions.cs" />
     <Compile Include="Fixins\AbstractGenericFixin.cs" />
     <Compile Include="Fixins\BaseFixin.cs" />
     <Compile Include="Fixins\BasePhysicalFixin.cs" />
     <Compile Include="Fixins\BasePositionalFixin.cs" />
+    <Compile Include="Forms\Menu\BaseMenuForm.cs" />
+    <Compile Include="Forms\Menu\ButtonForm.cs" />
+    <Compile Include="Graphics\FontProperties.cs" />
     <Compile Include="IAttachableToFixin.cs" />
     <Compile Include="Input\ControlIntent.cs" />
     <Compile Include="Input\ControlScheme.cs" />
@@ -62,7 +66,7 @@
     <Compile Include="Effectors\EffectorFunction.cs" />
     <Compile Include="Effectors\IEffector.cs" />
     <Compile Include="Fixins\TextureFixin.cs" />
-    <Compile Include="Form.cs" />
+    <Compile Include="Forms\Form.cs" />
     <Compile Include="FormException.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameSetupException.cs" />
@@ -109,7 +113,8 @@
     <Compile Include="Graphics\RenderLayerException.cs" />
     <Compile Include="Graphics\RenderOrder.cs" />
     <Compile Include="Graphics\RenderOrderException.cs" />
-    <Compile Include="Graphics\TextureOrigins.cs" />
+    <Compile Include="LayoutDesigner.cs" />
+    <Compile Include="PositionOffsets.cs" />
     <Compile Include="Graphics\UniformLayerScaleType.cs" />
     <Compile Include="IPositional.cs" />
     <Compile Include="Multiforms\Menu\MenuMultiform.cs" />
@@ -123,8 +128,8 @@
     <Compile Include="Persistence\OptionValidator.cs" />
     <Compile Include="Persistence\SimpleOptionRecord.cs" />
     <Compile Include="Persistence\UserOptions.cs" />
-    <Compile Include="PhysicalForm.cs" />
-    <Compile Include="PositionalForm.cs" />
+    <Compile Include="Forms\PhysicalForm.cs" />
+    <Compile Include="Forms\PositionalForm.cs" />
     <Compile Include="CoordinateSpace.cs" />
     <Compile Include="ResolutionChangedDelegate.cs" />
     <Compile Include="ResolutionChangeListener.cs" />
@@ -227,7 +232,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Effectors\Paths\" />
-    <Folder Include="Forms\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
