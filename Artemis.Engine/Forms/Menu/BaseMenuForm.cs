@@ -119,7 +119,7 @@ namespace Artemis.Engine.Forms.Menu
             if (Body == null)
                 return;
             var mousePos = ConvertUnits.ToSimUnits(ArtemisEngine.Mouse.PositionVector);
-            if (Body.CollidingWithMouse())
+            if (Body.CollidingWithMouse(Layer))
             {
                 if (MouseColliding)
                 {
@@ -171,12 +171,8 @@ namespace Artemis.Engine.Forms.Menu
                 if (MouseColliding)
                 {
                     MouseColliding = false;
-#if C_SHARP_6
-                    OnMouseLeave?.Invoke();
-#else
                     if (OnMouseLeave != null)
                         OnMouseLeave();
-#endif              
                     FramesMouseHovered = 0;
                     TimeMouseHovered = 0;
                 }
