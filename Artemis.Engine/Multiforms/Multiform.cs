@@ -11,7 +11,7 @@ using System.Linq;
 namespace Artemis.Engine.Multiforms
 {
 
-    public enum FormType
+    public enum FormNameType
     {
         Named,
         Anonymous,
@@ -47,7 +47,7 @@ namespace Artemis.Engine.Multiforms
         /// </summary>
         /// <param name="order"></param>
         /// <param name="formType"></param>
-        public void Update(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
+        public void Update(TraversalOptions order = TraversalOptions.Pre, FormNameType formType = FormNameType.Both)
         {
             switch (order)
             {
@@ -72,7 +72,7 @@ namespace Artemis.Engine.Multiforms
         /// </summary>
         /// <param name="order"></param>
         /// <param name="formType"></param>
-        public void UpdateSubgroups(TraversalOptions order = TraversalOptions.Pre, FormType formType = FormType.Both)
+        public void UpdateSubgroups(TraversalOptions order = TraversalOptions.Pre, FormNameType formType = FormNameType.Both)
         {
             foreach (var subnode in Subnodes.Values)
             {
@@ -84,23 +84,23 @@ namespace Artemis.Engine.Multiforms
         /// Update the forms in this form group.
         /// </summary>
         /// <param name="formType"></param>
-        public void UpdateTop(FormType formType = FormType.Both)
+        public void UpdateTop(FormNameType formType = FormNameType.Both)
         {
             switch (formType)
             {
-                case FormType.Named:
+                case FormNameType.Named:
                     foreach (var item in Items.Values)
                     {
                         item.Update();
                     }
                     break;
-                case FormType.Anonymous:
+                case FormNameType.Anonymous:
                     foreach (var item in AnonymousItems)
                     {
                         item.Update();
                     }
                     break;
-                case FormType.Both:
+                case FormNameType.Both:
                     foreach (var item in Items.Values)
                     {
                         item.Update();
